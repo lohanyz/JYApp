@@ -1,0 +1,99 @@
+package cn.com.jy.activity;
+
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import cn.com.jy.entity.Trainorder;
+import cn.com.jy.helper.GetTextUtil;
+
+public class PortActivity_Train extends Activity implements OnClickListener,TextView.OnEditorActionListener{
+	private Button btnsubmit,btncancle;
+	private EditText classorderid,	//班列号
+					reportime,		//报数时间
+					tid,			//车号
+					tkind,			//车型
+					oid,			//运输号
+					pertweight,		//单车吨数
+					tformatweight,	//车皮标重
+					stime,			//发时间
+					pertcount;		//单车件数
+	private Trainorder trainOrder;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.port_train);
+		init();
+	}
+	protected void init() {
+		trainOrder=new Trainorder();
+		btnsubmit=(Button) findViewById(R.id.submit);
+		btncancle=(Button) findViewById(R.id.cancle);
+		classorderid=(EditText) findViewById(R.id.classorderid);
+		reportime=(EditText) findViewById(R.id.reportime);
+		tid=(EditText) findViewById(R.id.tid);
+		tkind=(EditText) findViewById(R.id.tkind);
+		oid=(EditText) findViewById(R.id.oid);
+		pertweight=(EditText) findViewById(R.id.pertweight);
+		tformatweight=(EditText) findViewById(R.id.tformatweight);
+		stime=(EditText) findViewById(R.id.stime);
+		pertcount=(EditText) findViewById(R.id.pertcount);
+		classorderid.setOnEditorActionListener(this);
+		reportime.setOnEditorActionListener(this);
+		tid.setOnEditorActionListener(this);
+		tkind.setOnEditorActionListener(this);
+		oid.setOnEditorActionListener(this);
+		pertweight.setOnEditorActionListener(this);
+		tformatweight.setOnEditorActionListener(this);
+		stime.setOnEditorActionListener(this);
+		pertcount.setOnEditorActionListener(this);
+		btnsubmit.setOnClickListener(this);
+		btncancle.setOnClickListener(this);
+	}
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.submit:
+			//需加入输入判定，否则不能跳转
+			trainOrder.setClassorderid(GetTextUtil.getText(classorderid));
+			trainOrder.setOid(GetTextUtil.getText(oid));
+			trainOrder.setPertcount(Integer.parseInt(GetTextUtil.getText(pertcount)));
+			trainOrder.setPertweight(Double.valueOf(GetTextUtil.getText(pertweight)));
+			trainOrder.setReportime(GetTextUtil.getText(reportime));
+			trainOrder.setStime(GetTextUtil.getText(stime));
+			trainOrder.setTformatweight(Double.valueOf(GetTextUtil.getText(tformatweight)));
+			trainOrder.setTid(GetTextUtil.getText(tid));
+			trainOrder.setTkind(GetTextUtil.getText(tkind));
+			Intent intent=new Intent();
+			Bundle bundle=new Bundle();
+			//Log.d("dsfsd", Integer.toString(trainOrder.getPertcount()));
+			bundle.putSerializable("trainorder", trainOrder);
+			intent.putExtras(bundle);
+			setResult(RESULT_OK, intent);
+			finish();
+			break;
+		case R.id.cancle:
+			setResult(RESULT_CANCELED);
+			finish();
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		((EditText)findViewById(v.getId())).setTextColor(Color.BLACK);
+		((EditText)findViewById(v.getId())).setGravity(Gravity.CENTER);
+		return false;
+	}
+}

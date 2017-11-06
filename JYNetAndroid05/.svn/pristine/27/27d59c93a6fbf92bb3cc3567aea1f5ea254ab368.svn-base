@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_state_codes">
+        <item>状态</item>
+        <item>正常</item>
+        <item>异常</item>
+    </string-array> 
+    <string-array name="array_oper_codes">
+        <item>港口操作</item>
+        <item>口岸操作</item>
+        <item>签收操作</item>
+    </string-array>
+    <string-array name="array_oil_kinds">
+        <item>燃料类型</item>
+        <item>汽油类型</item>
+        <item>柴油类型</item>
+    </string-array>
+    <string-array name="array_oil01_codes">
+        <item>89</item>
+        <item>92</item>
+        <item>95</item>
+        <item>98</item>
+    </string-array>
+    <string-array name="array_oil02_codes">
+        <item>5#</item>
+        <item>0#</item>
+        <item>-10#</item>
+        <item>-20#</item>
+        <item>-35#</item>
+        <item>-50#</item>
+    </string-array>
+    <string-array name="array_pay_ways">
+        <item>现金方式</item>
+        <item>油卡方式</item>
+    </string-array>
+      <string-array name="array_oper_ways">
+        <item>操作选择</item>  
+        <item>签字操作</item>
+        <item>拍照操作</item>
+    </string-array>
+    <string-array name="array_topics">
+        <item>业务信息</item>
+        <item>跟踪信息</item>
+        <item>加油信息</item>
+        <item>设置信息</item>
+    </string-array>
+    <string-array name="array_trans_ways">
+        <item>请选择</item>>
+        <item>汽运</item>
+        <item>铁路</item>
+    </string-array>
+</resources>

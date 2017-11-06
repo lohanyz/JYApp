@@ -1,0 +1,92 @@
+package cn.com.jy.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import cn.com.jy.entity.Truckorder;
+import cn.com.jy.helper.GetTextUtil;
+
+public class PortActivity_Truck extends Activity implements OnClickListener ,TextView.OnEditorActionListener{
+	private Button btnsubmit,btncancle;
+	private EditText tid,
+					tkind,
+					leadnumber,
+					pertcount,
+					pertweight,
+					tcount,
+					stime;
+	private Truckorder truckorder;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.port_truck);
+		init();
+	}
+	private void init(){
+		tid=(EditText)findViewById(R.id.tid);
+		tkind=(EditText)findViewById(R.id.tkind);
+		leadnumber=(EditText)findViewById(R.id.leadnumber);
+		pertcount=(EditText)findViewById(R.id.pertcount);
+		pertweight=(EditText)findViewById(R.id.pertweight);
+		tcount=(EditText)findViewById(R.id.tcount);
+		stime=(EditText)findViewById(R.id.stime);
+		tid.setOnEditorActionListener(this);
+		tkind.setOnEditorActionListener(this);
+		leadnumber.setOnEditorActionListener(this);
+		pertcount.setOnEditorActionListener(this);
+		pertweight.setOnEditorActionListener(this);
+		tcount.setOnEditorActionListener(this);
+		stime.setOnEditorActionListener(this);
+		btnsubmit=(Button) findViewById(R.id.submit);
+		btncancle=(Button) findViewById(R.id.cancle);
+		truckorder=new Truckorder();
+		btnsubmit.setOnClickListener(this);
+		btncancle.setOnClickListener(this);
+	}
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.submit:
+			truckorder.setLeadnumber(GetTextUtil.getText(leadnumber));
+			truckorder.setPertcount(Integer.parseInt(GetTextUtil.getText(pertcount)));
+			truckorder.setPertweight(Double.parseDouble(GetTextUtil.getText(pertweight)));
+			truckorder.setStime(GetTextUtil.getText(stime));
+			truckorder.setTcount(Integer.parseInt(GetTextUtil.getText(tcount)));
+			truckorder.setTid(GetTextUtil.getText(tid));
+			truckorder.setTkind(GetTextUtil.getText(tkind));
+			Intent intent=new Intent();
+			Bundle bundle=new Bundle();
+			bundle.putSerializable("truckorder", truckorder);
+			intent.putExtras(bundle);
+			setResult(RESULT_OK, intent);
+			finish();
+			break;
+
+
+		case R.id.cancle:
+			setResult(RESULT_CANCELED);
+			finish();
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		((EditText)findViewById(v.getId())).setTextColor(Color.BLACK);
+		((EditText)findViewById(v.getId())).setGravity(Gravity.CENTER);
+		return false;
+	}
+}

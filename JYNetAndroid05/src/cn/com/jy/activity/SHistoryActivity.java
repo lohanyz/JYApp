@@ -1,0 +1,162 @@
+package cn.com.jy.activity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import cn.com.jy.helper.ConfigHelper;
+import cn.com.jy.helper.FileHelper;
+import cn.com.jy.helper.SQLiteHelper;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+
+public class SHistoryActivity extends Activity implements OnClickListener{
+//	信息内容的全局变量;
+	private Context			mContext;
+	//	信息列表的显示控件;
+	private ListView 		mListView;
+	private SimpleAdapter	mAdapter;
+	//	数据库信息的加载;
+	private SQLiteHelper	mSqLiteHelper;  //01.数据库帮助类;
+	private SQLiteDatabase 	mDB;		    //02.数据库对象类;
+	private ConfigHelper	mConfigHelper;	//03.参数工具类
+	private FileHelper		mFileHelper;	//04.文件辅助工具类;
+	private Cursor 		   	mCursor;  	    //05.数据库遍历签;
+	
+	private List<Map<String, String>> mList;//06.数据信息的加载;
+	private Set<String>       mSetTmp;		//Set的临时表;
+	private ArrayList<String> mListBid;		//列表;
+	
+	
+	//	参数信息;
+	private String 			sql;
+	//	按钮;
+	private TextView		btnBack,
+							btnFunction,
+							tvTopic;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//	进行页面的加载;
+		setContentView(R.layout.hisinfo);
+		//	添加控件的视图;
+		initView();
+		//	添加空间的事件;
+		initEvent();
+	}
+	//	控件的初始化声明;
+	private void initView(){
+		//	listView信息的加载;
+		mListView	=(ListView) findViewById(R.id.listView);
+		btnBack		=(TextView) findViewById(R.id.btnBack);
+		btnFunction	=(TextView) findViewById(R.id.btnFunction);
+		tvTopic		=(TextView) findViewById(R.id.tvTopic);
+	}
+	//	事件的初始化声明;
+	private void initEvent(){
+		mContext		=	SHistoryActivity.this;
+		//	数据库信息的加载;
+		mSqLiteHelper	=	new SQLiteHelper(mContext);
+		mDB 			= 	mSqLiteHelper.getmDB();
+		mFileHelper		=	new FileHelper();
+		mConfigHelper	=	new ConfigHelper();
+		//	Set初始化;
+		mSetTmp			=	new HashSet<String>();
+		//	list初始化;
+		mListBid		=	new ArrayList<String>();
+		
+		//	初始化信息内容;
+		tvTopic.setText("签收历史信息");
+		btnFunction.setText("清空");
+		
+		//	添加事件监听;
+		btnBack.setOnClickListener(this);
+		btnFunction.setOnClickListener(this);
+
+		showData();
+//		
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position,
+					long id) {
+				Intent  intent	=new Intent(SHistoryActivity.this, SDetailActivity.class);
+				Bundle	bundle	=new Bundle();
+				String  rid	=mList.get(position).get("id");
+				bundle.putString("rid", rid);
+				intent.putExtras(bundle);
+				startActivity(intent);
+			}
+		});
+	}
+	//	显示信息的内容;
+	private void showData(){
+		//	表信息的加载;
+		mList	=loadData();
+		//	适配器的添加;
+		mAdapter=new SimpleAdapter(mContext, mList, R.layout.item, new  String[]{"number","content","id"}, new int[]{R.id.tvNum,R.id.tvContent,R.id.tvId});
+		//	适配器列表的绑定;
+		mListView.setAdapter(mAdapter);
+	}
+	//	加载数据信息法;
+	private List<Map<String, String>> loadData(){
+		List<Map<String, String>> list=new ArrayList<Map<String,String>>();
+		sql		=	"select * from resigninfo group by bid,gid";
+		mCursor	= 	mDB.rawQuery(sql, null);
+		int nCount=0;
+		while (mCursor.moveToNext()) {	
+			nCount++;
+			Map<String, String> map=new HashMap<String, String>();
+			String rid	=	mCursor.getString(mCursor.getColumnIndex("rid")).toString();
+			String gid	=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
+			String bid	=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
+			if(mSetTmp.add(bid)){
+				mListBid.add(bid);
+			}
+			map.put("number", nCount+"");
+			map.put("content", bid+"-"+gid);
+			map.put("id",rid);
+			list.add(map);
+		}
+		
+		if(mCursor!=null){
+			mCursor.close();
+		}	
+		return list;
+	}
+	@Override
+	public void onClick(View view) {
+		int nVid=view.getId();
+		switch (nVid) {
+		case R.id.btnFunction:
+			sql		=	"delete from resigninfo";
+			mDB.execSQL(sql);
+			for(String bid:mListBid){
+				String folder=mConfigHelper.getfParentPath()+bid+File.separator+"sign";
+				mFileHelper.delAllFile(folder);
+			}
+		case R.id.btnBack:
+			break;
+		
+		default:
+			break;
+		}
+		finish();
+	}
+}

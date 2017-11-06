@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- 01.总论 -->
+    <string name="app_name">嘉友</string>
+    <string name="action_add">添加</string>
+    <string name="menu_group_chat">发起群聊</string>
+    <string name="menu_feedback">意见反馈</string>
+    <string name="menu_addfriend">添加朋友</string>
+    <string name="menu_scan">扫一扫</string>
+    <!-- 02.功能-->
+    <string name="tab_order">订单</string>
+    <string name="tab_track">跟踪</string>
+    <string name="tab_addoil">加油</string>
+    <string name="tab_set">设置</string>
+    <!-- 03.操作 -->
+ 	<string name="action_settings">设置</string>
+    <string name="action_login">登&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;录</string>
+    <string name="action_ok">&#160;&#160;&#160;&#160;确&#160;&#160;&#160;&#160;&#160;&#160;认&#160;&#160;&#160;&#160;</string>
+    <string name="action_no">取  消</string>
+    <string name="action_resign">注  册</string>
+    <string name="action_delAll">清空</string>
+    <string name="action_delItem">删除</string>
+    <string name="action_upload">上传</string>
+    <string name="action_exit">退出</string>
+    <string name="action_reset">重置</string>
+    <string name="action_sendtime">设置时间(发)</string>
+    <string name="action_update">更新</string>
+    <string name="action_save">上传</string>
+    <string name="action_list">列表</string>
+    <string name="action_pictures">拍&#160;&#160;照</string>
+    <string name="action_search">搜索</string>
+    <string name="action_flush">扫码</string>
+    <string name="action_manual">手动</string>
+    <string name="action_detail">详情</string>
+    <string name="action_about">关于</string>
+    <string name="action_oil_management">油控管理</string>
+    <string name="action_mile_management">里程管理</string>
+    <string name="action_auto_focus">自动对焦</string>
+    <!-- 04.功能提示 -->
+    <string name="tip_id">账  号</string>
+    <string name="tip_pwd">密  码</string>
+    <string name="tip_ensure">确  认</string>
+    <string name="tip_name">电  话</string>
+    <string name="tip_call">昵  称</string>
+    <string name="tip_note">备  注</string>
+    <string name="tip_result">结  果</string>
+    <string name="tip_payway">付款方式</string>
+    <string name="tip_oilcode">燃料型号</string>
+      <string name="tip_oilkind">燃料类型</string>
+    <!-- 05.操作提示 -->
+    <string name="oper_getgoods">提	货</string>
+    <string name="oper_port">港	口</string>
+    <string name="oper_box">箱	管</string>
+    <string name="oper_harbor">口	岸</string>
+    <string name="oper_resign">签	收</string>
+    <string name="oper_goods">货物管理</string>
+    <string name="oper_switch">选择操作</string>
+    <string name="oper_addtruck">增加车辆</string>
+    <string name="oper_oilcheck">油耗监管</string>
+    <string name="oper_hisinfo">历史信息</string>
+    
+    
+    
+    <string name="tip_dialog_wait">请等待 ..</string>
+    <string name="tip_dialog_done">正在访问..</string>
+    <string name="tip_state">状&#160;&#160;态</string>
+    <string name="tip_trans">运输方式</string>
+    <string name="tip_tkind">车型</string>
+    <string name="tip_oid">运输号</string>
+    <string name="tip_percount">件数(单)</string>
+    <string name="tip_perweight">吨数(单)</string>
+    <string name="tip_tformatweight">标重(车)</string>
+    <string name="tip_tcount">车数</string>
+    <string name="tip_tid">车辆编号</string>
+    <string name="tip_bid">业务编号</string>
+    
+    <string name="tip_success">成功</string>
+    <string name="tip_fail">失败</string>
+    <string name="tip_exit">退出？</string>
+    <string name="tip_null">为空</string>
+    <string name="tip_exception">请输入异常信息</string>
+    <string name="tip_truck_num">请输入车号</string>
+    <string name="tip_data">请输入条形码</string>
+    <string name="tip_update">更新原数据</string>
+    <string name="tip_city">城市</string>
+    <string name="tip_liters">升数</string>
+    <string name="tip_money">金额</string>
+    <string name="tip_mile">公里数</string>
+    <string name="tip_oil_card_id">油卡卡号</string>
+    <string name="tip_oil_card_money">卡上余额</string>
+    <string name="tip_query">查询结果</string>
+    
+    <string name="scan_title">请圈进条形码/二维码</string>
+    <string name="title_order">订单信息</string>
+    <string name="title_track">追踪信息</string>
+    <string name="title_oil">油控信息</string>
+    <string name="title_setting">设置信息</string>
+    <string name="content_space"></string>
+    <string name="result_exit">已经跳出程序</string>
+    <!-- 测试 -->
+    <string name="dateSliderTitle">Selected date</string>
+
+    <string name="t1">1</string>
+</resources>

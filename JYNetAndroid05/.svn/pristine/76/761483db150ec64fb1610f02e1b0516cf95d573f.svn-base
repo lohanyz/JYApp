@@ -1,0 +1,321 @@
+package cn.com.jy.activity;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.com.jy.helper.ConfigHelper;
+import cn.com.jy.helper.FileHelper;
+import cn.com.jy.helper.GetOrPostHelper;
+import cn.com.jy.helper.ImgHelper;
+import cn.com.jy.helper.SQLiteHelper;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.TypedArray;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.Gallery;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemLongClickListener;
+
+@SuppressWarnings("deprecation")
+public class PDetailActivity extends Activity implements OnClickListener{
+    //	全程序内容;
+    private Context	 		mContext;
+    //	主要的控件;
+    private TextView 		tvTopic,btnFunction,btnBack,	//	内容标题;
+            tvShow;	//	内容信息;
+    private Gallery	 		mGallery;	//	画廊按钮;
+    private	ProgressDialog	mDialog;	 // 对话框;
+    private String 	 		pid,		//	id主键;
+            sql,
+            sResult,
+            bid,
+            gid,
+            folderPath
+                    ;
+    //	数据库管理;
+    private SQLiteHelper	mSqLiteHelper;
+    private SQLiteDatabase 	mDB;		 //  数据库件;
+    private Cursor 		   	mCursor;     //  数据库遍历签;
+    private ConfigHelper	mConfigHelper;// 配置项;
+    private GetOrPostHelper mGetOrPostHelper;
+
+    private FileHelper		mFileHelper; // 文件配置项;
+    private ImgHelper		mImgHelper;  // 图片辅助类;
+    //	图片的集合列表;
+    private List<BitmapDrawable> listBD = null;
+    private ArrayList<String>    list;
+    private MyThread		mThread;	 // 线程;
+
+
+    @SuppressLint("HandlerLeak")
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            int nFlag=msg.what;
+            mDialog.dismiss();
+            switch (nFlag) {
+                case ConfigHelper.NTAG_SUCCESS:
+                    Toast.makeText(mContext, R.string.tip_success,Toast.LENGTH_SHORT).show();
+                    break;
+                case ConfigHelper.NTAG_FAIL:
+                    Toast.makeText(mContext, R.string.tip_fail,Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    break;
+            }
+            closeThread();
+        }
+    };
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.detail);
+        //	添加控件;
+        initView();
+        //	添加事件监听;
+        initEvent();
+    }
+    //	控件初始化;
+    private void initView(){
+        tvTopic			=	(TextView) findViewById(R.id.tvTopic);
+        tvShow			=	(TextView) findViewById(R.id.tvShow);
+        btnBack			=	(TextView) findViewById(R.id.btnBack);
+        btnFunction		=	(TextView) findViewById(R.id.btnFunction);
+        mGallery		=	(Gallery) findViewById(R.id.gallery);
+    }
+    //	事件监听初始化;
+    private void initEvent(){
+        mContext		=	PDetailActivity.this;
+        mConfigHelper	=	new ConfigHelper();
+        mGetOrPostHelper=	new GetOrPostHelper();
+        mFileHelper		=	new FileHelper();
+        mImgHelper		=	new ImgHelper();
+        //	控件的初始化;
+        btnFunction.setVisibility(View.GONE);
+        //btnBack.setText("返回");
+        tvTopic.setText("港口信息详情");
+        //	获取id;
+        Intent	mIntent =	getIntent();
+        Bundle	mBundle =	mIntent.getExtras();
+        pid			=	mBundle.getString("pid");
+        //	数据库加载;
+        mSqLiteHelper	=	new SQLiteHelper(mContext);
+        mDB 			= 	mSqLiteHelper.getmDB();
+        //	数据信息加载;
+        doLoadData();
+        tvShow.setText(sResult);
+        //	提货信息路径;
+        folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"port"+File.separator+gid;
+        //	承装图片的容器;
+        listBD		=	mImgHelper.getBitmap01(folderPath);
+        //	设置图片适配器;
+        mGallery.setAdapter(new ImageAdaper(mContext, listBD));
+        list		=	mFileHelper.getFileNamesByList(folderPath);
+        //	添加事件监听;
+        btnBack.setOnClickListener(this);
+        //	图片长按的上传;
+        mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view,
+                                           final int position, long id) {
+                Builder builder=new Builder(mContext);
+                builder.setTitle("提示信息:");
+                builder.setPositiveButton("上传", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        if(mThread==null){
+                            // 进度条的内容;
+                            final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+                            final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
+                            mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
+                            mThread=new MyThread(position);
+                            mThread.start();
+                        }
+                    }
+                });
+                builder.setNegativeButton(R.string.action_no, null);
+                builder.create();
+                builder.show();
+                return false;
+            }
+        });
+    }
+    //	信息加载;
+    private void doLoadData(){
+        sql		=	"select * from portinfo where pid="+pid;
+        mCursor	= 	mDB.rawQuery(sql, null);
+        while (mCursor.moveToNext()) {
+            //	信息加载;
+            bid		=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
+            gid		=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
+            String  state		=	mCursor.getString(mCursor.getColumnIndex("state")).toString();
+            String simg		=	mCursor.getString(mCursor.getColumnIndex("simg")).toString();
+            String inporttime		=	mCursor.getString(mCursor.getColumnIndex("inporttime")).toString();
+            String ctime		=	mCursor.getString(mCursor.getColumnIndex("ctime")).toString();
+            String intime		=	mCursor.getString(mCursor.getColumnIndex("intime")).toString();
+            String pboxtime		=	mCursor.getString(mCursor.getColumnIndex("pboxtime")).toString();
+            String islean		=	mCursor.getString(mCursor.getColumnIndex("islean")).toString();
+            String lkind		=	mCursor.getString(mCursor.getColumnIndex("lkind")).toString();
+            String reporttime		=	mCursor.getString(mCursor.getColumnIndex("reporttime")).toString();
+            String classorderid		=	mCursor.getString(mCursor.getColumnIndex("classorderid")).toString();
+            String tid		=	mCursor.getString(mCursor.getColumnIndex("tid")).toString();
+            String tkind		=	mCursor.getString(mCursor.getColumnIndex("tkind")).toString();
+            String oid		=	mCursor.getString(mCursor.getColumnIndex("oid")).toString();
+           // String leadnumber		=	mCursor.getString(mCursor.getColumnIndex("leadnumber")).toString();
+            int percount		=	mCursor.getInt(mCursor.getColumnIndex("percount"));
+            double perweight		=	mCursor.getDouble(mCursor.getColumnIndex("perweight"));
+            double tformatweight	=	mCursor.getDouble(mCursor.getColumnIndex("tformatweight"));
+            int tcount		=	mCursor.getInt(mCursor.getColumnIndex("tcount"));
+            String gtime		=	mCursor.getString(mCursor.getColumnIndex("gtime")).toString();
+            String stime		=	mCursor.getString(mCursor.getColumnIndex("stime")).toString();
+
+            sResult  = "商品编号:" + bid + "-" + gid + "\r\n";
+            sResult += "到港时间:" + inporttime + "\r\n";
+            sResult += "换单时间:" + ctime + "\r\n";
+            sResult += "进场时间:" + intime + "\r\n";
+            sResult += "装箱时间:" + pboxtime + "\r\n";
+            sResult += "是否偏心/偏重:" + islean + "\r\n";
+            sResult += "运输方式:" + lkind + "\r\n";
+            if(lkind.equals("汽运")) {
+                sResult += "拖车号:" + tid + "\r\n";
+                sResult += "车型:" + tkind + "\r\n";
+                sResult += "铅封号:" + oid + "\r\n";
+                sResult += "单车件数:" + percount + "\r\n";
+                sResult += "单车吨数:" + perweight + "\r\n";
+                sResult += "车数:" + tcount + "\r\n";
+                sResult += "发车时间:" + stime + "\r\n";
+
+            }
+            else{
+                sResult +="报数时间"+reporttime+"\r\n";
+                sResult +="班列号"+classorderid+"\r\n";
+                sResult +="车皮号"+tid+"\r\n";
+                sResult +="铁路车型"+tkind+"\r\n";
+                sResult +="运单号"+oid+"\r\n";
+                sResult +="单车件数"+percount+"\r\n";
+                sResult +="单车吨数"+perweight+"\r\n";
+                sResult +="车皮标重"+tformatweight+"\r\n";
+                sResult +="发车时间"+stime+"\r\n";
+            }
+            sResult=sResult+"状态信息:\r\n"+
+                    state
+            ;
+        }
+        if(mCursor!=null){
+            mCursor.close();
+        }
+
+        tvShow.setText(sResult);
+    }
+    //	适配器的类;
+    public class ImageAdaper extends BaseAdapter{
+        private Context mContext;
+        private int 	mGalBackgroundItem;
+        private int 	nSize;
+        private List<BitmapDrawable> listBD;
+
+        public ImageAdaper(Context mContext,List<BitmapDrawable> list){
+            this.mContext = mContext;
+            this.listBD	  = list;
+            this.nSize	  = list.size();
+            TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);
+            mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
+            typedArray.recycle();
+        }
+
+        public int getCount() {
+            return this.nSize;
+        }
+
+        public Object getItem(int position) {
+            return this.listBD.get(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ImageView imageview = new ImageView(this.mContext);
+            imageview.setImageDrawable(this.listBD.get(position));
+
+            imageview.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));
+            imageview.setBackgroundResource(mGalBackgroundItem);
+            notifyDataSetChanged();
+            return imageview;
+        }
+    }
+    //	线程的自定义形式;
+    class MyThread extends Thread{
+        private String url,
+                response;
+        private int position;
+        public MyThread(int position) {
+            this.position=position;
+        }
+        @Override
+        public void run() {
+            String path		=	folderPath+File.separator+list.get(this.position)+".jpg";
+            url				=	"http://"+ConfigHelper.TAG_IP_ADDRESS+":"+ConfigHelper.TAG_PORT+"/"+ConfigHelper.TAG_PROGRAM+"/upPhoto";
+            response		=	mGetOrPostHelper.uploadFile(url,path,list.get(position));
+            int nFlag= ConfigHelper.NTAG_FAIL;
+            if(!response.endsWith("fail")){
+                nFlag= ConfigHelper.NTAG_SUCCESS;
+            }
+            mHandler.sendEmptyMessage(nFlag);
+        }
+    }
+    private void closeThread(){
+        if(mThread!=null){
+            mThread.interrupt();
+            mThread=null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeThread();
+        mSqLiteHelper.doCloseDataBase();
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        int nVid=view.getId();
+        switch (nVid) {
+            case R.id.btnBack:
+                finish();
+                break;
+
+            default:
+                break;
+        }
+
+    }
+}

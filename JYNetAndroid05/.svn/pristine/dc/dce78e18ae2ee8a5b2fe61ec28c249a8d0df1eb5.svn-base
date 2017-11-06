@@ -1,0 +1,570 @@
+package cn.com.jy.activity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.jy.listener.DialogListener;
+import com.jy.view.WritePadDialog;
+import cn.com.jy.helper.ConfigHelper;
+import cn.com.jy.helper.FileHelper;
+import cn.com.jy.helper.GetOrPostHelper;
+import cn.com.jy.helper.ImgHelper;
+import cn.com.jy.helper.SPHelper;
+import cn.com.jy.helper.SQLiteHelper;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class SignActivity extends Activity implements OnClickListener{
+	//	上下文的内容信息;
+	private Context	 mContext;
+	private Intent	 mIntent;
+	//	顶层的信息按钮;
+	private TextView btnBack,
+					 btnFunction;
+	private Button	 btnSearch,
+					 btnCode,
+					 btnOk,
+					 btnSign,
+					 btnPhoto
+					 ;
+
+	private TextView tvTopic,
+					 mState02;
+	
+	private Spinner	 mState
+					 ;
+	
+	private Builder				 mBuilder;	//	对话框;
+	private EditText 			 etSearch;
+	private ListView 			 mListView;
+	private ArrayList<String>    list;
+	private ArrayAdapter<String> mAdapter;
+
+	private ProgressDialog 		 mDialog; 	//	对话方框;
+	private MyThread	   		 mThread; 	//	线程内容;
+	private MyThread2	   		 mThread2; 	//	线程内容;
+	
+	private String 				 taskid,	//	标签Id编号;
+								 bid,		//	业务编号;
+								 gid,		//	货品编号;
+								 state,		//	状态内容;
+								 simg,
+								 folderPath,		//	文件夹路径;
+								    filePath,		//	文件路径;
+								    tmpPath,		//	临时路径;
+								 sSize,
+								 wid
+								 ;
+	//	帮助类;
+	private ConfigHelper	mConfigHelper;
+	private GetOrPostHelper mGetOrPostHelper;
+	private ImgHelper		mImgHelper;
+	private FileHelper		mFileHelper;
+	private SPHelper 		mSpHelper;	  // 首选项存储;
+	
+	private SQLiteHelper    mSqLiteHelper;// 数据库的帮助类;	
+	private SQLiteDatabase  mDB;	  	  // 数据库件;
+	
+	
+	@SuppressLint("HandlerLeak")
+	Handler mHandler    = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			int nFlag	=	msg.what;
+			mDialog.dismiss();
+			switch (nFlag) {
+			//	01.成功;
+			case ConfigHelper.NTAG_SUCCESS:				
+				Toast.makeText(mContext, R.string.tip_success,Toast.LENGTH_SHORT).show();
+				break;
+			//	02.失败;
+			case ConfigHelper.NTAG_FAIL:
+				Toast.makeText(mContext, R.string.tip_fail,Toast.LENGTH_LONG).show();
+				break;
+			default:
+				break;
+			}
+			showData();
+			closeThread();
+		}
+	};
+	
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.sign);
+		//	控件的初始化;
+		initView();
+		//	事件的初始化;
+		initEvent();
+	}
+	
+	//	控件的初始化;
+	private void initView(){
+		//	顶层控件初始化;
+		btnBack		=(TextView) findViewById(R.id.btnBack);
+		btnFunction	=(TextView) findViewById(R.id.btnFunction);
+		tvTopic		=(TextView) findViewById(R.id.tvTopic);
+		
+		
+		btnSearch	=(Button) findViewById(R.id.btnSearch);
+		btnCode		=(Button) findViewById(R.id.btnCode);
+		btnOk		=(Button) findViewById(R.id.btnOk);
+		btnSign		=(Button) findViewById(R.id.sign);
+		btnPhoto	=(Button) findViewById(R.id.photo);
+//		mState01	=(TextView) findViewById(R.id.state01);
+		mState02	=(TextView) findViewById(R.id.state02);
+		mState		=(Spinner) findViewById(R.id.state);
+		
+//		mSwitch	=(Spinner) findViewById(R.id.sswitch);
+		
+		etSearch	=(EditText) findViewById(R.id.etSearch);
+		mListView	=(ListView) findViewById(R.id.listView);
+	}
+	//	事件监听初始;
+	@SuppressWarnings("static-access")
+	private void initEvent(){
+		mContext		=	SignActivity.this;
+		//	系统的配置工具类的添加;
+		mGetOrPostHelper=	new GetOrPostHelper();
+		mConfigHelper	=	new ConfigHelper();
+		mImgHelper		=	new ImgHelper();
+		mFileHelper		=	new FileHelper();
+		mSpHelper  	  	= 	new SPHelper(mContext, ConfigHelper.CONFIG_SELF,mContext.MODE_APPEND);
+		
+		//	数据库的操作;
+		mSqLiteHelper 	=	new SQLiteHelper(mContext);
+		mDB			  	=	mSqLiteHelper.getmDB();
+		//	信息列表的加载;
+		list			=	new ArrayList<String>();
+
+		//	控件信息事件初始化;
+		btnFunction.setText("历史");
+		tvTopic.setText("签收");
+		//	添加事件的监听;
+		btnBack.setOnClickListener(this);
+		btnFunction.setOnClickListener(this);	
+		btnSearch.setOnClickListener(this);
+		btnCode.setOnClickListener(this);
+		btnOk.setOnClickListener(this);
+		btnSign.setOnClickListener(this);
+		btnPhoto.setOnClickListener(this);
+		//	状态选择;
+		mState.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> adapter, View view,
+					int position, long id) {
+				switch (position) {
+				case 0:
+				case 1:
+					state="正常";
+//					mState01.setBackgroundColor(Color.GREEN);	
+					break;
+				case 2:
+					mBuilder	=	new Builder(mContext);
+					mBuilder.setTitle("异常信息");
+					final EditText   edit	=	new EditText(mContext);
+					edit.setSingleLine(false);
+					edit.setLines(6);
+					mBuilder.setView(edit);
+					mBuilder.setPositiveButton(R.string.action_ok,new  DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							String tmp=edit.getText().toString().trim();
+							if(!tmp.equals("")){								
+								state=tmp;
+//								mState01.setBackgroundColor(Color.RED);	
+							}
+						}
+					});
+					mBuilder.setNegativeButton(R.string.action_no, null);
+					mBuilder.create();
+					mBuilder.show();
+					break;
+				default:
+					break;
+				}
+				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapter) {
+				state="正常";
+//				mState01.setBackgroundColor(Color.GREEN);	
+			}
+		});
+
+		etSearch.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				doResetParam2();
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		showData();
+	}
+	@Override
+	public void onClick(View view) {
+		int nVid=view.getId();
+		switch (nVid) {
+		case R.id.photo:
+			getPhoto_Ggoods();
+			break;
+		case R.id.sign:
+			if(bid!=null&&gid!=null){						
+				folderPath	= mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
+				mConfigHelper.doSetScreenWidthAndHeigth(mContext);
+				
+				WritePadDialog writeTabletDialog = new WritePadDialog(
+						mContext, new DialogListener() {
+							@Override
+							public void refreshActivity(Object object) {			
+								//	进行数据的长宽设置;
+								simg			   = bid+"resign"+gid+"file"+java.lang.System.currentTimeMillis();
+								Bitmap 	zoombm	   = mImgHelper.doWriteImg(object, folderPath, simg);
+								if(zoombm!=null){
+									sSize		   = String.valueOf(mFileHelper.getFileCount(folderPath));
+									mState02.setText(sSize);
+								}
+							}
+						},mConfigHelper.getScreenWidth(),mConfigHelper.getScreenHeigth());
+				writeTabletDialog.show();
+			}else{
+				Toast.makeText(mContext, "没有基础信息",Toast.LENGTH_SHORT).show();
+			}
+			break;
+		case R.id.btnBack:
+			finish();
+			break;
+		//	历史信息;
+		case R.id.btnFunction:
+			mIntent=new Intent(mContext, SHistoryActivity.class);
+			startActivity(mIntent);
+			break;
+		case R.id.btnReset:
+			etSearch.setText(ConfigHelper.SPACE);
+			break;
+		case R.id.btnSearch:
+			if(mThread==null){
+				int nSize=list.size();
+				if(nSize!=0){
+					list.clear();
+				}
+				// 进度条的内容;
+				final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+				final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
+				mDialog 						  = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);	
+				taskid							  = etSearch.getText().toString().trim();
+				mThread=new MyThread();
+				mThread.start();
+			}
+			break;
+		case R.id.btnCode:
+			//	跳转至专门的intent控件;
+			mIntent	=	new Intent(mContext, FlushActivity.class);
+			//	有返回值的跳转;
+			startActivityForResult(mIntent,ConfigHelper.NTRACK_SIGN_GID_TO);
+			break;
+		//	上传按钮;
+		case R.id.btnOk:
+			if(bid!=null&&gid!=null){
+				//	图片;
+				simg	= 	mFileHelper.getFileNamesByStrs(folderPath);
+				if(simg.equals("")){
+					simg="null";
+				}
+				wid		= 	mSpHelper.getValue(ConfigHelper.CONFIG_SELF_WID);
+				//	线程启动;
+				if(mThread2==null){
+					mThread2=new MyThread2();
+					mThread2.start();
+				}
+			}else{
+				Toast.makeText(mContext, "请进行搜索配对", Toast.LENGTH_SHORT).show();
+			}
+			break;
+			
+		default:
+			break;
+		}
+		
+	}
+	//	检测网络信息的线程;
+	//	定义的线程——自定义的线程内容;
+	public class MyThread extends Thread{
+		private String url,
+					   param,
+					   response
+					   ;
+		@Override
+		public void run() {
+			// 进行相应的登录操作的界面显示;
+			//	01.Http 协议中的Get和Post方法;
+			url		 =	"http://"+ConfigHelper.TAG_IP_ADDRESS+":"+ConfigHelper.TAG_PORT+"/"+ConfigHelper.TAG_PROGRAM+"/goods2";
+			param	 =	"operType=2&gid="+taskid;
+			response = 	mGetOrPostHelper.sendGet(url,param);
+			int nFlag= 	ConfigHelper.NTAG_FAIL;
+			
+			if(!response.equalsIgnoreCase("fail")){
+				nFlag= ConfigHelper.NTAG_SUCCESS;
+				try {
+					JSONArray array = new JSONArray(response);
+					int 	  i		= 0;
+					JSONObject obj 	= null;
+					do {
+						try {		
+							//	JsonObject的解析;
+							obj			  =	array.getJSONObject(i);	
+							
+							bid	  		  = obj.getString("bid");
+							String bname  = obj.getString("bname");
+							String bkind  = obj.getString("bkind");
+							String bcoman = obj.getString("bcoman");
+							String bgaddress  = obj.getString("bgaddress");
+							String bgoid	  = obj.getString("bgoid");
+							String bshipcom	  = obj.getString("bshipcom");
+							String bpretoportday  = obj.getString("bpretoportday");
+							String boxid	  = obj.getString("boxid");
+							String boxsize	  = obj.getString("boxsize");
+							String boxkind	  = obj.getString("boxkind");
+							String boxbelong  = obj.getString("boxbelong");
+							String retransway = obj.getString("retransway");
+						
+							gid		  		= obj.getString("gid");
+							String gname	  = obj.getString("gname");
+							String boxid2	  = obj.getString("boxid");
+							String boxsize2	  =	obj.getString("boxsize");
+							String boxkind2	  = obj.getString("boxkind");
+							String leadnumber = obj.getString("leadnumber");
+							String gcount	  = obj.getString("gcount");
+							String gunit	  = obj.getString("gunit");
+							String gtotalweight= obj.getString("gtotalweight");
+							String glength 	  = obj.getString("glength");
+							String gwidth	  = obj.getString("gwidth");
+							String gheight	  = obj.getString("gheight");
+							String gvolume	  = obj.getString("gvolume");
+							
+							list.add("业务编号:"+bid);
+							list.add("业务名称:"+bname);
+							list.add("业务类型:"+bkind);
+							list.add("建单人:"+bcoman);
+							list.add("提货地址:"+bgaddress);
+							list.add("提单号:"+bgoid);
+							list.add("船舶公司:"+bshipcom);
+							list.add("预计到港日:"+bpretoportday);
+							list.add("箱号:"+boxid);
+							list.add("箱尺寸:"+boxsize);
+							list.add("箱型:"+boxkind);
+							list.add("箱所属:"+boxbelong);
+							list.add("回程运输方式:"+retransway);
+							list.add("\r\n");
+							list.add("货物编号:"+bid+"-"+gid);
+							list.add("品名:"+gname);
+							list.add("箱号:"+boxid2);
+							list.add("箱尺寸:"+boxsize2);
+							list.add("箱型:"+boxkind2);
+							list.add("铅封号:"+leadnumber);
+							list.add("件数:"+gcount);
+							list.add("单位:"+gunit);
+							list.add("总毛重:"+gtotalweight);
+							list.add("长:"+glength);
+							list.add("宽:"+gwidth);
+							list.add("高:"+gheight);
+							list.add("体积:"+gvolume);
+	
+							i++;
+						} catch (Exception e) {
+							obj=null;
+						}
+					} while (obj!=null);
+				} catch (JSONException e) {
+					nFlag	=	ConfigHelper.NTAG_FAIL;
+				}
+			}
+			mHandler.sendEmptyMessage(nFlag);
+		}
+	}
+	//	信息的另一个添加;
+	public class MyThread2 extends Thread{
+		private String url,
+		   param,
+		   response,
+		   sql
+		   ;
+		@Override
+		public void run() {
+		
+			// 进行相应的登录操作的界面显示;
+			//	01.Http 协议中的Get和Post方法;
+			url		 =	"http://"+ConfigHelper.TAG_IP_ADDRESS+":"+ConfigHelper.TAG_PORT+"/"+ConfigHelper.TAG_PROGRAM+"/resign";
+			try {
+				param	 =	"operType=1&" +
+							"bid="+bid+"&" +
+							"gid="+gid+"&" +
+							"state="+URLEncoder.encode(state,"utf-8")+"&" +
+							"simg="+simg+"&" +
+							"wid="+wid;
+				
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			
+			response = 	mGetOrPostHelper.sendGet(url,param);
+			int nFlag= 	ConfigHelper.NTAG_FAIL;
+			
+			if(!response.equalsIgnoreCase("fail")){
+				nFlag= ConfigHelper.NTAG_SUCCESS;
+				sql="insert into resigninfo (" +
+				"bid,gid,state,simg) values (" +
+				"'"+bid+"'," +
+				"'"+gid+"'," +
+				"'"+state+"',"+ 
+				"'"+simg+"')"; 
+				mDB.execSQL(sql);
+			}
+			mHandler.sendEmptyMessage(nFlag);
+		}
+	}
+	//	重新置空所有选项卡;
+	private void doResetParam2(){
+		//	bid置空&gid置空;
+		bid=null;
+		gid=null;
+		//	数据列表;
+		list.clear();
+		//	重新加载数据;
+		showData();
+		//	异常按钮重置;
+		state	="正常";
+		mState.setSelection(0);
+//		mSwitch.setSelection(0);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if(requestCode==ConfigHelper.NTRACK_SIGN_GID_TO&&resultCode==ConfigHelper.NTRACK_FLUSH_TO_MENU){
+			String 	gid	=	intent.getStringExtra("bid");
+			etSearch.setText(gid);
+		}else if(requestCode==ConfigHelper.NTRACK_SIGN_PHOTO_TO&&resultCode==-1 ){			
+			Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
+			mImgHelper.compressPicture(tmpPath, filePath);
+			mImgHelper.clearPicture(tmpPath,null);
+			Log.i("MyLog", "张数="+folderPath);
+//			mState02.setBackgroundColor(Color.GREEN);
+			sSize		=	String.valueOf(mFileHelper.getFileCount(folderPath));
+			mState02.setText(sSize);
+		}
+	}
+	private void showData(){
+		//	图片的大小张数;
+		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
+		sSize		=	String.valueOf(mFileHelper.getFileCount(folderPath));
+		mState02.setText(sSize);
+		mAdapter=new ArrayAdapter<String>(mContext, android.R.layout.simple_dropdown_item_1line, list);
+		mListView.setAdapter(mAdapter);
+	}
+	//	拍照功能;
+	public void getPhoto_Ggoods(){
+		File 	file;
+		if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
+			if(bid!=null&&gid!=null){
+				folderPath	= mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
+				simg  		= bid+"resign"+gid+"file"+java.lang.System.currentTimeMillis();
+				file	  	= new File(folderPath);
+				//	生成文件夹的方式;
+				if(!file.exists()){
+					file.mkdirs();
+				}
+				//	生成2中文件路径:01.临时的 02.永久的
+				tmpPath		= folderPath+File.separator+simg+"_tmp.jpg";
+				filePath  	= folderPath+File.separator+simg+".jpg";
+				file 	  	= new File(tmpPath);
+				if(file.exists()){				
+					file.delete();
+				}
+				if (!file.exists()) {
+					try {
+						file.createNewFile();
+					} catch (IOException e) {
+						Toast.makeText(mContext, "照片创建失败!",Toast.LENGTH_LONG).show();
+						return;
+					}
+				}
+				mIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+				mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+				startActivityForResult(mIntent, ConfigHelper.NTRACK_SIGN_PHOTO_TO);
+			}else{
+				Toast.makeText(mContext, "没有基础信息",Toast.LENGTH_SHORT).show();
+			}
+		} else {
+			Toast.makeText(mContext, "sdcard无效或没有插入!",Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	//	关闭线程;
+	private void closeThread(){
+		if(mThread!=null){
+			mThread.interrupt();
+			mThread=null;
+		}
+		
+		if(mThread2!=null){
+			mThread2.interrupt();
+			mThread2=null;
+		}
+	}
+}
