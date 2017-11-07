@@ -31,7 +31,7 @@
         android:allowBackup="true"
         android:icon="@drawable/jy01" >
         <activity
-            android:name="cn.com.jy.view.WelActivity"
+            android:name="cn.com.jy.view.need.WelActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
@@ -41,91 +41,91 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="cn.com.jy.view.MenuActivity"
+            android:name="cn.com.jy.view.need.MenuActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.GetgoodsInformationActivity"
+            android:name="cn.com.jy.view.need.GetgoodsInformationActivity"
             android:theme="@android:style/Theme.NoTitleBar" 
             android:windowSoftInputMode="adjustPan"
             >
         </activity>
         <activity
-            android:name="cn.com.jy.view.SignInformationActivity"
+            android:name="cn.com.jy.view.need.SignInformationActivity"
             android:theme="@android:style/Theme.NoTitleBar" 
             android:windowSoftInputMode="adjustPan"
             >
         </activity>
         <activity
-            android:name="cn.com.jy.view.ResignActivity"
+            android:name="cn.com.jy.view.need.ResignActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         
         <activity
-            android:name="cn.com.jy.view.FlushActivity"
+            android:name="cn.com.jy.view.need.FlushActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.GetgoodsHistoryActivity"
+            android:name="cn.com.jy.view.need.GetgoodsHistoryActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.GetgoodsDetailActivity"
+            android:name="cn.com.jy.view.need.GetgoodsDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.SignHistoryActivity"
+            android:name="cn.com.jy.view.need.SignHistoryActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.SignDetailActivity"
+            android:name="cn.com.jy.view.need.SignDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.HarborHistoryActivity"
+            android:name="cn.com.jy.view.need.HarborHistoryActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.HarborDetailActivity"
+            android:name="cn.com.jy.view.need.HarborDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.PHistoryActivity"
+            android:name="cn.com.jy.view.need.PHistoryActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.PDetailActivity"
+            android:name="cn.com.jy.view.need.PDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.BMHistoryActivity"
+            android:name="cn.com.jy.view.need.BMHistoryActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.BMDetailActivity"
+            android:name="cn.com.jy.view.need.BMDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.PortActivity"
+            android:name="cn.com.jy.view.need.PortActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.PortActivity_Train"
+            android:name="cn.com.jy.view.need.PortActivity_Train"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.PortActivity_Truck"
+            android:name="cn.com.jy.view.need.PortActivity_Truck"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.HarborActivity"
+            android:name="cn.com.jy.view.need.HarborInformationActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="cn.com.jy.view.BoxActivity"
+            android:name="cn.com.jy.view.need.BoxActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>

@@ -9,7 +9,7 @@
         android:layout_height="fill_parent"
         android:layout_gravity="center" />
 
-    <com.jy.view.ViewfinderView
+    <cn.com.jy.view.extra.ViewfinderView
         android:id="@+id/viewfinder_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
