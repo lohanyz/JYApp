@@ -72,7 +72,9 @@
         </activity>
         <activity
             android:name="cn.com.jy.view.need.GetgoodsDetailActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            >
         </activity>
         <activity
             android:name="cn.com.jy.view.need.SignHistoryActivity"
@@ -80,7 +82,9 @@
         </activity>
         <activity
             android:name="cn.com.jy.view.need.SignDetailActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            >
         </activity>
         <activity
             android:name="cn.com.jy.view.need.HarborHistoryActivity"
