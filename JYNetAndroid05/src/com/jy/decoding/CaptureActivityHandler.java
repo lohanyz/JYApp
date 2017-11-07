@@ -28,8 +28,8 @@ import android.os.Message;
 import android.util.Log;
 
 
-import cn.com.jy.activity.FlushActivity;
 import cn.com.jy.activity.R;
+import cn.com.jy.view.FlushActivity;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;

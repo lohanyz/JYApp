@@ -114,18 +114,27 @@
                 android:entries="@array/array_state_codes"
                 android:prompt="@string/tip_state" />
 
-            <Button
-                android:id="@+id/sign"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/sign_selector"
-                android:clickable="true" />
+                android:layout_weight="1" 
+                android:gravity="center"
+                >
+
+                <Button
+                    android:id="@+id/sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/sign_selector"
+                    android:layout_centerInParent="true"
+                    android:clickable="true" />
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" >
+                android:layout_weight="1" 
+                >
 
                 <ImageView
                     android:layout_width="wrap_content"

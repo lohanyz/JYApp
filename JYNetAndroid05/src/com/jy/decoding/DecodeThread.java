@@ -7,7 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import android.os.Handler;
 import android.os.Looper;
 
-import cn.com.jy.activity.FlushActivity;
+import cn.com.jy.view.FlushActivity;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;

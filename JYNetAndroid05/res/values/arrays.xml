@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="array_state_codes">
-        <item>状态</item>
         <item>正常</item>
         <item>异常</item>
     </string-array> 
