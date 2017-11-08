@@ -32,9 +32,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:focusable="true"
-        android:focusableInTouchMode="true" >
-
-        <LinearLayout
+        android:focusableInTouchMode="true" ><LinearLayout
             android:id="@+id/l1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -68,13 +66,18 @@
                 android:textColor="#969696"
                 android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/btnPhoto"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="@drawable/photo_selector" />
+                android:layout_weight="1" >
+
+                <Button
+                    android:id="@+id/btnPhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/photo_selector" />
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -308,9 +311,8 @@
         android:layout_above="@id/layBottom"
         android:layout_below="@id/laySearch"
         android:layout_marginTop="5dp"
-        android:divider="#ffffff"
         android:cacheColorHint="#ffffff"
-        >
+        android:divider="#ffffff" >
     </ListView>
 
 </RelativeLayout>

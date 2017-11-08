@@ -38,7 +38,6 @@ public class GetgoodsHistoryActivity extends Activity implements OnClickListener
 	private Cursor 		   	  mCursor;  	//03.数据库遍历签;
 	private FileHelper		  mFileHelper;	//04.文件处理帮助类;
 	private MTConfigHelper	  mConfigHelper;//05.参数处理帮助类;
-	
 	private List<Map<String, String>> mList;//数据信息的加载;
 	private Set<String>       mSetTmp;		//文件夹下信息删除的方式;
 	private ArrayList<String> mListBid;

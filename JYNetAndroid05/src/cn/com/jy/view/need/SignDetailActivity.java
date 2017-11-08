@@ -24,10 +24,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
@@ -42,9 +44,9 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private Context	 		mContext;	//	上下文信息;
 	//	主要的控件;
 	private TextView 		tvTopic,	//	内容标题;
-					 		tvShow,		//	内容信息;
 					 		btnBack,	//	返回按钮;
 					 		btnFunction;//	功能按钮;
+	private WebView			vWvShow;
 	private Gallery	 		mGallery;	//	画廊按钮;
 	private	ProgressDialog	mDialog;	 // 对话框; 
 	private String 	 		rid,		//	id主键;
@@ -61,7 +63,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private Cursor 		   	mCursor;     //  数据库遍历签;
 	private MTConfigHelper	mConfigHelper;// 配置项;
 	private MTGetOrPostHelper mGetOrPostHelper;
-//	private FileHelper		mFileHelper; // 文件配置项;
+
 	private MTFileHelper	mtFileHelper;
 	private MTImgHelper		mImgHelper;  // 图片辅助类;
 	//	图片的集合列表;
@@ -94,7 +96,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.detail);
+		setContentView(R.layout.detail2);
 		//	添加控件;
 		initView();
 		//	添加事件监听;
@@ -103,10 +105,18 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	//	控件初始化;
 	private void initView(){
 		tvTopic			=	(TextView) findViewById(R.id.tvTopic);
-		tvShow			=	(TextView) findViewById(R.id.tvShow);
+		vWvShow			= 	(WebView) findViewById(R.id.wvShow);
 		btnBack			=	(TextView) findViewById(R.id.btnBack);
 		btnFunction		=	(TextView) findViewById(R.id.btnFunction);
 		mGallery		=	(Gallery) findViewById(R.id.gallery);
+		
+//		WebSettings settings = vWvShow.getSettings();
+//		settings.setAppCacheEnabled(true);
+//		settings.setDatabaseEnabled(true);
+//		settings.setDomStorageEnabled(true);//开启DOM缓存，关闭的话H5自身的一些操作是无效的
+////	settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+//		settings.setCacheMode(WebSettings.LOAD_CACHE_ONLY);//不使用网络，只加载缓存
+
 	}
 	//	事件监听初始化;
 	private void initEvent(){
@@ -124,12 +134,13 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		Bundle	mBundle =	mIntent.getExtras();
 		rid				=	mBundle.getString("rid");
 		imgs				=	mBundle.getString("imgs");
+		Log.i("MyLog", "info="+imgs);
 		//	数据库加载;
 		mSqLiteHelper	=	new MTSQLiteHelper(mContext);
 		mDB 			= 	mSqLiteHelper.getmDB();
 		//	数据信息加载;
 		doLoadData();
-		tvShow.setText(sResult);
+//		tvShow.setText(sResult);
 		//	提货信息路径;
 		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
 		//	承装图片的容器;
@@ -178,15 +189,27 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 			gid		=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
 			String state	=	mCursor.getString(mCursor.getColumnIndex("state")).toString();
 			
-			sResult="商品编号:"+bid+"-"+gid+"\r\n状态信息:\r\n"+
-					state
+			sResult="<html>" +
+						"<body>" +
+							"<table border=\"1\">" +
+								"<tr bgcolor=\"#00FF00\" align=\"center\">" +
+									"<td>商品编号</td>"+
+									"<td>状态信息</td>"+
+								"</tr>" +
+								"<tr align=\"center\">" +
+									"<td>"+bid+"-"+gid+"</td>" +
+									"<td>"+state+"</td>" +
+								"</tr>"+
+							"</table>"+
+						"</body>" +
+					"</html>"
 					;
 		}
 		if(mCursor!=null){
 			mCursor.close();
 		}
-		
-		tvShow.setText(sResult);		
+		vWvShow.getSettings().setDefaultTextEncodingName("utf-8") ;
+		vWvShow.loadDataWithBaseURL(null, sResult, "text/html", "utf-8", null);	
 	}
 	//	适配器的类;
 	public class ImageAdaper extends BaseAdapter{  

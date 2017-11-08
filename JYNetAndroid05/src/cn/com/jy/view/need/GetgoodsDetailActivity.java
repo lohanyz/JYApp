@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
@@ -41,11 +42,13 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	private Context	 		mContext;	//	上下文信息;
 	//	主要的控件;
 	private TextView 		tvTopic,	//	内容标题;
-					 		tvShow;		//	内容信息;
-	private TextView 	 	vBack,	//	返回按钮;
+							vBack,		//	返回按钮;
 					 		btnFunction;//	功能按钮;
 	private Gallery	 		mGallery;	//	画廊按钮;
 	private	ProgressDialog	mDialog;	// 	对话框; 
+	private WebView			vWvShow;	//	webview;
+	
+	/*参数*/
 	private String 	 		ggid,		//	id主键;
 		  			 		sql,		//	SQl语句串;
 		  			 		sResult,	//	结果字符串;
@@ -55,17 +58,17 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		  			 		imgs
 		  			 		;		
 	//	数据库管理;
-	private MTSQLiteHelper	mSqLiteHelper;//  数据库帮助类;
-	private SQLiteDatabase 	mDB;		  //  数据库件;
-	private Cursor 		   	mCursor;      //  数据库遍历签;
-	private MTConfigHelper	mConfigHelper;//  配置项;
+	private MTSQLiteHelper	  mSqLiteHelper;//  数据库帮助类;
+	private SQLiteDatabase 	  mDB;		  //  数据库件;
+	private Cursor 		   	  mCursor;      //  数据库遍历签;
+	private MTConfigHelper	  mConfigHelper;//  配置项;
 	private MTGetOrPostHelper mGetOrPostHelper;//	数据发送帮助类;
-	private MTFileHelper    mtFileHelper;
-	private MTImgHelper		mImgHelper;  // 图片辅助类;
+	private MTFileHelper      mtFileHelper;
+	private MTImgHelper		  mImgHelper;   // 图片辅助类;
 	//	图片的集合列表;
 	private List<BitmapDrawable> listBD = null;// 承装图片的列表;
 	private ArrayList<String>    list;	 	   // 承装文件夹的列表;
-	private MyThread		mThread;	 // 线程;
+	private MyThread			 mThread;	 // 线程;
 	
 	
 	@SuppressLint("HandlerLeak")
@@ -92,7 +95,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.detail);
+		setContentView(R.layout.detail2);
 		//	添加控件;
 		initView();
 		//	添加事件监听;
@@ -101,7 +104,8 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	//	控件初始化;
 	private void initView(){
 		tvTopic			=	(TextView) findViewById(R.id.tvTopic);
-		tvShow			=	(TextView) findViewById(R.id.tvShow);
+//		tvShow			=	(TextView) findViewById(R.id.tvShow);
+		vWvShow			= 	(WebView) findViewById(R.id.wvShow);
 		vBack			=	(TextView) findViewById(R.id.btnBack);
 		btnFunction		=	(TextView) findViewById(R.id.btnFunction);
 		mGallery		=	(Gallery) findViewById(R.id.gallery);
@@ -126,7 +130,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		mDB 			= 	mSqLiteHelper.getmDB();
 		//	数据信息加载;
 		doLoadData();
-		tvShow.setText(sResult);
+//		tvShow.setText(sResult);
 		//	提货信息路径;
 		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"ggoods"+File.separator+gid;
 		//	承装图片的容器;
@@ -165,11 +169,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 			}
 		});				
 	}
-	
-	
-	
-	
-	
+
 	//	信息加载;
 	private void doLoadData(){
 		sql		=	"select * from getgoodsinfo where ggid="+ggid;
@@ -190,33 +190,45 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 			String gtime	=	mCursor.getString(mCursor.getColumnIndex("gtime")).toString();
 			String stime	=	mCursor.getString(mCursor.getColumnIndex("stime")).toString();
 			
-			sResult="商品编号:"+bid+"-"+gid+"\r\n运输方式:"+lkind+"\r\n";
+			sResult="<html>" +
+						"<body>" +
+							"<table border=\"1\" style=\"width:1000px;\">" +
+						"<tr bgcolor=\"#00FF00\" align=\"center\">" +
+						"<td colspan=\"3\">商品编号</td><td colspan=\"5\">"+bid+"-"+gid+"</td><td colspan=\"3\">运输方式</td><td colspan=\"5\">"+lkind+"</td></tr>";
 			
-			if(lkind.equals("汽车运输")){
-				sResult=sResult+
-						"拖车编号:"+tid+"	车辆类型:"+tkind+"\r\n"+
-						"铅封号:"+oid+"\r\n"+
-						"单车件数:"+percount+"件	单车吨数:"+perweight+"吨	车数:"+tcount+"辆\r\n"+
-						"提货时间:"+gtime+"\r\n" +
-						"发车时间:"+stime+"\r\n";
+			if(lkind.equals("汽运")){
+				sResult+=
+						"<tr align=\"center\">" +
+						"<td>拖车编号</td>" +
+						"<td>"+tid+"</td>" +
+						"<td>车辆类型</td>" +
+						"<td>"+tkind+"</td>" +
+						"<td>铅封号</td><td>"+oid+"</td><td>单车件数</td><td>"+percount+"件</td>" +
+						"<td>单车吨数</td><td>"+perweight+"吨</td><td>车数</td><td>"+tcount+"辆</td><td>提货时间</td><td>"+gtime+"</td><td>发车时间</td><td>"+stime+"</td>" +
+						"</tr>";
 			}else{
-				sResult=sResult+
-						"车皮编号:"+tid+"	车辆类型:"+tkind+"\r\n"+
-						"运单号:"+oid+"\r\n"+
-						"单车件数:"+percount+"件	单车吨数:"+perweight+"吨	标重(车):"+tformatweight+"吨\r\n"+
-						"提货时间:"+gtime+"\r\n" +
-						"发车时间:"+stime+"\r\n";
-				
+				sResult+=
+						"<tr align=\"center\">" +
+						"<td>车皮编号</td><td>"+tid+"</td><td>车辆类型</td><td>"+tkind+"</td><td>运单号</td><td>"+oid+"</td><td>单车件数</td><td>"+percount+"件</td><td>单车吨数</td><td>"+perweight+"吨</td><td>标重(车)</td><td>"+tformatweight+"吨</td><td>提货时间</td><td>"+gtime+"</td><td>发车时间</td><td>"+stime+"</td>" +
+						"</tr>";
 			}		
-			sResult=sResult+"状态信息:\r\n"+
-					gstate
+			sResult+=
+								"<tr>" +
+									"<td colspan=\"4\" align=\"center\">状态信息</td>" +
+									"<td colspan=\"12\">"+gstate+"</td>" +
+								 "</tr>"+
+							"</table>" +
+						"</body>" +
+					"</html>"
 					;
 		}
 		if(mCursor!=null){
 			mCursor.close();
 		}
 		
-		tvShow.setText(sResult);		
+		vWvShow.getSettings().setDefaultTextEncodingName("utf-8") ;
+		vWvShow.loadDataWithBaseURL(null, sResult, "text/html", "utf-8", null);	
+//		tvShow.setText(sResult);		
 	}
 	//	适配器的类;
 	public class ImageAdaper extends BaseAdapter{  
@@ -235,11 +247,11 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
         }  
 
         public int getCount() {  
-            return this.nSize;  
+            return nSize;  
         }  
   
         public Object getItem(int position) {  
-            return this.listBD.get(position);  
+            return listBD.get(position);  
         }  
   
         public long getItemId(int position) {  
@@ -248,8 +260,8 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 
 		public View getView(int position, View convertView, ViewGroup parent) {  
             
-            ImageView imageview = new ImageView(this.mContext); 
-            imageview.setImageDrawable(this.listBD.get(position));	            	
+            ImageView imageview = new ImageView(mContext); 
+            imageview.setImageDrawable(listBD.get(position));	            	
             
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);  
             imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));  
@@ -260,17 +272,15 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
     }
 	//	线程的自定义形式;
 	class MyThread extends Thread{
-		private String url,
-					   response;
-		private int position;
+		private int    position;
 		public MyThread(int position) {
 			this.position=position;
 		}
 		@Override
 		public void run() {
-			String path		=	folderPath+File.separator+list.get(this.position)+".jpg";
-			url				=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
-			response		=	mGetOrPostHelper.uploadFile(url,path,list.get(this.position));
+			String path		=	folderPath+File.separator+list.get(position)+".jpg";
+			String url		=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+			String response	=	mGetOrPostHelper.uploadFile(url,path,list.get(this.position));
 			int nFlag= MTConfigHelper.NTAG_FAIL;
 			if(!response.endsWith("fail")){
 				nFlag= MTConfigHelper.NTAG_SUCCESS;
@@ -300,10 +310,8 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		case R.id.btnBack:
 			finish();
 			break;
-
 		default:
 			break;
 		}
-		
 	}
 }

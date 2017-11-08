@@ -120,7 +120,7 @@ public class SignHistoryActivity extends Activity implements OnClickListener{
 		mListBid.clear();
 		
 		List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-		sql		=	"select * from resigninfo group by bid,gid";
+		sql		=	"select * from resigninfo order by rid";
 		mCursor	= 	mDB.rawQuery(sql, null);
 		int nCount=0;
 		while (mCursor.moveToNext()) {	

@@ -51,56 +51,63 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+/**
+ * @author Li Yuxuan;
+ * */
 public class GetgoodsInformationActivity extends Activity implements OnClickListener {
 	/*程序内部的上下文*/
 	private Context   mContext;   // 文件内容;
+	/*进行信息传递的intent*/
+	private Intent 	  mIntent;
+	
+	/*控件的声明*/
 	private Button	  vCode, 	  // 扫码按钮;
 					  vSearch, 	  // 搜索按钮;
 					  vPhoto, 	  // 拍照按钮;
 					  vOid, 	  // 运单扫码;
 					  vSetTime,   // 设置时间;
-					  vOk // 确认按钮;
+					  vOk 		  // 确认按钮;
 					  ;
-	private TextView vTopic, // 标题显示;
-					 vState2, // 状态2;
-					 vBack, // 返回按钮;
-					 vFunction;// 功能按钮;
+	private TextView  vTopic, 	  // 标题显示;
+					  vState2,    // 状态2;
+					  vBack, 	  // 返回按钮;
+					  vFunction;  // 功能按钮;
 					 ;
 
-	private Builder mBuilder; // 对话框;
-	private Spinner vState;
-	private EditText ettid, // 拖车号;
-			ettkind, // 车型;
-			etoid, // 运输号;
-			etPercount, // 件数(单);
-			etPerweight,// 吨数(单);
-			etTformatweight,// 标重(车)
-			etTcount, // 车数;
-			etSearch // 搜索的框;
-			;
-	private ListView mListView;
-	/*参数定义*/
-	private String slkind, // 标题栏;
-	taskid,
-	gid, // 货品号;
-	bid, gstate = "正常", gsimg = "null", lkind 	   = "汽运",
-	tid 		= "null",
-	tkind 		= "null", oid   = "null", percount = "1",
-	perweight 	= "1",
-	tformatweight = "1", tcount = "0", gtime, stime, folderPath, // 文件夹路径;
-	filePath, 	// 文件路径;
-	tmpPath, 	// 临时路径;
-	sSize,
-	wid;
-	private ArrayList<String> list;
+	private Builder   vBuilder;   // 对话框;
+	private Spinner   vState;
+	private EditText  vTid, 	  // 拖车号;
+					  ettkind, 	  // 车型;
+					  etoid, 	  // 运输号;
+					  etPercount, // 件数(单);
+					  etPerweight,// 吨数(单);
+					  etTformatweight,// 标重(车)
+					  etTcount,   // 车数;
+					  etSearch 	  // 搜索的框;
+					  ;
+	private ListView  vListView;
+	private ProgressDialog mDialog; // 对话方框;
 	private ArrayAdapter<String> mAdapter;
+	/*参数定义*/
+	private String   slkind, 	  // 标题栏;
+					 taskid,
+					 gid, 		  // 货品号;
+					 bid, gstate   = "正常", gsimg = "null", lkind 	   = "汽运",
+					 tid 		   = "null",
+					 tkind 		   = "null", oid   = "null", percount = "1",
+					 perweight 	   = "1",
+					 tformatweight = "1", tcount = "0", gtime, stime, folderPath, // 文件夹路径;
+					 filePath, 	// 文件路径;
+					 tmpPath, 	// 临时路径;
+					 sSize,
+					 wid;
+	private ArrayList<String> 	 list;
+	//	TODO 01.新增的相关内容;
 	private ArrayList<MEFile> 	 listfile;
 	
-	/*进行信息传递的intent*/
-	private Intent mIntent;
-	private ProgressDialog mDialog; // 对话方框;
-	private MyThread mThread; // 线程内容;
-	private MyThread2 mThread2;
+	//	TODO 02.修改的相关内容;
+	private LoadInfoThread mThread; // 线程内容;
+	private UpLoadThread   mThread2;
 	// 帮助类;
 	private MTConfigHelper 	  mConfigHelper;
 	private MTGetOrPostHelper mGetOrPostHelper;
@@ -133,6 +140,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			default:
 				break;
 			}
+			showImgCount();
 			showData();
 			closeThread();
 		}
@@ -155,12 +163,13 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		mContext 	  = GetgoodsInformationActivity.this;
 		mSpHelper     = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,mContext.MODE_APPEND);
 		mSqLiteHelper = new MTSQLiteHelper(mContext);
-		mDB = mSqLiteHelper.getmDB();
-		mBuilder = new Builder(mContext);
-		mBuilder.setTitle("选择运输方式(默认汽运)");
+		mDB 		  = mSqLiteHelper.getmDB();
+		vBuilder 	  = new Builder(mContext);
+		
+		vBuilder.setTitle("选择运输方式(默认汽运)");
 		final String[] kinds = { "汽运", "铁路" };
 
-		mBuilder.setItems(kinds, new DialogInterface.OnClickListener() {
+		vBuilder.setItems(kinds, new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface arg0, int position) {
@@ -170,9 +179,9 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			}
 		});
 
-		mBuilder.setNegativeButton(R.string.action_no, null);
-		mBuilder.create();
-		mBuilder.show();
+		vBuilder.setNegativeButton(R.string.action_no, null);
+		vBuilder.create();
+		vBuilder.show();
 		vTopic.setText("提货	( " + slkind + " )");
 	}
 
@@ -191,18 +200,17 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		vOk 	  = (Button) findViewById(R.id.btnOk);
 
 		vState2   = (TextView) findViewById(R.id.state2);
-		mListView = (ListView) findViewById(R.id.lvResult);
+		vListView = (ListView) findViewById(R.id.lvResult);
 		//
-		ettid = (EditText) findViewById(R.id.ettid);
-		ettkind = (EditText) findViewById(R.id.ettkind);
-		etoid = (EditText) findViewById(R.id.etoid);
-		etPercount = (EditText) findViewById(R.id.etPercount);
+		vTid 	  = (EditText) findViewById(R.id.ettid);
+		ettkind   = (EditText) findViewById(R.id.ettkind);
+		etoid 	  = (EditText) findViewById(R.id.etoid);
+		etPercount  = (EditText) findViewById(R.id.etPercount);
 		etPerweight = (EditText) findViewById(R.id.etPerweight);
 		etTformatweight = (EditText) findViewById(R.id.etTformatweight);
-		etTcount = (EditText) findViewById(R.id.etTcount);
-		etSearch = (EditText) findViewById(R.id.etSearch);
-		//
-		vState = (Spinner) findViewById(R.id.gstate);
+		etTcount  = (EditText) findViewById(R.id.etTcount);
+		etSearch  = (EditText) findViewById(R.id.etSearch);
+		vState 	  = (Spinner) findViewById(R.id.gstate);
 	}
 
 	// 事件初始化;
@@ -213,6 +221,9 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		mImgHelper 		 = new MTImgHelper();
 		//	文件的管理类对象;
 		mtFileHelper	 = new MTFileHelper();
+		// 信息列表的加载;
+		list = new ArrayList<String>();
+
 		listfile		 = mtFileHelper.getListfiles();
 		// 顶部按钮的事件监听的添加;
 		vBack.setOnClickListener(this);
@@ -228,8 +239,6 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		vSetTime.setOnClickListener(this);
 		vOk.setOnClickListener(this);
 		
-		// 信息列表的加载;
-		list = new ArrayList<String>();
 
 		// 进行事件监听的添加;
 		vState.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -242,26 +251,25 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					gstate = "正常";
 					break;
 				case 1:
-					mBuilder = new Builder(mContext);
-					mBuilder.setTitle("异常信息");
+					vBuilder = new Builder(mContext);
+					vBuilder.setTitle("异常信息");
 					final EditText edit = new EditText(mContext);
 					edit.setSingleLine(false);
 					edit.setLines(6);
-					mBuilder.setView(edit);
-					mBuilder.setPositiveButton(R.string.action_ok,
+					vBuilder.setView(edit);
+					vBuilder.setPositiveButton(R.string.action_ok,
 							new DialogInterface.OnClickListener() {
 
 								@Override
 								public void onClick(DialogInterface arg0,
 										int arg1) {
-									String tmp = edit.getText().toString()
-											.trim();
+									String tmp = edit.getText().toString().trim();
 									if (!tmp.equals("")) {
 										gstate = tmp;
 									}
 								}
 							});
-					mBuilder.setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
+					vBuilder.setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
@@ -269,8 +277,8 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 							vState.setSelection(0);
 						}
 					});
-					mBuilder.create();
-					mBuilder.show();
+					vBuilder.create();
+					vBuilder.show();
 					break;
 				default:
 					break;
@@ -287,19 +295,17 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				doResetParam2();
+				doResetParam();
 			}
 			
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -308,13 +314,13 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 	// 事件监测;
 	private void checkEvent() {
 		if (slkind.equals("铁路")) {
-			ettid.setHint("车皮号");
+			vTid.setHint("车皮号");
 			etoid.setHint("运单号");
 			etTformatweight.setVisibility(View.VISIBLE);
 			etTcount.setVisibility(View.GONE);
 			vSetTime.setText("发送时间(铁)");
 		} else {
-			ettid.setHint("托车号");
+			vTid.setHint("托车号");
 			etoid.setHint("铅封号");
 			etTformatweight.setVisibility(View.GONE);
 			etTcount.setVisibility(View.VISIBLE);
@@ -325,6 +331,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 	@Override
 	protected void onResume() {
 		super.onResume();
+		showImgCount();
 		showData();
 	}
 
@@ -336,6 +343,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		switch (nVid) {
 		// 返回按钮;
 		case R.id.btnBack:
+			// TODO 修改的内容;
 			int n=listfile.size();
 			if(n!=0){
 				for(MEFile item:listfile){
@@ -373,7 +381,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 				mDialog = ProgressDialog.show(mContext, strDialogTitle,
 						strDialogBody, true);
 				taskid = etSearch.getText().toString().trim();
-				mThread = new MyThread();
+				mThread = new LoadInfoThread();
 				mThread.start();
 			}
 			break;
@@ -389,11 +397,10 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			break;
 		// 设置时间;
 		case R.id.btnSetTime:
-			mBuilder = new Builder(mContext);
-			View view2 = getLayoutInflater().inflate(
-					R.layout.activity_datatimepicker, null);
-			mBuilder.setTitle("设置时间");
-			mBuilder.setView(view2);
+			vBuilder = new Builder(mContext);
+			View view2 = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
+			vBuilder.setTitle("设置时间");
+			vBuilder.setView(view2);
 			DatePicker datePicker = (DatePicker) view2
 					.findViewById(R.id.dpPicker);
 			TimePicker timePicker = (TimePicker) view2
@@ -414,21 +421,19 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 				public void onDateChanged(DatePicker view, int year,
 						int monthOfYear, int dayOfMonth) {
 					// 日历控件;
-					date = year + "年" + (monthOfYear + 1) + "月" + dayOfMonth
-							+ "日";
+					date = year + "年" + (monthOfYear + 1) + "月" + dayOfMonth + "日";
 				}
 			});
 
 			timePicker.setIs24HourView(true);
-			timePicker
-					.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-						@Override
-						public void onTimeChanged(TimePicker view,
-								int hourOfDay, int minute) {
-							time = hourOfDay + "时" + minute + "分";
-						}
-					});
-			mBuilder.setPositiveButton(R.string.action_ok,
+			timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+				@Override
+				public void onTimeChanged(TimePicker view,
+						int hourOfDay, int minute) {
+					time = hourOfDay + "时" + minute + "分";
+				}
+			});
+			vBuilder.setPositiveButton(R.string.action_ok,
 					new DialogInterface.OnClickListener() {
 
 						@Override
@@ -438,9 +443,9 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 
 						}
 					});
-			mBuilder.setNegativeButton(R.string.action_no, null);
-			mBuilder.create();
-			mBuilder.show();
+			vBuilder.setNegativeButton(R.string.action_no, null);
+			vBuilder.create();
+			vBuilder.show();
 			break;
 		// 确认按钮;
 		case R.id.btnOk:
@@ -475,7 +480,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 				// 运输方式;
 				lkind = slkind;
 				// 车辆编号;
-				tid = ettid.getText().toString().trim();
+				tid = vTid.getText().toString().trim();
 				if (tid.equals("")) {
 					tid = "null";
 				}
@@ -519,10 +524,10 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					stime = "无";
 				}
 			
-				mBuilder=new Builder(mContext);
-				mBuilder.setTitle("信息确认");
+				vBuilder=new Builder(mContext);
+				vBuilder.setTitle("信息确认");
 		
-				sSize = String.valueOf(mtFileHelper.getListfiles().size());
+				showImgCount();
 				String sContent=
 						"状态:"+gstate+"\r\n" +
 						"商品编号:"+bid+"-"+gid+"\r\n"+
@@ -551,21 +556,21 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 				sContent+=
 						"提货时间:"+gtime+"\r\n" +
 						"发货时间:"+stime;
-				mBuilder.setMessage(sContent);
-				mBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+				vBuilder.setMessage(sContent);
+				vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 						if (mThread2 == null) {
-							mThread2 = new MyThread2();
+							mThread2 = new UpLoadThread();
 							mThread2.start();
 						}
 					}
 				});
-				mBuilder.setNegativeButton(R.string.action_no, null);
+				vBuilder.setNegativeButton(R.string.action_no, null);
 				
-				mBuilder.create();
-				mBuilder.show();
+				vBuilder.create();
+				vBuilder.show();
 				
 				
 			} else {
@@ -588,15 +593,15 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		} else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
 				&& resultCode == -1) {
 			Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
+			//	清空照片列表;
 			mImgHelper.compressPicture(tmpPath, filePath);
 			mImgHelper.clearPicture(tmpPath, null);
 			//	进行文件内容的叠加;
 			MEFile meFile=new MEFile(gsimg, filePath);
+			//	将拍照操作放入列表;
+			// TODO 修改的内容;
 			mtFileHelper.fileAdd(meFile);
-			//	
-			sSize = String.valueOf(mtFileHelper.getListfiles().size());
-//					String.valueOf(mFileHelper.getFileCount(folderPath));
-			vState2.setText(sSize);
+			showImgCount();
 		} else if (requestCode == MTConfigHelper.NTRACK_GGOODS_OID_TO
 				&& resultCode == MTConfigHelper.NTRACK_FLUSH_TO_MENU) {
 			String oid = intent.getStringExtra("bid");
@@ -604,42 +609,42 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		}
 	}
 
-	public class MyThread2 extends Thread {
-		private String url, param, response, sql;
-
+	public class UpLoadThread extends Thread {
 		@Override
 		public void run() {
 
 			// 进行相应的登录操作的界面显示;
 			// 01.Http 协议中的Get和Post方法;
-			url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
+			String url  = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
+			String param= null;
 			try {
-				param = "operType=1&" + "bid=" + bid + "&" + "gid=" + gid + "&"+ "gstate=" + URLEncoder.encode(gstate, "utf-8") + "&"+ "gsimg=" + gsimg + "&" + "lkind="+ URLEncoder.encode(lkind, "utf-8") + "&" + "tid="+ tid + "&" + "tkind="+ URLEncoder.encode(tkind, "utf-8") + "&" + "oid="+ oid + "&" + "percount=" + percount + "&"+ "perweight=" + perweight + "&" + "tformatweight="+ tformatweight + "&" + "tcount=" + tcount + "&" + "gtime="+ URLEncoder.encode(gtime, "utf-8") + "&" + "stime="+ URLEncoder.encode(stime, "utf-8") + "&" + "wid="+ wid;
+				param 	= "operType=1&" + "bid=" + bid + "&" + "gid=" + gid + "&"+ "gstate=" + URLEncoder.encode(gstate, "utf-8") + "&"+ "gsimg=" + gsimg + "&" + "lkind="+ URLEncoder.encode(lkind, "utf-8") + "&" + "tid="+ tid + "&" + "tkind="+ URLEncoder.encode(tkind, "utf-8") + "&" + "oid="+ oid + "&" + "percount=" + percount + "&"+ "perweight=" + perweight + "&" + "tformatweight="+ tformatweight + "&" + "tcount=" + tcount + "&" + "gtime="+ URLEncoder.encode(gtime, "utf-8") + "&" + "stime="+ URLEncoder.encode(stime, "utf-8") + "&" + "wid="+ wid;
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 
-			response = mGetOrPostHelper.sendGet(url, param);
-			int nFlag = MTConfigHelper.NTAG_FAIL;
+			String response = mGetOrPostHelper.sendGet(url, param);
+			int    nFlag 	= MTConfigHelper.NTAG_FAIL;
 
 			if (!response.equalsIgnoreCase("fail")) {
-				nFlag = MTConfigHelper.NTAG_SUCCESS;
-				sql = "insert into getgoodsinfo (bid,gid,gstate,gsimg,lkind,tid,tkind,oid,percount,perweight,tformatweight,tcount,gtime,stime) values ('"+ bid+ "',"+ "'"+ gid+ "',"+ "'"+ gstate+ "',"+ "'"+ gsimg+ "',"+ "'"+ lkind+ "',"+ "'"+ tid+ "',"+ "'"+ tkind+ "',"+ "'"+ oid+ "',"+ percount+ ","+ perweight+ ","+ tformatweight+ ","+ tcount+ ","+ "'"+ gtime+ "',"+ "'"+ stime+ "')";
+				nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
+				String sql  = "insert into getgoodsinfo (bid,gid,gstate,gsimg,lkind,tid,tkind,oid,percount,perweight,tformatweight,tcount,gtime,stime) values ('"+ bid+ "',"+ "'"+ gid+ "',"+ "'"+ gstate+ "',"+ "'"+ gsimg+ "',"+ "'"+ lkind+ "',"+ "'"+ tid+ "',"+ "'"+ tkind+ "',"+ "'"+ oid+ "',"+ percount+ ","+ perweight+ ","+ tformatweight+ ","+ tcount+ ","+ "'"+ gtime+ "',"+ "'"+ stime+ "')";
 				mDB.execSQL(sql);
 			}
 			mHandler.sendEmptyMessage(nFlag);
 		}
 	}	
-	private void doResetParam2() {
+	private void doResetParam() {
 		// 数据列表;
 		list.clear();
 		// 重新加载数据;
+		showImgCount();
 		showData();
 		// 异常按钮重置;
 		gstate = "正常";
 		vState.setSelection(0);
 		// 拖车号;
-		ettid.setText(MTConfigHelper.SPACE);
+		vTid.setText(MTConfigHelper.SPACE);
 		// 车型
 		ettkind.setText(MTConfigHelper.SPACE);
 		// 铅封号;
@@ -659,7 +664,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 	}
 
 	// 定义的线程——自定义的线程内容;
-	public class MyThread extends Thread {
+	public class LoadInfoThread extends Thread {
 		private String url, param, response;
 
 		@Override
@@ -723,6 +728,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 							list.add("箱型:" + boxkind);
 							list.add("箱所属:" + boxbelong);
 							list.add("回程运输方式:" + retransway);
+							// TODO 修改的内容;
 							list.add("————分割线————");
 							list.add("货物编号:" + bid + "-" + gid);
 							list.add("品名:" + gname);
@@ -750,12 +756,15 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			mHandler.sendEmptyMessage(nFlag);
 		}
 	}
-
-	private void showData() {
+	// TODO 修改的内容;
+	private void showImgCount(){
 		sSize = String.valueOf(mtFileHelper.getListfiles().size());
-		vState2.setText(sSize);
+		vState2.setText(sSize);		
+	}
+	private void showData() {
 		mAdapter = new ArrayAdapter<String>(mContext, R.layout.item02, R.id.tvTopic, list);
-		mListView.setAdapter(mAdapter);
+		//	显示的列表和适配器绑定;
+		vListView.setAdapter(mAdapter);
 	}
 
 	// 拍照功能;
