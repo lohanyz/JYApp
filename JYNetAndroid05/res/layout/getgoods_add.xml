@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff" >
+
+    <include
+        android:id="@+id/includeTop"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        layout="@layout/topbar" />
+
+    <View
+        android:id="@+id/separator1"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/includeTop"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="5dp"
+        android:background="#90909090" />
+
+    <Button
+        android:id="@+id/btnOk"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/btn01"
+        android:text="@string/action_ok"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/layTrain"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnOk"
+        android:layout_below="@id/separator1"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_marginTop="5sp"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <EditText
+            android:id="@+id/etDgtrainwagonno"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtrainwagonno"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etDgtraintype"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtraintype"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etDgtrainwaybillno"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtrainwaybillno"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etDgtrainsinglenum"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtrainsinglenum"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/etDgtrainsingleton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtrainsingleton"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/etDgtrainwagonkg"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dgtrainwagonkg"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btnDloadingtime"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/btn07"
+            android:text="@string/dloadingtime"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnDgtrainstartdate"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/btn07"
+            android:text="@string/dgtrainstartdate"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layTruck"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnOk"
+        android:layout_below="@id/separator1"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_marginTop="5sp"
+        android:orientation="vertical"
+        android:visibility="visible" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30sp"
+            android:text="@string/truckgetinfo"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etSeaino"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/seaino"
+            android:inputType="text" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/etDttrailerno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dttrailerno" />
+
+            <EditText
+                android:id="@+id/etDtrailermodelscoll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtrailermodelscoll" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/etDtsingletrailernum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtsingletrailernum" />
+
+            <EditText
+                android:id="@+id/etDtsingletrailerton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtsingletrailerton" />
+
+            <EditText
+                android:id="@+id/etSvehiclescoll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/svehiclescoll" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDtpickupdate"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/btn07"
+            android:text="@string/dtpickupdate"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnDtstartdate"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/btn07"
+            android:text="@string/dtstartdate"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30sp"
+            android:text="@string/trucksendinfo"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/etDgtrailerno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dttrailerno" />
+
+            <EditText
+                android:id="@+id/etDtrailermodelsdely"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtrailermodelscoll" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/etDgsingletrailernum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtsingletrailernum" />
+
+            <EditText
+                android:id="@+id/etDgsingletrailerton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/dtsingletrailerton" />
+
+            <EditText
+                android:id="@+id/etSvehiclesdely"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/svehiclescoll" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDgstartdate"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/btn07"
+            android:text="@string/dtstartdate"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</RelativeLayout>

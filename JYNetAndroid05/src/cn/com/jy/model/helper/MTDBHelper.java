@@ -43,25 +43,63 @@ public class MTDBHelper extends SQLiteOpenHelper {
 			"gstate integer" +
 			")";	
 
-	//	提货信息表;
+//	//	提货信息表;
+//	private String sql_getgoodsinfo=
+//			"create table getgoodsinfo (" +
+//			"ggid integer primary key ," +
+//			"gid varchar(20)," +
+//			"bid varchar(20)," +
+//			"gstate varchar(500)," +
+//			"gsimg varchar(500)," +
+//			"lkind varchar(20)," +
+//			"tid varchar(500)," +
+//			"tkind varchar(100)," +
+//			"oid varchar(100)," +
+//			"percount integer," +
+//			"perweight double," +
+//			"tformatweight double," +
+//			"tcount integer," +
+//			"gtime varchar(20)," +
+//			"stime varchar(20)" +
+//			")";
+	
 	private String sql_getgoodsinfo=
-			"create table getgoodsinfo (" +
-			"ggid integer primary key ," +
-			"gid varchar(20)," +
-			"bid varchar(20)," +
-			"gstate varchar(500)," +
-			"gsimg varchar(500)," +
-			"lkind varchar(20)," +
-			"tid varchar(500)," +
-			"tkind varchar(100)," +
-			"oid varchar(100)," +
-			"percount integer," +
-			"perweight double," +
-			"tformatweight double," +
-			"tcount integer," +
-			"gtime varchar(20)," +
-			"stime varchar(20)" +
-			")";
+	"create table getgoodsinfo ( " +
+	"_id integer primary key ," 		+ 		//	id编号;
+	"barcode 	 varchar(32) not null," +		//	二维码信息;
+	"dttrailerno varchar(32) not null," +		//	拖车(取)拖车号(国内信息)
+	
+	"seaino 	 varchar(32) not null," +		//	铅封号(货物信息)
+	
+	"dtsingletrailernum	 varchar(32) not null," +		//	拖车(取)单车件数
+	"dtsingletrailerton	 varchar(32) not null,"+	    //	拖车(取)单车吨数
+	"svehiclescoll	 	 varchar(32) not null,"+	    //	车数(取)(仓储)
+	
+	"dtpickupdate		 varchar(32) not null,"+		//	拖车(取)提货时间(国内时间)
+	"dtstartdate	 	 varchar(32) not null,"+		//	拖车(取)发车时间(国内时间)
+	"dgtrainwagonno	 	 varchar(32) not null,"+		//	铁路车皮号(国内信息)
+	
+	"dgtraintype 	 	 varchar(32) not null,"+		//	铁路车型(国内信息)
+	"dgtrainwaybillno 	 varchar(32) not null,"+		//	铁路运单号(国内信息)
+	
+	"dgtrainsinglenum 	 varchar(32) not null,"+		//	铁路单车件数(国内信息)
+	"cargostatuscenter   varchar(500) not null,"+		//	货物状态
+	"dgtrainsingleton	 varchar(32) not null,"+		//	铁路单车吨数
+	"dgtrainwagonkg	 	 varchar(32) not null,"+		//	铁路车皮标重
+	"dloadingtime	 	 varchar(32) not null,"+		//	装车时间(调度)
+	
+	"dgtrainstartdate 	 varchar(32) not null,"+		//	铁路发运日
+	"dgtrailerno	 	 varchar(32) not null,"+		//	拖车送拖车号(国内信息)
+	"dtrailermodelsdely	 varchar(32) not null,"+		//	拖车车型(送)(调度)
+	"dgsingletrailernum	 varchar(32) not null,"+		//	拖车(送)单车件数(国内信息)
+	"dgsingletrailerton	 varchar(32) not null,"+		//	拖车(送)单车吨数(国内信息)
+	"svehiclesdely	 	 varchar(32) not null,"+		//	车数(送)(仓储)
+	
+	"dgstartdate	 	 varchar(32) not null,"+		//	拖车(送)发车时间(国内信息)
+	"img 	 			 varchar(1000) not null" +		//	图片
+	")";		
+	
+	
 	//	港口信息的表;
 	private String sql_portinfo=
 			"create table portinfo (" +

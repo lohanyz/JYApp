@@ -16,6 +16,7 @@
  	<string name="action_settings">设置</string>
     <string name="action_login">登&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;录</string>
     <string name="action_ok">&#160;&#160;&#160;&#160;确&#160;&#160;&#160;&#160;&#160;&#160;认&#160;&#160;&#160;&#160;</string>
+    <string name="action_editinfo">编辑信息</string>
     <string name="action_no">取  消</string>
     <string name="action_resign">注  册</string>
     <string name="action_delAll">清空</string>
@@ -99,6 +100,36 @@
     <string name="result_exit">已经跳出程序</string>
     <!-- 测试 -->
     <string name="dateSliderTitle">Selected date</string>
+    <string name="dgtrainwagonno">铁路车皮号</string>
+	<string name="dgtraintype">铁路车型</string>
+	<string name="dgtrainwaybillno">铁路运单号</string>
+	<string name="dgtrainsinglenum">铁路单车件数</string>
+	<string name="dgtrainsingleton">铁路单车吨数</string>
+	<string name="dgtrainwagonkg">铁路车皮标重</string>
+	<string name="dloadingtime">装车时间</string>
+	<string name="dgtrainstartdate">铁路发送日</string>
+    
+    <string name="truckgetinfo">调度取信息</string>
+    <string name="trucksendinfo">调度送信息</string>
+    <string name="seaino">铅封号</string>
+    <string name="dttrailerno">拖车号</string>
+    <string name="dtrailermodelscoll">拖车型</string>
+    <string name="dtsingletrailernum">单车件数</string>
+    <string name="dtsingletrailerton">单车吨数</string>
+    
+    <string name="svehiclescoll">车数</string>
+    <string name="dtpickupdate">提货时间</string>
+    
+    <string name="dtstartdate">发车时间</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     <string name="t1">1</string>
 </resources>

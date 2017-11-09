@@ -71,6 +71,12 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
+            android:name="cn.com.jy.view.need.GetgoodsAddActivity"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
             android:name="cn.com.jy.view.need.GetgoodsDetailActivity"
             android:theme="@android:style/Theme.NoTitleBar" 
             android:screenOrientation="portrait"
