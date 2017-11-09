@@ -504,7 +504,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				"dtpickupdate," +
 				"dtstartdate," +
 				"dgtrainwagonno,dgtraintype,dgtrainwaybillno,dgtrainsinglenum,cargostatuscenter,dgtrainsingleton,dgtrainwagonkg," +
-				"dloadingtime,dgtrainstartdate,dgtrailerno,dtrailermodelsdely,dgsingletrailernum,dgsingletrailerton,svehiclesdely,dgstartdate,img" +		//	图片
+				"dloadingtime,dgtrainstartdate,dgtrailerno,dtrailermodelsdely,dgsingletrailernum,dgsingletrailerton,svehiclesdely,dgstartdate,img,busiinvcode" +		//	图片
 				") values (" +
 				"'"+barcode+"'," +
 				"'"+dttrailerno+"'," +
@@ -529,7 +529,8 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				"'"+dgsingletrailerton+"'," +
 				"'"+svehiclesdely+"'," +
 				"'"+dgstartdate+"'," +
-				"'"+img+"')";		
+				"'"+img+"'," +
+				"'"+busiinvcode+"')";		
 				mDB.execSQL(sql);
 			}
 			mHandler.sendEmptyMessage(nFlag);

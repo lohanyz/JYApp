@@ -97,10 +97,10 @@ public class GetgoodsHistoryActivity extends Activity implements OnClickListener
 					long id) {
 				Intent  intent	=new Intent(GetgoodsHistoryActivity.this, GetgoodsDetailActivity.class);
 				Bundle	bundle	=new Bundle();
-				String  ggid	=mList.get(position).get("id");
-				String  simg	=mList.get(position).get("img");
-				bundle.putString("ggid", ggid);
-				bundle.putString("imgs", simg);
+				String  _id		=mList.get(position).get("_id");
+				String  img		=mList.get(position).get("img");
+				bundle.putString("_id", _id);
+				bundle.putString("imgs", img);
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}
@@ -122,27 +122,25 @@ public class GetgoodsHistoryActivity extends Activity implements OnClickListener
 		mListBid.clear();
 		
 		List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-		sql		=	"select * from getgoodsinfo order by ggid  ";
+		sql		=	"select * from getgoodsinfo order by _id  ";
 		mCursor	= 	mDB.rawQuery(sql, null);
 		int nCount=0;
 		while (mCursor.moveToNext()) {	
 			nCount++;
 			Map<String, String> map=new HashMap<String, String>();
-			String ggid		=	mCursor.getString(mCursor.getColumnIndex("ggid")).toString();
-			String gid		=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-			String bid		=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-			String gtime	=	mCursor.getString(mCursor.getColumnIndex("gtime")).toString();
-			String stime	=	mCursor.getString(mCursor.getColumnIndex("stime")).toString();
-			String gsimg	=	mCursor.getString(mCursor.getColumnIndex("gsimg")).toString();
+			String _id		=	mCursor.getString(mCursor.getColumnIndex("_id")).toString();
+			String barcode	=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
+			String img		=	mCursor.getString(mCursor.getColumnIndex("img")).toString();
+			String busiinvcode=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
 			
-			if(mSetTmp.add(bid)){
-				mListBid.add(bid);
+			if(mSetTmp.add(busiinvcode)){
+				mListBid.add(busiinvcode);
 			}
 			
-			map.put("content", nCount+" --> "+bid+"-"+gid+" ["+gtime+"|"+stime+"] "+"  详情");
-			map.put("img", gsimg);
+			map.put("content", nCount+" --> 业务"+busiinvcode+" 条码"+barcode+" 总序 "+_id+"  详情");
+			map.put("img", img);
 			
-			map.put("id",ggid);
+			map.put("id",_id);
 			list.add(map);
 		}
 		

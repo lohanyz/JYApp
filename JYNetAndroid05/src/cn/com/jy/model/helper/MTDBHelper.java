@@ -96,8 +96,8 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	"svehiclesdely	 	 varchar(32) not null,"+		//	车数(送)(仓储)
 	
 	"dgstartdate	 	 varchar(32) not null,"+		//	拖车(送)发车时间(国内信息)
-	"img 	 			 varchar(1000) not null" +		//	图片
-	")";		
+	"img 	 			 varchar(1000) not null," +		//	图片
+	"busiinvcode		 varchar(32) not null)";		
 	
 	
 	//	港口信息的表;
