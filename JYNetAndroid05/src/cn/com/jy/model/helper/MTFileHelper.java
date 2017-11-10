@@ -62,7 +62,8 @@ public class MTFileHelper {
     		 for(String item:names){
     			 list.add(item);
     		 }
-    	 }else list.add(param);
+    	 }else if(!param.equals("未拍照"))
+    		 list.add(param);
     	 
  		return list;
  	}

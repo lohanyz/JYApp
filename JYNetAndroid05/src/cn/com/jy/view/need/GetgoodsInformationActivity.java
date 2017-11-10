@@ -374,36 +374,11 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 			String oid = intent.getStringExtra("bid");
 			etoid.setText(oid);
 		}else if(requestCode ==1){
-			
-			
+			if(resultCode==1){
+				doResetParam();
+			}
 		}
 	}
-
-//	public class UpLoadThread extends Thread {
-//		@Override
-//		public void run() {
-//
-//			// 进行相应的登录操作的界面显示;
-//			// 01.Http 协议中的Get和Post方法;
-//			String url  = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
-//			String param= null;
-//			try {
-//				param 	= "operType=1&" + "bid=" + bid + "&" + "gid=" + gid + "&"+ "gstate=" + URLEncoder.encode(gstate, "utf-8") + "&"+ "gsimg=" + gsimg + "&" + "lkind="+ URLEncoder.encode(lkind, "utf-8") + "&" + "tid="+ tid + "&" + "tkind="+ URLEncoder.encode(tkind, "utf-8") + "&" + "oid="+ oid + "&" + "percount=" + percount + "&"+ "perweight=" + perweight + "&" + "tformatweight="+ tformatweight + "&" + "tcount=" + tcount + "&" + "gtime="+ URLEncoder.encode(gtime, "utf-8") + "&" + "stime="+ URLEncoder.encode(stime, "utf-8") + "&" + "wid="+ wid;
-//			} catch (UnsupportedEncodingException e) {
-//				e.printStackTrace();
-//			}
-//
-//			String response = mGetOrPostHelper.sendGet(url, param);
-//			int    nFlag 	= MTConfigHelper.NTAG_FAIL;
-//
-//			if (!response.equalsIgnoreCase("fail")) {
-//				nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
-//				String sql  = "insert into getgoodsinfo (bid,gid,gstate,gsimg,lkind,tid,tkind,oid,percount,perweight,tformatweight,tcount,gtime,stime) values ('"+ bid+ "',"+ "'"+ gid+ "',"+ "'"+ gstate+ "',"+ "'"+ gsimg+ "',"+ "'"+ lkind+ "',"+ "'"+ tid+ "',"+ "'"+ tkind+ "',"+ "'"+ oid+ "',"+ percount+ ","+ perweight+ ","+ tformatweight+ ","+ tcount+ ","+ "'"+ gtime+ "',"+ "'"+ stime+ "')";
-//				mDB.execSQL(sql);
-//			}
-//			mHandler.sendEmptyMessage(nFlag);
-//		}
-//	}	
 	private void doResetParam() {
 		// 数据列表;
 		list.clear();

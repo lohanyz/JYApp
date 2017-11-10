@@ -37,6 +37,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	
 	/*上下文内容*/
 	private Context		 mContext;
+	private Intent		 mIntent;
 	/*控件内容*/
 	private TextView	 vTopic,vBack,vFunction;
 	private LinearLayout layTrain,layTruck;
@@ -132,9 +133,11 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 			default:
 				break;
 			}
-//			showImgCount();
-//			showData();
 			closeThread();
+			if(nFlag==1){
+				setResult(1, mIntent);
+				    finish();                                              
+			}
 		}
 	};
 	@Override
@@ -159,31 +162,31 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		vFunction= 	(TextView) findViewById(R.id.btnFunction);
 		layTrain =	(LinearLayout) findViewById(R.id.layTrain);
 		layTruck =	(LinearLayout) findViewById(R.id.layTruck);
-		 /*控件声明*/		 
-		 vdttrailerno		=(EditText) findViewById(R.id.etDttrailerno) ;		//	拖车(取)拖车号(国内信息)
-		 vseaino	 		=(EditText) findViewById(R.id.etSeaino);
-		 vdtsingletrailernum=(EditText) findViewById(R.id.etDtsingletrailernum);
-		 vdtsingletrailerton=(EditText) findViewById(R.id.etDtsingletrailerton);
-		 vsvehiclescoll		=(EditText) findViewById(R.id.etSvehiclescoll);
-		 vdgtrainwagonno	=(EditText) findViewById(R.id.etDgtrainwagonno);
-		 vdgtraintype		=(EditText) findViewById(R.id.etDgtraintype);
-		 vdgtrainwaybillno	=(EditText) findViewById(R.id.etDgtrainwaybillno);					
-		 vdgtrainsinglenum	=(EditText) findViewById(R.id.etDgtrainsinglenum);
-		 vdgtrainsingleton	=(EditText) findViewById(R.id.etDgtrainsingleton);
-		 vdgtrainwagonkg	=(EditText) findViewById(R.id.etDgtrainwagonkg);
+		/*控件声明*/		 
+		vdttrailerno		=(EditText) findViewById(R.id.etDttrailerno) ;		//	拖车(取)拖车号(国内信息)
+		vseaino	 		=(EditText) findViewById(R.id.etSeaino);
+		vdtsingletrailernum=(EditText) findViewById(R.id.etDtsingletrailernum);
+		vdtsingletrailerton=(EditText) findViewById(R.id.etDtsingletrailerton);
+		vsvehiclescoll		=(EditText) findViewById(R.id.etSvehiclescoll);
+		vdgtrainwagonno	=(EditText) findViewById(R.id.etDgtrainwagonno);
+		vdgtraintype		=(EditText) findViewById(R.id.etDgtraintype);
+		vdgtrainwaybillno	=(EditText) findViewById(R.id.etDgtrainwaybillno);					
+		vdgtrainsinglenum	=(EditText) findViewById(R.id.etDgtrainsinglenum);
+		vdgtrainsingleton	=(EditText) findViewById(R.id.etDgtrainsingleton);
+		vdgtrainwagonkg	=(EditText) findViewById(R.id.etDgtrainwagonkg);
 
-		 vdgtrailerno		=(EditText) findViewById(R.id.etDgtrailerno);
-		 vdtrailermodelsdely=(EditText) findViewById(R.id.etDtrailermodelsdely);
-		 vdgsingletrailernum=(EditText) findViewById(R.id.etDgsingletrailernum);
-		 vdgsingletrailerton=(EditText) findViewById(R.id.etDgsingletrailerton);
-		 vsvehiclesdely		=(EditText) findViewById(R.id.etSvehiclesdely);
-		 /*按钮触发*/
-		 vdloadingtime		=(Button) findViewById(R.id.btnDloadingtime);
-		 vdgtrainstartdate	=(Button) findViewById(R.id.btnDgtrainstartdate);
-		 vdtpickupdate		=(Button) findViewById(R.id.btnDtpickupdate);
-		 vdtstartdate		=(Button) findViewById(R.id.btnDtstartdate);
-		 vdgstartdate		=(Button) findViewById(R.id.btnDgstartdate);
-		 vOk				=(Button) findViewById(R.id.btnOk);
+		vdgtrailerno		=(EditText) findViewById(R.id.etDgtrailerno);
+		vdtrailermodelsdely=(EditText) findViewById(R.id.etDtrailermodelsdely);
+		vdgsingletrailernum=(EditText) findViewById(R.id.etDgsingletrailernum);
+		vdgsingletrailerton=(EditText) findViewById(R.id.etDgsingletrailerton);
+		vsvehiclesdely		=(EditText) findViewById(R.id.etSvehiclesdely);
+		/*按钮触发*/
+		vdloadingtime		=(Button) findViewById(R.id.btnDloadingtime);
+		vdgtrainstartdate	=(Button) findViewById(R.id.btnDgtrainstartdate);
+		vdtpickupdate		=(Button) findViewById(R.id.btnDtpickupdate);
+		vdtstartdate		=(Button) findViewById(R.id.btnDtstartdate);
+		vdgstartdate		=(Button) findViewById(R.id.btnDgstartdate);
+		vOk				=(Button) findViewById(R.id.btnOk);
 		 
 	}
 	
@@ -209,15 +212,13 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	}
 	//	获取数据;
 	private void getInfo(){
-		Intent mIntent=getIntent();
+		mIntent		  =getIntent();
 		Bundle mBundle=mIntent.getExtras();
 		busiinvcode   =mBundle.getString("busiinvcode");
 		barcode	  	  =mBundle.getString("barcode");
 		cargostatuscenter=mBundle.getString("cargostatuscenter");
 		pslkind 	  =mBundle.getString("slkind");
-		img 	  =mBundle.getString("imgs");
-		
-		Log.i("MyLog", "bid="+busiinvcode+"|barcode="+barcode+"|state="+cargostatuscenter+"|img="+img);
+		img 	  	  =mBundle.getString("imgs");
 	}
 	//	获取控件;
 	private void checkView(){
@@ -491,8 +492,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 
 			if (!response.equalsIgnoreCase("fail")) {
 				nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
-//				String sql  = "insert into getgoodsinfo (bid,gid,gstate,gsimg,lkind,tid,tkind,oid,percount,perweight,tformatweight,tcount,gtime,stime) values ('"+ bid+ "',"+ "'"+ gid+ "',"+ "'"+ gstate+ "',"+ "'"+ gsimg+ "',"+ "'"+ lkind+ "',"+ "'"+ tid+ "',"+ "'"+ tkind+ "',"+ "'"+ oid+ "',"+ percount+ ","+ perweight+ ","+ tformatweight+ ","+ tcount+ ","+ "'"+ gtime+ "',"+ "'"+ stime+ "')";
-				
+
 				String sql=
 				"insert into getgoodsinfo (" +
 				"barcode," +

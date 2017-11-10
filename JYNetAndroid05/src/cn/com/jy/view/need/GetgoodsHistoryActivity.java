@@ -140,7 +140,7 @@ public class GetgoodsHistoryActivity extends Activity implements OnClickListener
 			map.put("content", nCount+" --> 业务"+busiinvcode+" 条码"+barcode+" 总序 "+_id+"  详情");
 			map.put("img", img);
 			
-			map.put("id",_id);
+			map.put("_id",_id);
 			list.add(map);
 		}
 		
