@@ -27,63 +27,63 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class BMHistoryActivity extends Activity implements OnClickListener{
-    //	信息内容的全局变量;
-    private Context			mContext;
-    //	信息列表的显示控件;
-    private ListView 		mListView;
-    private SimpleAdapter	mAdapter;
-    //	数据库信息的加载;
-    private MTSQLiteHelper	mSqLiteHelper;  //01.数据库帮助类;
-    private SQLiteDatabase 	mDB;		    //02.数据库对象类;
-    private MTConfigHelper	mConfigHelper;	//03.参数工具类
-    private FileHelper		mFileHelper;	//04.文件辅助工具类;
-    private Cursor 		   	mCursor;  	    //05.数据库遍历签;
+    //  信息内容的全局变量;
+    private Context         mContext;
+    //  信息列表的显示控件;
+    private ListView        mListView;
+    private SimpleAdapter   mAdapter;
+    //  数据库信息的加载;
+    private MTSQLiteHelper  mSqLiteHelper;  //01.数据库帮助类;
+    private SQLiteDatabase  mDB;            //02.数据库对象类;
+    private MTConfigHelper  mConfigHelper;  //03.参数工具类
+    private FileHelper      mFileHelper;    //04.文件辅助工具类;
+    private Cursor          mCursor;        //05.数据库遍历签;
 
     private List<Map<String, String>> mList;//06.数据信息的加载;
-    private Set<String>       mSetTmp;		//Set的临时表;
-    private ArrayList<String> mListBid;		//列表;
+    private Set<String>       mSetTmp;      //Set的临时表;
+    private ArrayList<String> mListBid;     //列表;
 
 
-    //	参数信息;
-    private String 			sql;
+    //  参数信息;
+    private String          sql;
 
-    private TextView		tvTopic,btnFunction,btnBack;
+    private TextView        tvTopic,btnFunction,btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //	进行页面的加载;
+        //  进行页面的加载;
         setContentView(R.layout.hisinfo);
-        //	添加控件的视图;
+        //  添加控件的视图;
         initView();
-        //	添加空间的事件;
+        //  添加空间的事件;
         initEvent();
     }
-    //	控件的初始化声明;
+    //  控件的初始化声明;
     private void initView(){
-        //	listView信息的加载;
-        mListView	=(ListView) findViewById(R.id.listView);
-        btnBack		=(TextView) findViewById(R.id.btnBack);
-        btnFunction	=(TextView) findViewById(R.id.btnFunction);
-        tvTopic		=(TextView) findViewById(R.id.tvTopic);
+        //  listView信息的加载;
+        mListView   =(ListView) findViewById(R.id.listView);
+        btnBack     =(TextView) findViewById(R.id.btnBack);
+        btnFunction =(TextView) findViewById(R.id.btnFunction);
+        tvTopic     =(TextView) findViewById(R.id.tvTopic);
     }
-    //	事件的初始化声明;
+    //  事件的初始化声明;
     private void initEvent(){
-        mContext		=	BMHistoryActivity.this;
-        //	数据库信息的加载;
-        mSqLiteHelper	=	new MTSQLiteHelper(mContext);
-        mDB 			= 	mSqLiteHelper.getmDB();
-        mFileHelper		=	new FileHelper();
-        mConfigHelper	=	new MTConfigHelper();
-        //	Set初始化;
-        mSetTmp			=	new HashSet<String>();
-        //	list初始化;
-        mListBid		=	new ArrayList<String>();
+        mContext        =   BMHistoryActivity.this;
+        //  数据库信息的加载;
+        mSqLiteHelper   =   new MTSQLiteHelper(mContext);
+        mDB             =   mSqLiteHelper.getmDB();
+        mFileHelper     =   new FileHelper();
+        mConfigHelper   =   new MTConfigHelper();
+        //  Set初始化;
+        mSetTmp         =   new HashSet<String>();
+        //  list初始化;
+        mListBid        =   new ArrayList<String>();
 
-        //	初始化信息内容;
+        //  初始化信息内容;
         tvTopic.setText("箱管历史信息");
         btnFunction.setText("清空");
-        //	添加事件监听;
+        //  添加事件监听;
         btnBack.setOnClickListener(this);
         btnFunction.setOnClickListener(this);
 
@@ -94,41 +94,46 @@ public class BMHistoryActivity extends Activity implements OnClickListener{
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int position,
                                     long id) {
-                Intent  intent	=new Intent(BMHistoryActivity.this, BMDetailActivity.class);
-                Bundle	bundle	=new Bundle();
-                String  bmid	=mList.get(position).get("id");
+                Intent  intent  =new Intent(BMHistoryActivity.this, BMDetailActivity.class);
+                Bundle  bundle  =new Bundle();
+                String  bmid    =mList.get(position).get("id");
+                String simg = mList.get(position).get("img");
                 bundle.putString("bmid", bmid);
+                bundle.putString("imgs", simg);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
     }
-    //	显示信息的内容;
+    //  显示信息的内容;
     private void showData(){
-        //	表信息的加载;
-        mList	=loadData();
-        //	适配器的添加;
-        mAdapter=new SimpleAdapter(mContext, mList, R.layout.item, new  String[]{"number","content","id"}, new int[]{R.id.tvNum,R.id.tvContent,R.id.tvId});
-        //	适配器列表的绑定;
+        //  表信息的加载;
+        mList   =loadData();
+        //  适配器的添加;
+        mAdapter=new SimpleAdapter(mContext, mList, R.layout.item02, new String[]{"content"}, new int[]{R.id.tvTopic});
+        //  适配器列表的绑定;
         mListView.setAdapter(mAdapter);
     }
-    //	加载数据信息法;
+    //  加载数据信息法;
     private List<Map<String, String>> loadData(){
+        mSetTmp.clear();
+        mListBid.clear();
         List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-        sql		=	"select * from boxmanageinfo group by bid,gid";
-        mCursor	= 	mDB.rawQuery(sql, null);
+        sql     =   "select * from boxmanageinfo group by bmid";
+        mCursor =   mDB.rawQuery(sql, null);
         int nCount=0;
         while (mCursor.moveToNext()) {
             nCount++;
             Map<String, String> map=new HashMap<String, String>();
-            String bmid	=	mCursor.getString(mCursor.getColumnIndex("bmid")).toString();
-            String gid	=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String bid	=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
+            String bmid =   mCursor.getString(mCursor.getColumnIndex("bmid")).toString();
+            String gid  =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
+            String bid  =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
+            String gsimg = mCursor.getString(mCursor.getColumnIndex("simg")).toString();
             if(mSetTmp.add(bid)){
                 mListBid.add(bid);
             }
-            map.put("number", nCount+"");
-            map.put("content", bid+"-"+gid);
+            map.put("content", nCount + " --> " + bid + "-" + gid + " [|] " + "  详情");
+            map.put("img", gsimg);
             map.put("id",bmid);
             list.add(map);
         }
@@ -143,10 +148,10 @@ public class BMHistoryActivity extends Activity implements OnClickListener{
         int nVid=view.getId();
         switch (nVid) {
             case R.id.btnFunction:
-                sql		=	"delete from boxmanageinfo";
+                sql     =   "delete from boxmanageinfo";
                 mDB.execSQL(sql);
                 for(String bid:mListBid){
-                    String folder=mConfigHelper.getfParentPath()+bid+File.separator+"sign";
+                    String folder=mConfigHelper.getfParentPath()+bid+File.separator+"boxmanage";
                     mFileHelper.delAllFile(folder);
                 }
             case R.id.btnBack:

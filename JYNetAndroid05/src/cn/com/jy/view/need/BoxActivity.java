@@ -17,6 +17,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,8 +47,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import cn.com.jy.activity.R;
+import cn.com.jy.model.entity.MEFile;
 import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
+import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTImgHelper;
@@ -58,18 +61,10 @@ public class BoxActivity extends Activity implements OnClickListener {
 	private ArrayList<String> list;
 	private Context mContext;
 	private ProgressDialog mDialog;
-	private MTGetOrPostHelper mGetOrPostHelper;
-	private MTImgHelper mImgHelper;
 	private TextView tvTopic,state2;
-	private MTSharedpreferenceHelper mSpHelper;
-	private MTConfigHelper	mConfigHelper;
-	private SQLiteDatabase mDB; // 数据库件;
-	private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
-	private Thread mThread;
-	private Thread mThread2;
 	private EditText etSearch;
 	private EditText etgetboxspace,ettranstid;
-	private String getboxspace,transtid;
+	private String getboxspace,transtid,wid;
 	private TextView  btnDetail ;
 	private Button  mGsimg,
 			btnbackchnportime, btnbackportstorehoustime, btnportranstime,btngetboxtime,
@@ -83,6 +78,21 @@ public class BoxActivity extends Activity implements OnClickListener {
 	private FileHelper mFileHelper;
 	private String backchnportime, backportstorehoustime, portranstime,
 			downlineovertime, railwaydownlinetime, fbacknulltime,getboxtime;
+	private ArrayList<MEFile> 	 listfile;
+	private Builder   vBuilder;
+	//	TODO 02.修改的相关内容;
+	private LoadInfoThread mThread; // 线程内容;
+	private UpLoadThread   mThread2;
+	// 帮助类;
+	private MTConfigHelper 	  mConfigHelper;
+	private MTGetOrPostHelper mGetOrPostHelper;
+	private MTImgHelper 	  mImgHelper;
+	private MTFileHelper mtFileHelper;
+	//
+	private MTSharedpreferenceHelper mSpHelper; // 首选项存储;
+
+	private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
+	private SQLiteDatabase mDB; // 数据库件;
 	private String saveDir = Environment.getExternalStorageDirectory()
 			.getPath() + File.separator + "jyFile",saveFolder = "photo", folderPath, // 文件夹路径;
 			filePath, // 文件路径;
@@ -95,6 +105,7 @@ public class BoxActivity extends Activity implements OnClickListener {
 			switch (msg.what){
 				case MTConfigHelper.NTAG_SUCCESS:
 					Toast.makeText(mContext, R.string.tip_success,Toast.LENGTH_SHORT).show();
+					mtFileHelper.fileDelAll();
 					break;
 				//	02.失败;
 				case MTConfigHelper.NTAG_FAIL:
@@ -103,8 +114,9 @@ public class BoxActivity extends Activity implements OnClickListener {
 				default:
 					break;
 			}
+			showImgCount();
 			showData();
-			onDestroy();
+			closeThread();
 		}
 	};
 
@@ -120,12 +132,16 @@ public class BoxActivity extends Activity implements OnClickListener {
 		list = new ArrayList<String>();
 		mContext = BoxActivity.this;
 		mIntent = getIntent();
+		mImgHelper 		 = new MTImgHelper();
+		//	文件的管理类对象;
+		mtFileHelper	 = new MTFileHelper();
 		mConfigHelper	=new MTConfigHelper();
 		mGetOrPostHelper=new MTGetOrPostHelper();
 		mFileHelper = new FileHelper();
 		mSqLiteHelper = new MTSQLiteHelper(mContext);
 		mDB = mSqLiteHelper.getmDB();
 		mImgHelper = new MTImgHelper();
+		listfile		 = mtFileHelper.getListfiles();
 		mListView	=   (ListView) findViewById(R.id.lvResult);
 		state2 = (TextView) findViewById(R.id.state2);
 		tvTopic 	= 	(TextView) findViewById(R.id.tvTopic);
@@ -267,6 +283,16 @@ public class BoxActivity extends Activity implements OnClickListener {
 	}
 
 	public void onClickBack(View view) {
+		int n=listfile.size();
+		if(n!=0){
+			for(MEFile item:listfile){
+				String path=item.getPath();
+				File file=new File(path);
+				if(file.exists()){
+					file.delete();
+				}
+			}
+		}
 		finish();
 	}
 
@@ -404,7 +430,7 @@ public class BoxActivity extends Activity implements OnClickListener {
 					final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
 					mDialog 						  = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
 					gid								  = etSearch.getText().toString().trim();
-					mThread=new MyThread();
+					mThread=new LoadInfoThread();
 					mThread.start();
 				}
 				break;
@@ -424,13 +450,34 @@ public class BoxActivity extends Activity implements OnClickListener {
 					getboxspace=MTGetTextUtil.getText(etgetboxspace);
 					transtid=MTGetTextUtil.getText(ettranstid);
 					gsimg = mFileHelper.getFileNamesByStrs(folderPath);
+					wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
 					if (gsimg.isEmpty()) {
 						gsimg = "null";
 					}
-					if(mThread2==null){
-						mThread2=new MyThread2();
-						mThread2.start();
-					}
+					vBuilder=new Builder(mContext);
+					vBuilder.setTitle("信息确认");
+
+					showImgCount();
+					String sContent=
+							"状态:"+gstate+"\r\n" +
+									"商品编号:"+bid+"-"+gid+"\r\n"+
+									"图片张数:"+sSize+"\r\n" +
+									"运输方式:";
+					vBuilder.setMessage(sContent);
+					vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							if (mThread2 == null) {
+								mThread2 = new UpLoadThread();
+								mThread2.start();
+							}
+						}
+					});
+					vBuilder.setNegativeButton(R.string.action_no, null);
+
+					vBuilder.create();
+					vBuilder.show();
 				}catch (Exception e){
 					Toast.makeText(this,"请按要求填写内容",Toast.LENGTH_LONG).show();
 				}
@@ -486,77 +533,151 @@ public class BoxActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	public class MyThread extends Thread{
+	public class LoadInfoThread extends Thread{
 		private String url,
 				param,
 				response;
 		@Override
 		public void run() {
 			url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
-			//url		 =	"http://172.23.24.155:8080/JYTest02/goods2";
 			param	 =	"operType=2&gid="+gid;
 			response= 	mGetOrPostHelper.sendGet(url,param);
 			int nFlag= 	MTConfigHelper.NTAG_FAIL;
-			if(!response.equalsIgnoreCase("fail")){
+			JSONObject res;
+			JSONObject body;
+			if(!response.trim().equalsIgnoreCase("fail")){
 				nFlag= MTConfigHelper.NTAG_SUCCESS;
 				try {
-					JSONArray array = new JSONArray(response);
-					int 	  i		= 0;
-					JSONObject obj 	= null;
-					do {
-						try {
-							//	JsonObject的解析;
-							obj			  =	array.getJSONObject(i);
-							String bgoid	  = obj.getString("bgoid");
-							String boxid	  = obj.getString("boxid");
-							String boxsize	  = obj.getString("boxsize");
-							String boxkind	  = obj.getString("boxkind");
-							String boxbelong  = obj.getString("boxbelong");
-							String retransway  = obj.getString("retransway");
-
-							bid               = obj.getString("bid");
-							gid		  		  = obj.getString("gid");
-							String gname	  = obj.getString("gname");
-							String leadnumber = obj.getString("leadnumber");
-							String gcount	  = obj.getString("gcount");
-							String gunit	  = obj.getString("gunit");
-							String gtotalweight= obj.getString("gtotalweight");
-							String glength 	  = obj.getString("glength");
-							String gwidth	  = obj.getString("gwidth");
-							String gheight	  = obj.getString("gheight");
-							String gvolume	  = obj.getString("gvolume");
-
-							list.add("业务编号:"+bid);
-							list.add("提单号:"+bgoid);
-							list.add("箱号:"+boxid);
-							list.add("箱尺寸:"+boxsize);
-							list.add("箱型:"+boxkind);
-							list.add("箱属"+boxbelong);
-							list.add("回城运输方式"+retransway);
-							list.add("\r\n");
-							list.add("品名:"+gname);
-							list.add("铅封号:"+leadnumber);
-							list.add("件数:"+gcount);
-							list.add("单位:"+gunit);
-							list.add("总毛重:"+gtotalweight);
-							list.add("长:"+glength);
-							list.add("宽:"+gwidth);
-							list.add("高:"+gheight);
-							list.add("体积:"+gvolume);
-							i++;
-						} catch (Exception e) {
-							obj=null;
-						}
-					} while (obj!=null);
+					res = new JSONObject(response);
+					body = new JSONObject(res.getString("body"));
 				} catch (JSONException e) {
-					nFlag	=	MTConfigHelper.NTAG_FAIL;
+					res = null;
+					body = null;
+				}
+				if(body!=null){
+					try {
+						String busiinvcode = body.getString("busiinvcode");
+						String billoflading = body.getString("billoflading");
+						String cid = body.getString("cid");
+						String csize = body.getString("csize");
+						String ctype = body.getString("ctype");
+						String cowner = body.getString("cowner");
+						String goodsdesc = body.getString("goodsdesc");
+						String etransportationmode = body.getString("etransportationmode");
+						String cname = body.getString("cname");
+						String sealno = body.getString("sealno");
+						String pieces = body.getString("pieces");
+						String grossweight = body.getString("grossweight");
+						String grossweightjw = body.getString("grossweightjw");
+						String grossweighgn = body.getString("grossweighgn");
+						String volume = body.getString("volume");
+						String length = body.getString("length");
+						String width = body.getString("width");
+						String height = body.getString("height");
+						list.add("业务编号:"+busiinvcode);
+						list.add("提单号:"+billoflading);
+						list.add("箱号:"+cid);
+						list.add("箱尺寸:"+csize);
+						list.add("箱型:"+ctype);
+						list.add("箱属:"+cowner);
+						list.add("包装类型:"+goodsdesc);
+						list.add("回程运输方式:"+etransportationmode);
+						list.add("品名:"+cname);
+						list.add("铅封号:"+sealno);
+						list.add("件数:"+pieces);
+						list.add("毛重量:"+grossweight);
+						list.add("毛重-境外(KGS):"+grossweightjw);
+						list.add("毛重-国内(KGS):"+grossweighgn);
+						list.add("体积（CBM）:"+volume);
+						list.add("长(CM):"+length);
+						list.add("宽(CM):"+width);
+						list.add("高(CM):"+height);
+
+					}catch (JSONException e){
+						nFlag=MTConfigHelper.NTAG_FAIL;
+						Log.e("getdata", "run: ", e);
+					}
+//					"busiinvcode": "业务编号",
+//							"billoflading": "提单号",
+//							"cid": "箱号（货物信息）",
+//							"csize": "箱尺寸（货物信息）",
+//							"ctype": "箱型（货物信息）",
+//							"cowner": "箱属（货物信息）",
+//						“goodsdesc”;”包装类型”,
+//					"etransportationmode": "回程运输方式（箱管）",
+//							"cname": "品名（货物信息）",
+//							"sealno": "铅封号（货物信息）",
+//							"pieces": "件数（货物信息）",
+//							"grossweight": "毛重量（货物信息）",
+//							"grossweightjw": "毛重-境外(KGS)（货物信息-大宗）",
+//							"grossweighgn": "毛重-国内(KGS)（货物信息-大宗）",
+//							"volume": "体积（CBM）（货物信息）",
+//							"length": "长(CM)（货物信息）",
+//							"width": "宽(CM)（货物信息）",
+//							"height": "高(CM)（货物信息）"
 
 				}
 			}
+//			if(!response.equalsIgnoreCase("fail")){
+//				nFlag= MTConfigHelper.NTAG_SUCCESS;
+//				try {
+//					JSONArray array = new JSONArray(response);
+//					int 	  i		= 0;
+//					JSONObject obj 	= null;
+//					do {
+//						try {
+//							//	JsonObject的解析;
+//							obj			  =	array.getJSONObject(i);
+//							String bgoid	  = obj.getString("bgoid");
+//							String boxid	  = obj.getString("boxid");
+//							String boxsize	  = obj.getString("boxsize");
+//							String boxkind	  = obj.getString("boxkind");
+//							String boxbelong  = obj.getString("boxbelong");
+//							String retransway  = obj.getString("retransway");
+//
+//							bid               = obj.getString("bid");
+//							gid		  		  = obj.getString("gid");
+//							String gname	  = obj.getString("gname");
+//							String leadnumber = obj.getString("leadnumber");
+//							String gcount	  = obj.getString("gcount");
+//							String gunit	  = obj.getString("gunit");
+//							String gtotalweight= obj.getString("gtotalweight");
+//							String glength 	  = obj.getString("glength");
+//							String gwidth	  = obj.getString("gwidth");
+//							String gheight	  = obj.getString("gheight");
+//							String gvolume	  = obj.getString("gvolume");
+//
+//							list.add("业务编号:"+bid);
+//							list.add("提单号:"+bgoid);
+//							list.add("箱号:"+boxid);
+//							list.add("箱尺寸:"+boxsize);
+//							list.add("箱型:"+boxkind);
+//							list.add("箱属"+boxbelong);
+//							list.add("回城运输方式"+retransway);
+//							list.add("\r\n");
+//							list.add("品名:"+gname);
+//							list.add("铅封号:"+leadnumber);
+//							list.add("件数:"+gcount);
+//							list.add("单位:"+gunit);
+//							list.add("总毛重:"+gtotalweight);
+//							list.add("长:"+glength);
+//							list.add("宽:"+gwidth);
+//							list.add("高:"+gheight);
+//							list.add("体积:"+gvolume);
+//							i++;
+//						} catch (Exception e) {
+//							obj=null;
+//						}
+//					} while (obj!=null);
+//				} catch (JSONException e) {
+//					nFlag	=	MTConfigHelper.NTAG_FAIL;
+//
+//				}
+//			}
 			myHandler.sendEmptyMessage(nFlag);
 		}
 	}
-	public class MyThread2 extends Thread{
+	public class UpLoadThread extends Thread{
 		private String url,
 				param,
 				response,
@@ -621,9 +742,24 @@ public class BoxActivity extends Activity implements OnClickListener {
 			myHandler.sendEmptyMessage(nFlag);
 		}
 	}
-	private void showData(){
-		mAdapter=new ArrayAdapter<String>(mContext, android.R.layout.simple_dropdown_item_1line, list);
+	private void showImgCount(){
+		sSize = String.valueOf(mtFileHelper.getListfiles().size());
+		state2.setText(sSize);
+	}
+	private void showData() {
+		mAdapter = new ArrayAdapter<String>(mContext, R.layout.item02, R.id.tvTopic, list);
+		//	显示的列表和适配器绑定;
 		mListView.setAdapter(mAdapter);
+	}
+	private void closeThread() {
+		if (mThread != null) {
+			mThread.interrupt();
+			mThread = null;
+		}
+		if (mThread2 != null) {
+			mThread2.interrupt();
+			mThread2 = null;
+		}
 	}
 	@Override
 	protected void onDestroy() {

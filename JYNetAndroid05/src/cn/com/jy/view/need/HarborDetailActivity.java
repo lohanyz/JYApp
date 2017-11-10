@@ -6,6 +6,7 @@ import java.util.List;
 import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
+import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
@@ -37,33 +39,35 @@ import android.widget.AdapterView.OnItemLongClickListener;
 
 @SuppressWarnings("deprecation")
 public class HarborDetailActivity extends Activity implements OnClickListener{
-    //	全程序内容;
-    private Context	 		mContext;
-    //	主要的控件;
-    private TextView 		tvTopic,tvShow,btnBack,	//	返回按钮;
-    btnFunction;	//	内容信息;
-	private Gallery	 		mGallery;	//	画廊按钮;
-    private	ProgressDialog	mDialog;	 // 对话框;
-    private String 	 		hid,		//	id主键;
+    //  全程序内容;
+    private Context         mContext;
+    //  主要的控件;
+    private TextView        tvTopic,tvShow,btnBack, //  返回按钮;
+    btnFunction;    //  内容信息;
+    private Gallery         mGallery;   //  画廊按钮;
+    private ProgressDialog  mDialog;     // 对话框;
+    private String          hid,        //  id主键;
             sql,
             sResult,
             bid,
             gid,
-            folderPath
+            folderPath,
+            imgs
                     ;
-    //	数据库管理;
-    private MTSQLiteHelper	mSqLiteHelper;
-    private SQLiteDatabase 	mDB;		 //  数据库件;
-    private Cursor 		   	mCursor;     //  数据库遍历签;
-    private MTConfigHelper	mConfigHelper;// 配置项;
+    //  数据库管理;
+    private MTSQLiteHelper  mSqLiteHelper;
+    private SQLiteDatabase  mDB;         //  数据库件;
+    private Cursor          mCursor;     //  数据库遍历签;
+    private MTConfigHelper  mConfigHelper;// 配置项;
     private MTGetOrPostHelper mGetOrPostHelper;
+    private WebView vWvShow;
 
-    private FileHelper		mFileHelper; // 文件配置项;
-    private MTImgHelper		mImgHelper;  // 图片辅助类;
-    //	图片的集合列表;
+    private MTFileHelper mtFileHelper; // 文件配置项;
+    private MTImgHelper     mImgHelper;  // 图片辅助类;
+    //  图片的集合列表;
     private List<BitmapDrawable> listBD = null;
     private ArrayList<String>    list;
-    private MyThread		mThread;	 // 线程;
+    private MyThread        mThread;     // 线程;
 
 
     @SuppressLint("HandlerLeak")
@@ -90,50 +94,52 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.detail);
-        //	添加控件;
+        setContentView(R.layout.detail2);
+        //  添加控件;
         initView();
-        //	添加事件监听;
+        //  添加事件监听;
         initEvent();
     }
-    //	控件初始化;
+    //  控件初始化;
     private void initView(){
-        tvTopic			=	(TextView) findViewById(R.id.tvTopic);
-        tvShow			=	(TextView) findViewById(R.id.tvShow);
-        btnBack			=	(TextView) findViewById(R.id.btnBack);
-        btnFunction		=	(TextView) findViewById(R.id.btnFunction);
-        mGallery		=	(Gallery) findViewById(R.id.gallery);
+        tvTopic         =   (TextView) findViewById(R.id.tvTopic);
+        //tvShow            =   (TextView) findViewById(R.id.tvShow);
+        vWvShow         =   (WebView) findViewById(R.id.wvShow);
+        btnBack         =   (TextView) findViewById(R.id.btnBack);
+        btnFunction     =   (TextView) findViewById(R.id.btnFunction);
+        mGallery        =   (Gallery) findViewById(R.id.gallery);
     }
-    //	事件监听初始化;
+    //  事件监听初始化;
     private void initEvent(){
-        mContext		=	HarborDetailActivity.this;
-        mConfigHelper	=	new MTConfigHelper();
-        mGetOrPostHelper=	new MTGetOrPostHelper();
-        mFileHelper		=	new FileHelper();
-        mImgHelper		=	new MTImgHelper();
-        //	控件的初始化;
+        mContext        =   HarborDetailActivity.this;
+        mConfigHelper   =   new MTConfigHelper();
+        mGetOrPostHelper=   new MTGetOrPostHelper();
+        mtFileHelper    =   new MTFileHelper();
+        mImgHelper      =   new MTImgHelper();
+        //  控件的初始化;
         btnFunction.setVisibility(View.GONE);
         tvTopic.setText("口岸信息详情");
-        //	获取id;
-        Intent	mIntent =	getIntent();
-        Bundle	mBundle =	mIntent.getExtras();
-        hid			=	mBundle.getString("hid");
-        //	数据库加载;
-        mSqLiteHelper	=	new MTSQLiteHelper(mContext);
-        mDB 			= 	mSqLiteHelper.getmDB();
-        //	数据信息加载;
+        //  获取id;
+        Intent  mIntent =   getIntent();
+        Bundle  mBundle =   mIntent.getExtras();
+        hid         =   mBundle.getString("hid");
+        imgs            =   mBundle.getString("imgs");
+        //  数据库加载;
+        mSqLiteHelper   =   new MTSQLiteHelper(mContext);
+        mDB             =   mSqLiteHelper.getmDB();
+        //  数据信息加载;
         doLoadData();
         tvShow.setText(sResult);
-        //	提货信息路径;
-        folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
-        //	承装图片的容器;
-        listBD		=	mImgHelper.getBitmap01(folderPath);
-        //	设置图片适配器;
+        //  提货信息路径;
+        folderPath  =   mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
+        //  承装图片的容器;
+        listBD      =   mImgHelper.getBitmap01_2(folderPath, imgs);
+        //  设置图片适配器;
         mGallery.setAdapter(new ImageAdaper(mContext, listBD));
-        list		=	mFileHelper.getFileNamesByList(folderPath);
-        //	添加事件监听;
+        list        =   mtFileHelper.getFileNamesByList(imgs,"_");
+        //  添加事件监听;
         btnBack.setOnClickListener(this);
-        //	图片长按的上传;
+        //  图片长按的上传;
         mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
             @Override
@@ -162,24 +168,24 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
             }
         });
     }
-    //	信息加载;
+    //  信息加载;
     private void doLoadData(){
-        sql		=	"select * from harborinfo where hid="+hid;
-        mCursor	= 	mDB.rawQuery(sql, null);
+        sql     =   "select * from harborinfo where hid="+hid;
+        mCursor =   mDB.rawQuery(sql, null);
         while (mCursor.moveToNext()) {
-            //	信息加载;
-            bid		=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-            gid		=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String  state		=	mCursor.getString(mCursor.getColumnIndex("state")).toString();
-            String ftochnharbortime		=	mCursor.getString(mCursor.getColumnIndex("ftochnharbortime")).toString();
-            String pboxtime		=	mCursor.getString(mCursor.getColumnIndex("pboxtime")).toString();
-            String senttime		=	mCursor.getString(mCursor.getColumnIndex("senttime")).toString();
-            String transtime		=	mCursor.getString(mCursor.getColumnIndex("transtime")).toString();
-            String transtid		=	mCursor.getString(mCursor.getColumnIndex("transtid")).toString();
-            int transtcount		=	mCursor.getInt(mCursor.getColumnIndex("transtcount"));
-            int pertcount		=	mCursor.getInt(mCursor.getColumnIndex("pertcount"));
-            double pertweight		=	mCursor.getDouble(mCursor.getColumnIndex("pertweight"));
-            String stime		=	mCursor.getString(mCursor.getColumnIndex("stime")).toString();
+            //  信息加载;
+            bid     =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
+            gid     =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
+            String  state       =   mCursor.getString(mCursor.getColumnIndex("state")).toString();
+            String ftochnharbortime     =   mCursor.getString(mCursor.getColumnIndex("ftochnharbortime")).toString();
+            String pboxtime     =   mCursor.getString(mCursor.getColumnIndex("pboxtime")).toString();
+            String senttime     =   mCursor.getString(mCursor.getColumnIndex("senttime")).toString();
+            String transtime        =   mCursor.getString(mCursor.getColumnIndex("transtime")).toString();
+            String transtid     =   mCursor.getString(mCursor.getColumnIndex("transtid")).toString();
+            int transtcount     =   mCursor.getInt(mCursor.getColumnIndex("transtcount"));
+            int pertcount       =   mCursor.getInt(mCursor.getColumnIndex("pertcount"));
+            double pertweight       =   mCursor.getDouble(mCursor.getColumnIndex("pertweight"));
+            String stime        =   mCursor.getString(mCursor.getColumnIndex("stime")).toString();
             sResult="商品编号:"+bid+"-"+gid+"\r\n";
             sResult+="到中方口岸日:"+ftochnharbortime+"\r\n";
             sResult+="装箱日:"+pboxtime+"\r\n";
@@ -196,21 +202,22 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
             mCursor.close();
         }
 
-        tvShow.setText(sResult);
+        vWvShow.getSettings().setDefaultTextEncodingName("utf-8") ;
+        vWvShow.loadDataWithBaseURL(null, sResult, "text/html", "utf-8", null);
     }
-    //	适配器的类;
+    //  适配器的类;
     public class ImageAdaper extends BaseAdapter{
         private Context mContext;
-        private int 	mGalBackgroundItem;
-        private int 	nSize;
+        private int     mGalBackgroundItem;
+        private int     nSize;
         private List<BitmapDrawable> listBD;
 
         public ImageAdaper(Context mContext,List<BitmapDrawable> list){
             this.mContext = mContext;
-            this.listBD	  = list;
-            this.nSize	  = list.size();
+            this.listBD   = list;
+            this.nSize    = list.size();
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);
-            mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
+            mGalBackgroundItem    = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
             typedArray.recycle();
         }
 
@@ -238,7 +245,7 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
             return imageview;
         }
     }
-    //	线程的自定义形式;
+    //  线程的自定义形式;
     class MyThread extends Thread{
         private String url,
                 response;
@@ -248,9 +255,9 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
         }
         @Override
         public void run() {
-            String path		=	folderPath+File.separator+list.get(this.position)+".jpg";
-            url				=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
-            response		=	mGetOrPostHelper.uploadFile(url,path,list.get(position));
+            String path     =   folderPath+File.separator+list.get(position)+".jpg";
+            url             =   "http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+            response        =   mGetOrPostHelper.uploadFile(url,path,list.get(position));
             int nFlag= MTConfigHelper.NTAG_FAIL;
             if(!response.endsWith("fail")){
                 nFlag= MTConfigHelper.NTAG_SUCCESS;
