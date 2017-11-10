@@ -64,13 +64,14 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
     private ProgressDialog mDialog;
     private TextView tvTopic;
     private ArrayAdapter<String> mAdapter;
+    private Bundle    mBundle;
     private ListView             mListView;
     private Builder mBuilder;
     private TextView  btnDetail,state2;
     private Button mGsimg;
     private Button btnftochnharbortime,btnpboxtime,
             btnsenttime,btntranstime,btnstime,
-            btnCode,btnSearch,btnOk;
+            btnCode,btnSearch,btnOk,btnAdd;
     private String bid, gstate,date,time,gid,stime,stimea;
     private String ftochnharbortime,pboxtime, senttime,transtime,transtid,transtcount,percount,perweight;
     private Intent mIntent;
@@ -151,6 +152,7 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         state2      =   (TextView) findViewById(R.id.state2);
         btnCode     =   (Button) findViewById(R.id.btnCode);
         btnSearch   =   (Button) findViewById(R.id.btnSearch);
+        btnAdd   =   (Button) findViewById(R.id.btnAdd);
         mState      =   (Spinner) findViewById(R.id.gstate);
         mGsimg      =   (Button) findViewById(R.id.btnPhoto);
         btnftochnharbortime =   (Button) findViewById(R.id.ftochnharbortime);
@@ -181,6 +183,7 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         btnCode.setOnClickListener(this);
         btnSearch.setOnClickListener(this);
         btnOk.setOnClickListener(this);
+        btnAdd.setOnClickListener(this);
         ettranstid.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -377,6 +380,21 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                 mIntent = new Intent(mContext, HarborHistoryActivity.class);
                 startActivity(mIntent);
                 break;
+            case R.id.btnAdd:
+                if (list.size()>0) {
+                mIntent=new Intent(mContext, HarborAddActivity.class);
+                mBundle=new Bundle();
+                mBundle.putString("busiinvcode", bid);
+                mBundle.putString("barcode", gid);
+                mBundle.putString("cargostatuscenter", gstate);
+                gsimg=mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(),"_");
+                if (gsimg.equals("")) gsimg = "未拍照";
+                mBundle.putString("imgs", gsimg);
+                mIntent.putExtras(mBundle);
+                startActivityForResult(mIntent, 1);
+                }else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+
+                break;
             default:
                 mBuilder = new AlertDialog.Builder(mContext);
                 View view = getLayoutInflater().inflate(
@@ -454,10 +472,10 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
     public void getPhoto_Ggoods() {
         File file;
         if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
-            if (bid != null && gid != null) {
+            if (list.size()>0) {
                 folderPath = mConfigHelper.getfParentPath() + bid
                         + File.separator + "harbor" + File.separator + gid;
-                gsimg = bid + "harbor" + gid + "file"
+                gsimg = "harbor" + gid + "file"
                         + java.lang.System.currentTimeMillis();
                 file = new File(folderPath);
                 // 生成文件夹的方式;
@@ -467,6 +485,7 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                 // 生成2中文件路径:01.临时的 02.永久的
                 tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
                 filePath = folderPath + File.separator + gsimg + ".jpg";
+                Log.e("TAG", filePath );
                 file = new File(tmpPath);
                 if (file.exists()) {
                     file.delete();
@@ -484,7 +503,7 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                 mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                 startActivityForResult(mIntent,MTConfigHelper.NTRACK_GGOODS_PHOTO_TO);
             } else {
-                Toast.makeText(mContext, "没有基础信息", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(mContext, "sdcard无效或没有插入!", Toast.LENGTH_SHORT)
@@ -524,8 +543,6 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         etperweight.setText(MTConfigHelper.SPACE);
         // 发车时间;
         stime = null;
-        // bid置空&gid置空;
-        bid = null;
         gid = null;
     }
     private void showImgCount(){
@@ -543,39 +560,58 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
             //url        =  "http://172.23.24.155:8080/JYTest02/goods2";
-            param    =  "operType=2&gid="+gid;
+            param    =  "operType=2&barcode="+gid;
             response=   mGetOrPostHelper.sendGet(url,param);
             int nFlag=  MTConfigHelper.NTAG_FAIL;
             JSONObject res;
             JSONObject body;
-            if(!response.trim().equalsIgnoreCase("fail")) {
-                nFlag = MTConfigHelper.NTAG_SUCCESS;
-                try {
-                    res = new JSONObject(response);
-                    body = new JSONObject(res.getString("body"));
-                } catch (JSONException e) {
-                    res = null;
-                    body = null;
-                }
-                if (body != null) {
-                    try {
-                        String busiinvcode = body.getString("busiinvcode");
-                        String tradecode = body.getString("tradecode");
-                        String wcode = body.getString("wcode");
-                        String cname = body.getString("cname");
-                        String cid = body.getString("cid");
-                        String csize = body.getString("csize");
-                        String ctype = body.getString("ctype");
-                        String sealno = body.getString("sealno");
-                        String pieces = body.getString("pieces");
-                        String goodsdesc = body.getString("goodsdesc");
-                        String grossweight = body.getString("grossweight");
-                        String grossweightjw = body.getString("grossweightjw");
-                        String grossweighgn = body.getString("grossweighgn");
-                        String volume = body.getString("volume");
-                        String length = body.getString("length");
-                        String width = body.getString("width");
-                        String height = body.getString("height");
+//            if(!response.trim().equalsIgnoreCase("fail")) {
+//                nFlag = MTConfigHelper.NTAG_SUCCESS;
+//                try {
+//                    res = new JSONObject(response);
+//                    body = new JSONObject(res.getString("body"));
+//                } catch (JSONException e) {
+//                    res = null;
+//                    body = null;
+//                }
+//                if (body != null) {
+//                    try {
+//                        String busiinvcode = body.getString("busiinvcode");
+//                        String tradecode = body.getString("tradecode");
+//                        String wcode = body.getString("wcode");
+//                        String cname = body.getString("cname");
+//                        String cid = body.getString("cid");
+//                        String csize = body.getString("csize");
+//                        String ctype = body.getString("ctype");
+//                        String sealno = body.getString("sealno");
+//                        String pieces = body.getString("pieces");
+//                        String goodsdesc = body.getString("goodsdesc");
+//                        String grossweight = body.getString("grossweight");
+//                        String grossweightjw = body.getString("grossweightjw");
+//                        String grossweighgn = body.getString("grossweighgn");
+//                        String volume = body.getString("volume");
+//                        String length = body.getString("length");
+//                        String width = body.getString("width");
+//                        String height = body.getString("height");
+
+            String busiinvcode = "busiinvcode";
+            String tradecode = "tradecode";
+            String wcode = "wcode";
+            String cname = "cname";
+            String cid = "cid";
+            String csize = "csize";
+            String ctype = "ctype";
+            String sealno = "sealno";
+            String pieces = "pieces";
+            String goodsdesc = "goodsdesc";
+            String grossweight = "grossweight";
+            String grossweightjw = "grossweightjw";
+            String grossweighgn = "grossweighgn";
+            String volume = "volume";
+            String length = "length";
+            String width = "width";
+            String height = "height";
+            nFlag= MTConfigHelper.NTAG_SUCCESS;
                         list.add("业务编号:" + busiinvcode);
                         list.add("业务类型编号:" + tradecode);
                         list.add("建单人:" + wcode);
@@ -594,71 +630,12 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                         list.add("宽(CM):" + width);
                         list.add("高(CM):" + height);
 
-                    } catch (JSONException e) {
-                        nFlag = MTConfigHelper.NTAG_FAIL;
-                        Log.e("getdata", "run: ", e);
-                    }
-                }
-            }
-//            if(!response.equalsIgnoreCase("fail")){
-//                nFlag= MTConfigHelper.NTAG_SUCCESS;
-//                try {
-//                    Log.e("resp:",response);
-//                    JSONArray array = new JSONArray(response);
-//                    int     i     = 0;
-//                    JSONObject obj    = null;
-//                    do {
-//                        try {
-//                            //    JsonObject的解析;
-//                            obj             = array.getJSONObject(i);
-//                            Log.e("obj:",obj.toString());
-//
-//                            String bgoid    = obj.getString("bgoid");
-//
-//                            String boxid    = obj.getString("boxid");
-//                            String boxsize      = obj.getString("boxsize");
-//                            String boxkind      = obj.getString("boxkind");
-//                            String boxbelong  = obj.getString("boxbelong");
-//                            String retransway  = obj.getString("retransway");
-//
-//                            bid               = obj.getString("bid");
-//                          gid               = obj.getString("gid");
-//                            String gname    = obj.getString("gname");
-//                            String leadnumber = obj.getString("leadnumber");
-//                            String gcount   = obj.getString("gcount");
-//                            String gunit    = obj.getString("gunit");
-//                            String gtotalweight= obj.getString("gtotalweight");
-//                            String glength      = obj.getString("glength");
-//                            String gwidth   = obj.getString("gwidth");
-//                            String gheight      = obj.getString("gheight");
-//                            String gvolume      = obj.getString("gvolume");
-//
-//                            list.add("业务编号:"+bid);
-//                            list.add("提单号:"+bgoid);
-//                            list.add("箱号:"+boxid);
-//                            list.add("箱尺寸:"+boxsize);
-//                            list.add("箱型:"+boxkind);
-//                            list.add("箱属"+boxbelong);
-//                            list.add("回城运输方式"+retransway);
-//                            list.add("————分割线————");
-//                            list.add("品名:"+gname);
-//                            list.add("铅封号:"+leadnumber);
-//                            list.add("件数:"+gcount);
-//                            list.add("单位:"+gunit);
-//                            list.add("总毛重:"+gtotalweight);
-//                            list.add("长:"+glength);
-//                            list.add("宽:"+gwidth);
-//                            list.add("高:"+gheight);
-//                            list.add("体积:"+gvolume);
-//                            i++;
-//                        } catch (Exception e) {
-//                            obj=null;
-//                        }
-//                    } while (obj!=null);
-//                } catch (JSONException e) {
-//                    nFlag =   MTConfigHelper.NTAG_FAIL;
-//
+//                    } catch (JSONException e) {
+//                        nFlag = MTConfigHelper.NTAG_FAIL;
+//                        Log.e("getdata", "run: ", e);
+//                    }
 //                }
+//
 //            }
             myHandler.sendEmptyMessage(nFlag);
         }
