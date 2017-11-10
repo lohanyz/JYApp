@@ -88,4 +88,9 @@ public class MTConfigHelper {
 		this.fState = fState;
 	}	
 	
+	public String getCurrentDate(String format){
+		SimpleDateFormat df = new SimpleDateFormat(format);//设置日期格式
+		long l=System.currentTimeMillis();
+		return df.format(l);
+	}
 }

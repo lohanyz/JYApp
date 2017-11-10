@@ -97,7 +97,6 @@ public class SignInformationActivity extends Activity implements OnClickListener
 	private MTGetOrPostHelper mGetOrPostHelper;
 	private MTImgHelper		mImgHelper;
 	private MTFileHelper	mtFileHelper;
-//	private FileHelper		mFileHelper;
 	private MTSharedpreferenceHelper 		mSpHelper;	  // 首选项存储;
 	
 	private MTSQLiteHelper    mSqLiteHelper;// 数据库的帮助类;	
@@ -166,7 +165,6 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		mConfigHelper	=	new MTConfigHelper();
 		mImgHelper		=	new MTImgHelper();
 		mtFileHelper	=	new MTFileHelper();
-//		mFileHelper		=	new FileHelper();
 		mSpHelper  	  	= 	new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,mContext.MODE_APPEND);
 		
 		//	数据库的操作;
@@ -275,7 +273,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							@Override
 							public void refreshActivity(Object object) {			
 								//	进行数据的长宽设置;
-								simg			   = bid+"resign"+gid+"file"+java.lang.System.currentTimeMillis();
+								simg			   = bid+"sign"+gid+"file"+java.lang.System.currentTimeMillis();
 								Bitmap 	zoombm	   = mImgHelper.doWriteImg(object, folderPath, simg);
 								if(zoombm!=null){
 									MEFile meFile=new MEFile(simg, filePath);
@@ -286,9 +284,8 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							}
 						},mConfigHelper.getScreenWidth(),mConfigHelper.getScreenHeigth());
 				writeTabletDialog.show();
-			}else{
-				Toast.makeText(mContext, "没有基础信息",Toast.LENGTH_SHORT).show();
-			}
+			}else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+				
 			break;
 		case R.id.btnBack:
 			int n=listfile.size();
@@ -336,11 +333,8 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		case R.id.btnOk:
 			if(bid!=null&&gid!=null){
 				//	图片;
-//				simg	= 	mFileHelper.getFileNamesByStrs(folderPath);
 				simg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(),"_");
-				if(simg.equals("")){
-					simg="null";
-				}
+				if (simg.equals("")) simg = "未拍照";
 				wid		= 	mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
 				mBuilder=	new Builder(mContext);
 				mBuilder.setTitle("信息确认");
@@ -353,6 +347,10 @@ public class SignInformationActivity extends Activity implements OnClickListener
 					public void onClick(DialogInterface arg0, int arg1) {
 						//	线程启动;
 						if(mThread2==null){
+							// 进度条的内容;
+							final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+							final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
+							mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
 							mThread2=new MyThread2();
 							mThread2.start();
 						}						
@@ -362,9 +360,8 @@ public class SignInformationActivity extends Activity implements OnClickListener
 				mBuilder.setNegativeButton(R.string.action_no, null);
 				mBuilder.create();
 				mBuilder.show();
-			}else{
-				Toast.makeText(mContext, "请进行搜索配对", Toast.LENGTH_SHORT).show();
-			}
+			}else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+			
 			break;
 			
 		default:
@@ -383,8 +380,8 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		public void run() {
 			// 进行相应的登录操作的界面显示;
 			//	01.Http 协议中的Get和Post方法;
-			url		 =	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/goods2";
-			param	 =	"operType=2&gid="+taskid;
+			url		 =	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/goods";
+			param	 =	"operType=5&barcode="+taskid;
 			response = 	mGetOrPostHelper.sendGet(url,param);
 			int nFlag= 	MTConfigHelper.NTAG_FAIL;
 			
@@ -399,61 +396,38 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							//	JsonObject的解析;
 							obj			  =	array.getJSONObject(i);	
 							
-							bid	  		  = obj.getString("bid");
-							String bname  = obj.getString("bname");
-							String bkind  = obj.getString("bkind");
-							String bcoman = obj.getString("bcoman");
-							String bgaddress  = obj.getString("bgaddress");
-							String bgoid	  = obj.getString("bgoid");
-							String bshipcom	  = obj.getString("bshipcom");
-							String bpretoportday  = obj.getString("bpretoportday");
-							String boxid	  = obj.getString("boxid");
-							String boxsize	  = obj.getString("boxsize");
-							String boxkind	  = obj.getString("boxkind");
-							String boxbelong  = obj.getString("boxbelong");
-							String retransway = obj.getString("retransway");
-						
-							gid		  		= obj.getString("gid");
-							String gname	  = obj.getString("gname");
-							String boxid2	  = obj.getString("boxid");
-							String boxsize2	  =	obj.getString("boxsize");
-							String boxkind2	  = obj.getString("boxkind");
-							String leadnumber = obj.getString("leadnumber");
-							String gcount	  = obj.getString("gcount");
-							String gunit	  = obj.getString("gunit");
-							String gtotalweight= obj.getString("gtotalweight");
-							String glength 	  = obj.getString("glength");
-							String gwidth	  = obj.getString("gwidth");
-							String gheight	  = obj.getString("gheight");
-							String gvolume	  = obj.getString("gvolume");
 							
+							bid			=obj.getString("busiinvcode");
+							gid			=etSearch.getText().toString();
+							String wcode=obj.getString("wcode");
+							String cname=obj.getString("cname");
+							String cid	=obj.getString("cid");
+							String csize=obj.getString("csize");
+							String ctype=obj.getString("ctype");
+							String seaino=obj.getString("seaino");
+							String pieces=obj.getString("pieces");
+							String goodsdesc	=obj.getString("goodsdesc");
+							String grossweight	=obj.getString("grossweight");
+							String grossweightjw=obj.getString("grossweightjw");
+							String grossweighgn	=obj.getString("grossweighgn");
+							String volume=obj.getString("volume");
+							String length=obj.getString("length");
+							String width =obj.getString("width");
+							String height=obj.getString("height");
+
 							list.add("业务编号:"+bid);
-							list.add("业务名称:"+bname);
-							list.add("业务类型:"+bkind);
-							list.add("建单人:"+bcoman);
-							list.add("提货地址:"+bgaddress);
-							list.add("提单号:"+bgoid);
-							list.add("船舶公司:"+bshipcom);
-							list.add("预计到港日:"+bpretoportday);
-							list.add("箱号:"+boxid);
-							list.add("箱尺寸:"+boxsize);
-							list.add("箱型:"+boxkind);
-							list.add("箱所属:"+boxbelong);
-							list.add("回程运输方式:"+retransway);
-							list.add("————分割线————");
-							list.add("货物编号:"+bid+"-"+gid);
-							list.add("品名:"+gname);
-							list.add("箱号:"+boxid2);
-							list.add("箱尺寸:"+boxsize2);
-							list.add("箱型:"+boxkind2);
-							list.add("铅封号:"+leadnumber);
-							list.add("件数:"+gcount);
-							list.add("单位:"+gunit);
-							list.add("总毛重:"+gtotalweight);
-							list.add("长:"+glength);
-							list.add("宽:"+gwidth);
-							list.add("高:"+gheight);
-							list.add("体积:"+gvolume);
+							list.add("建单人:"+wcode);
+							list.add("品名:"+cname);
+							list.add("箱号:"+cid);
+							list.add("箱尺寸:"+csize);
+							list.add("箱型:"+ctype);
+							list.add("铅封号:"+seaino);
+							list.add("件数:"+pieces);
+							list.add("包装类型:"+goodsdesc);
+							list.add("毛重量:"+grossweight);
+							list.add("毛重量-境外(KGS):"+grossweightjw);
+							list.add("毛重量-国内(KGS):"+grossweighgn);
+							list.add("体积(CBM):"+volume+" 长(CM):"+length+" 宽(CM):"+width+" 高(CM):"+height);
 	
 							i++;
 						} catch (Exception e) {
@@ -476,18 +450,19 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		   ;
 		@Override
 		public void run() {
-		
 			// 进行相应的登录操作的界面显示;
 			//	01.Http 协议中的Get和Post方法;
 			url		 =	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/resign";
+			String date=mConfigHelper.getCurrentDate("yyyy年MM月dd日HH时mm分");
 			try {
-				param	 =	"operType=1&" +
-							"bid="+bid+"&" +
-							"gid="+gid+"&" +
-							"state="+URLEncoder.encode(state,"utf-8")+"&" +
-							"simg="+simg+"&" +
-							"wid="+wid;
-				
+				param =	"operType=1" +
+						"&barcode="+gid+
+						"&cargostatussign="+URLEncoder.encode(state,"utf-8")+
+						"&receiptdate="+URLEncoder.encode(date,"utf-8")+
+						"&img="+URLEncoder.encode(simg,"utf-8")+
+						"&wid="+wid+
+						"&busiinvcode="+bid
+						;
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -497,12 +472,14 @@ public class SignInformationActivity extends Activity implements OnClickListener
 			
 			if(!response.equalsIgnoreCase("fail")){
 				nFlag= MTConfigHelper.NTAG_SUCCESS;
-				sql="insert into resigninfo (" +
-				"bid,gid,state,simg) values (" +
-				"'"+bid+"'," +
+				sql=
+				"insert into signinfo (" +
+				"barcode,receiptdate,cargostatussign,img,busiinvcode) values (" +
 				"'"+gid+"'," +
+				"'"+date+"'," +
 				"'"+state+"',"+ 
-				"'"+simg+"')"; 
+				"'"+simg+"'," +
+				"'"+bid+"')"; 
 				mDB.execSQL(sql);
 			}
 			mHandler.sendEmptyMessage(nFlag);
@@ -520,7 +497,6 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		//	异常按钮重置;
 		state	="正常";
 		mState.setSelection(0);
-//		mSwitch.setSelection(0);
 	}
 	
 	@Override
@@ -552,7 +528,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 		if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
 			if(bid!=null&&gid!=null){
 				folderPath	= mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
-				simg  		= bid+"resign"+gid+"file"+java.lang.System.currentTimeMillis();
+				simg  		= bid+"sign"+gid+"file"+java.lang.System.currentTimeMillis();
 				file	  	= new File(folderPath);
 				//	生成文件夹的方式;
 				if(!file.exists()){
@@ -576,12 +552,9 @@ public class SignInformationActivity extends Activity implements OnClickListener
 				mIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 				mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
 				startActivityForResult(mIntent, MTConfigHelper.NTRACK_SIGN_PHOTO_TO);
-			}else{
-				Toast.makeText(mContext, "没有基础信息",Toast.LENGTH_SHORT).show();
-			}
-		} else {
-			Toast.makeText(mContext, "sdcard无效或没有插入!",Toast.LENGTH_SHORT).show();
-		}
+			}else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
+		} else Toast.makeText(mContext, "sdcard无效或没有插入!",Toast.LENGTH_SHORT).show();
+		
 	}
 
 	//	关闭线程;

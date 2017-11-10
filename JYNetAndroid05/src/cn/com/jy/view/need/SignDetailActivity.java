@@ -49,7 +49,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private WebView			vWvShow;
 	private Gallery	 		mGallery;	//	画廊按钮;
 	private	ProgressDialog	mDialog;	 // 对话框; 
-	private String 	 		rid,		//	id主键;
+	private String 	 		_id,		//	id主键;
 		  			 		sql,
 		  			 		sResult,
 		  			 		bid,
@@ -68,7 +68,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private MTImgHelper		mImgHelper;  // 图片辅助类;
 	//	图片的集合列表;
 	private List<BitmapDrawable> listBD = null;
-	private ArrayList<String>    list;
+	private ArrayList<String>    listMapName;
 	private MyThread		mThread;	 // 线程;
 	
 	
@@ -132,24 +132,28 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		//	获取id;
 		Intent	mIntent =	getIntent();
 		Bundle	mBundle =	mIntent.getExtras();
-		rid				=	mBundle.getString("rid");
+		_id				=	mBundle.getString("_id");
 		imgs				=	mBundle.getString("imgs");
 		Log.i("MyLog", "info="+imgs);
 		//	数据库加载;
 		mSqLiteHelper	=	new MTSQLiteHelper(mContext);
 		mDB 			= 	mSqLiteHelper.getmDB();
+		//	添加事件监听;
+		btnBack.setOnClickListener(this);
+		listMapName		=	mtFileHelper.getFileNamesByList(imgs,"_");
+		int 	size	=	listMapName.size();
+		
 		//	数据信息加载;
-		doLoadData();
+		doLoadData(size);
 //		tvShow.setText(sResult);
 		//	提货信息路径;
 		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
+		if(size>0){
+			
 		//	承装图片的容器;
 		listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);
 		//	设置图片适配器;
 		mGallery.setAdapter(new ImageAdaper(mContext, listBD)); 
-		list		=	mtFileHelper.getFileNamesByList(imgs,"_");
-		//	添加事件监听;
-		btnBack.setOnClickListener(this);
 		//	图片长按的上传;
 		mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -178,27 +182,40 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 				return false;
 			}
 		});				
+		}
 	}
 	//	信息加载;
-	private void doLoadData(){
-		sql		=	"select * from resigninfo where rid="+rid;
+	private void doLoadData(int size){
+		sql		=	"select * from signinfo where _id="+_id;
 		mCursor	= 	mDB.rawQuery(sql, null);
 		while (mCursor.moveToNext()) {	
 			//	信息加载;
-			bid		=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-			gid		=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-			String state	=	mCursor.getString(mCursor.getColumnIndex("state")).toString();
-			
+			gid		=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
+			String receiptdate		=	mCursor.getString(mCursor.getColumnIndex("receiptdate")).toString();
+			String cargostatussign	=	mCursor.getString(mCursor.getColumnIndex("cargostatussign")).toString();
+			bid 	=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
 			sResult="<html>" +
 						"<body>" +
 							"<table border=\"1\">" +
 								"<tr bgcolor=\"#00FF00\" align=\"center\">" +
-									"<td>商品编号</td>"+
-									"<td>状态信息</td>"+
+									"<td>业务编号</td>"+
+									"<td>二维码</td>"+
+									"<td>签收时间</td>"+
 								"</tr>" +
 								"<tr align=\"center\">" +
-									"<td>"+bid+"-"+gid+"</td>" +
-									"<td>"+state+"</td>" +
+									"<td>"+bid+"</td>" +
+									"<td>"+gid+"</td>" +
+									"<td>"+receiptdate+"</td>" +
+								"</tr>"+
+								"<tr align=\"center\">" +
+									"<td colspan=\"3\">状态</td>" +
+								"</tr>"+
+								"<tr align=\"center\">" +
+									"<td colspan=\"3\">"+cargostatussign+"</td>" +
+								"</tr>"+
+								"<tr align=\"center\">" +
+									"<td >图片</td>" +
+									"<td colspan=\"2\">"+size+"张</td>" +
 								"</tr>"+
 							"</table>"+
 						"</body>" +
@@ -261,9 +278,9 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		}
 		@Override
 		public void run() {
-			String path		=	folderPath+File.separator+list.get(this.position)+".jpg";
+			String path		=	folderPath+File.separator+listMapName.get(this.position)+".jpg";
 			url				=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
-			response		=	mGetOrPostHelper.uploadFile(url,path,list.get(position));
+			response		=	mGetOrPostHelper.uploadFile(url,path,listMapName.get(position));
 			int nFlag= MTConfigHelper.NTAG_FAIL;
 			if(!response.endsWith("fail")){
 				nFlag= MTConfigHelper.NTAG_SUCCESS;

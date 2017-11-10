@@ -42,15 +42,12 @@ public class SignHistoryActivity extends Activity implements OnClickListener{
 	private List<Map<String, String>> mList;//06.数据信息的加载;
 	private Set<String>       mSetTmp;		//Set的临时表;
 	private ArrayList<String> mListBid;		//列表;
-	
-	
 	//	参数信息;
 	private String 			sql;
 	//	按钮;
 	private TextView		btnBack,
 							btnFunction,
 							tvTopic;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,10 +92,10 @@ public class SignHistoryActivity extends Activity implements OnClickListener{
 					long id) {
 				Intent  intent	=new Intent(SignHistoryActivity.this, SignDetailActivity.class);
 				Bundle	bundle	=new Bundle();
-				String  rid		=mList.get(position).get("id");
-				String  simg	=mList.get(position).get("img");
-				bundle.putString("rid", rid);
-				bundle.putString("imgs", simg);
+				String  _id		=mList.get(position).get("_id");
+				String  img		=mList.get(position).get("img");
+				bundle.putString("_id", _id);
+				bundle.putString("imgs", img);
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}
@@ -120,23 +117,23 @@ public class SignHistoryActivity extends Activity implements OnClickListener{
 		mListBid.clear();
 		
 		List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-		sql		=	"select * from resigninfo order by rid";
+		sql		=	"select * from signinfo order by _id";
 		mCursor	= 	mDB.rawQuery(sql, null);
 		int nCount=0;
 		while (mCursor.moveToNext()) {	
 			nCount++;
 			Map<String, String> map=new HashMap<String, String>();
-			String rid	=	mCursor.getString(mCursor.getColumnIndex("rid")).toString();
-			String gid	=	mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-			String bid	=	mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-			String simg	=	mCursor.getString(mCursor.getColumnIndex("simg")).toString();
-			if(mSetTmp.add(bid)){
-				mListBid.add(bid);
+			String _id	=	mCursor.getString(mCursor.getColumnIndex("_id")).toString();
+			String barcode	=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
+			String img	=	mCursor.getString(mCursor.getColumnIndex("img")).toString();
+			String busiinvcode	=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
+			if(mSetTmp.add(busiinvcode)){
+				mListBid.add(busiinvcode);
 			}
 
-			map.put("content",nCount+" --> "+ bid+"-"+gid+" 详情");
-			map.put("img",simg);
-			map.put("id",rid);
+			map.put("content",nCount+" --> 业务"+busiinvcode+" 条码"+barcode+" 总序 "+_id+"  详情");
+			map.put("img",img);
+			map.put("_id",_id);
 			list.add(map);
 		}
 		
@@ -150,7 +147,7 @@ public class SignHistoryActivity extends Activity implements OnClickListener{
 		int nVid=view.getId();
 		switch (nVid) {
 		case R.id.btnFunction:
-			sql		=	"delete from resigninfo";
+			sql		=	"delete from signinfo";
 			mDB.execSQL(sql);
 			for(String bid:mListBid){
 				String folder=mConfigHelper.getfParentPath()+bid+File.separator+"sign";

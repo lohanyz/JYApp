@@ -224,6 +224,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 						"<body>" +
 							"<table border=\"1\" style=\"width:2000px;\">" +
 						"<tr bgcolor=\"#00FF00\" align=\"center\">" +
+							"<td >业务编号</td>" +
 							"<td >条码信息</td>" +
 							"<td >拖车号(取)</td>" +
 							"<td >铅封号</td>" +
@@ -250,6 +251,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 						"</tr>";
 			sResult+=
 								"<tr align=\"center\">" +
+										"<td >"+bid+"</td>" +
 										"<td >"+gid+"</td>" +
 										"<td >"+dttrailerno+"</td>" +
 										"<td >"+seaino+"</td>" +

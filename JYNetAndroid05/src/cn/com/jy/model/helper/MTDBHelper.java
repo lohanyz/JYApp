@@ -165,14 +165,15 @@ public class MTDBHelper extends SQLiteOpenHelper {
 					"stime varchar(20)"+
 					")";
 	//	签收信息的表;
-	private String sql_resigninfo=
-			"create table resigninfo (" +
-			"rid integer primary key," +
-			"bid varchar(20)," +
-			"gid varchar(20),"+
-			"state varchar(500)," +
-			"simg varchar(500)" +
-			")";
+	private String sql_signinfo=
+			"create table signinfo ( " +
+			"_id integer 	 primary key ," + 		//	id编号;
+			"barcode 	 	 varchar(32) not null," +		//	二维码信息;
+			"receiptdate	 varchar(32) not null," +		//	签收时间
+			"cargostatussign varchar(500) not null," +		//	货物状态
+			"img 	 		 varchar(1000) not null," +		//	图片
+			"busiinvcode 	 varchar(32) not null" +		//	图片
+			")";		
 //	//	油料表的结构;
 //	private String sql_oilinfo=
 //			"create table oilinfo ("+
@@ -226,7 +227,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 		//	02.建立提货信息表;
 		db.execSQL(sql_getgoodsinfo);
 		//	03.建立签收信息表;
-		db.execSQL(sql_resigninfo);
+		db.execSQL(sql_signinfo);
 		//	05.建立口岸信息表;
 		db.execSQL(sql_harborinfo);
 		//	06.建立箱管信息表;
