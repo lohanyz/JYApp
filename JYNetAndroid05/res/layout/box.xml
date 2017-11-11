@@ -121,7 +121,7 @@
 				android:layout_height="wrap_content"
 				android:textSize="20sp"
 				android:layout_weight="1"
-				android:textColor="#969696"
+				android:textColor="#b22222"
 				android:text="@string/tip_state"
 				/>
 			<Spinner
@@ -137,7 +137,7 @@
 				android:layout_weight="1"
 				android:gravity="center"
 				android:textSize="20sp"
-				android:textColor="#969696"
+				android:textColor="#b22222"
 				android:text="@string/action_pictures"
 				/>
 			<Button
@@ -172,209 +172,20 @@
 				android:textStyle="bold"
 				android:textColor="#969696" />
 		</LinearLayout>
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
 
-	        android:orientation="horizontal"
-	        >
-			<TextView
-				android:layout_width="0dp"
-				android:layout_weight="1"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:text="提箱地"
-				/>
-	        <EditText 
-	            android:id="@+id/getboxspace"
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="2"
-	            android:lines="1"
-				android:gravity="center"
-				android:inputType="text"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="10dp"
-				android:background="@drawable/buttonwithline"
-				android:imeOptions="actionNext"
-				android:layout_marginRight="5dp"
-	            />
-			<TextView
-				android:layout_width="0dp"
-				android:layout_weight="1"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:layout_marginLeft="5dp"
-				android:text="换装车号"
-				/>
-	        <EditText 
-	            android:id="@+id/transtid"
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="2"
-	            android:lines="1"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="10dp"
-				android:background="@drawable/buttonwithline"
-				android:gravity="center"
-				android:inputType="text"
-				android:imeOptions="actionDone"
-	            />
-	    </LinearLayout>
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        >
-	        <TextView 
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="1"
-	            android:text="返回中方口岸时间"
-	            />
-	        <Button
-	            android:id="@+id/backchnportime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="2"
-				android:background="@drawable/buttonwithline"
-				android:layout_marginRight="5dp"
-                 />
-	        <TextView 
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="1"
-				android:layout_marginLeft="5dp"
-	            android:text="返回口岸库房时间"
-	            />
-	        <Button
-	            android:id="@+id/backportstorehoustime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-				android:background="@drawable/buttonwithline"
-                android:layout_weight="2"
-                 />
-	    </LinearLayout>
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        >
-	        <TextView 
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="1"
-	            android:text="口岸换装时间"
-	            />
-	        <Button
-	            android:id="@+id/portranstime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="2"
-				android:background="@drawable/buttonwithline"
-				android:layout_marginRight="5dp"
-                 />
-	        <TextView 
-	            android:layout_width="0dp"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="1"
-				android:layout_marginLeft="5dp"
-	            android:text="下线结费时间"
-	            />
-	        <Button
-	            android:id="@+id/downlineovertime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-				android:background="@drawable/buttonwithline"
-                android:layout_weight="2"
-                 />
-	    </LinearLayout>
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        >
-			<TextView
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:text="铁路下线时间"
-				/>
-			<Button
-				android:id="@+id/railwaydownlinetime"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:layout_weight="2"
-				android:background="@drawable/buttonwithline"
-				android:layout_marginRight="5dp"
-				 />
-			<TextView
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:layout_marginLeft="5dp"
-				android:text="实际回空时间"
-				/>
-			<Button
-				android:id="@+id/fbacknulltime"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:background="@drawable/buttonwithline"
-				android:layout_weight="2"
-				 />
-	    </LinearLayout>
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="20dp"
-		android:background="@drawable/layoutwithline"
-		android:orientation="horizontal"
-		>
-		<TextView
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:minHeight="50dp"
-			android:layout_weight="1"
-			android:gravity="center|center_horizontal|center_vertical"
-			android:text="提箱时间"
-			/>
-		<LinearLayout
-			android:layout_width="0dp"
-			android:layout_weight="3"
-			android:layout_marginRight="3dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginBottom="5dp"
-			android:layout_height="match_parent"
-			android:background="#d6d6d6">
-			<Button
-				android:id="@+id/getboxtime"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:background="@color/white"
-				android:gravity="center_vertical|left"
-				android:layout_marginLeft="1dp"
-				android:textColor="#d6d6d6"
-				android:text="   设置" />
-		</LinearLayout>
-
-		</LinearLayout>
 		<Button
-			android:id="@+id/btnOk"
-			android:layout_width="match_parent"
-			android:minHeight="40dp"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:background="#34BC5A"
-			android:text="确   认"
-			android:textSize="25dp"
-			android:layout_marginTop="10dp"
-			android:textColor="@color/white"
-			/>
+			android:id="@+id/btnAdd"
+			style="?android:attr/buttonBarButtonStyle"
+			android:layout_width="fill_parent"
+			android:layout_height="40dp"
+			android:layout_below="@id/l1"
+			android:layout_marginBottom="2dp"
+			android:layout_marginLeft="2dp"
+			android:layout_marginRight="2dp"
+			android:layout_marginTop="2dp"
+			android:background="@drawable/btn07"
+			android:text="@string/action_editinfo"
+			android:textColor="#ffffff"
+			android:textSize="20sp" />
     </LinearLayout>
 </RelativeLayout>

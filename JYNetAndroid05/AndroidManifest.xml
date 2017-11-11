@@ -139,6 +139,11 @@
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
+        <activity
+            android:name="cn.com.jy.view.need.HarborAddActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name="cn.com.jy.view.need.BoxAddActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
     </application>
 
 </manifest>

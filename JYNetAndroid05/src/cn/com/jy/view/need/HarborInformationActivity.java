@@ -67,16 +67,13 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
     private Bundle    mBundle;
     private ListView             mListView;
     private Builder mBuilder;
-    private TextView  btnDetail,state2;
+    private TextView  btnDetail,tvImgCount;
     private Button mGsimg;
-    private Button btnftochnharbortime,btnpboxtime,
-            btnsenttime,btntranstime,btnstime,
-            btnCode,btnSearch,btnOk,btnAdd;
-    private String bid, gstate,date,time,gid,stime,stimea;
-    private String ftochnharbortime,pboxtime, senttime,transtime,transtid,transtcount,percount,perweight;
+    private Button btnCode,btnSearch,btnAdd;
+    private String barcode, gstate;
     private Intent mIntent;
     private Spinner mState;
-    private EditText etSearch,ettranstid,ettranstcount,etpercount,etperweight;
+    private EditText etSearch;
     private String saveDir  =   Environment.getExternalStorageDirectory().getPath()+File.separator+"jyFile",
             saveFolder  =   "photo",
             folderPath,     //  文件夹路径;
@@ -86,13 +83,12 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
             sSize,
             wid;
     private ArrayList<String> list;
-    private FileHelper mFileHelper;
+    //private FileHelper mFileHelper;
     //  TODO 01.新增的相关内容;
     private ArrayList<MEFile>    listfile;
     private AlertDialog.Builder vBuilder;   // 对话框;
     //  TODO 02.修改的相关内容;
     private LoadInfoThread mThread; // 线程内容;
-    private UpLoadThread mThread2;
     // 帮助类;
     private MTConfigHelper    mConfigHelper;
     private MTGetOrPostHelper mGetOrPostHelper;
@@ -135,13 +131,8 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         mContext    =   HarborInformationActivity.this;
         mListView   =   (ListView) findViewById(R.id.lvResult);
         etSearch    =   (EditText) findViewById(R.id.etSearch);
-        etpercount  =   (EditText) findViewById(R.id.percount);
-        ettranstcount=  (EditText) findViewById(R.id.transcount);
-        etperweight =   (EditText) findViewById(R.id.perweight);
-        ettranstid  =   (EditText) findViewById(R.id.transtid);
         tvTopic     =   (TextView) findViewById(R.id.tvTopic);
         mConfigHelper   =new MTConfigHelper();
-        mFileHelper     = new FileHelper();
         mSpHelper       = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,mContext.MODE_APPEND);
         mSqLiteHelper   = new MTSQLiteHelper(mContext);
         mtFileHelper     = new MTFileHelper();
@@ -149,25 +140,19 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         mDB         = mSqLiteHelper.getmDB();
         mIntent     =   getIntent();
         btnDetail   =   (TextView) findViewById(R.id.btnFunction);
-        state2      =   (TextView) findViewById(R.id.state2);
+        tvImgCount      =   (TextView) findViewById(R.id.tvImgCount);
         btnCode     =   (Button) findViewById(R.id.btnCode);
         btnSearch   =   (Button) findViewById(R.id.btnSearch);
         btnAdd   =   (Button) findViewById(R.id.btnAdd);
         mState      =   (Spinner) findViewById(R.id.gstate);
         mGsimg      =   (Button) findViewById(R.id.btnPhoto);
-        btnftochnharbortime =   (Button) findViewById(R.id.ftochnharbortime);
-        btnpboxtime =   (Button) findViewById(R.id.pboxtime);
-        btnsenttime =   (Button) findViewById(R.id.senttime);
-        btntranstime=   (Button) findViewById(R.id.transtime);
-        btnstime    =   (Button) findViewById(R.id.stime);
-        btnOk       =   (Button) findViewById(R.id.btnOk);
         list        =   new ArrayList<String>();
         mGetOrPostHelper = new MTGetOrPostHelper();
         mConfigHelper    = new MTConfigHelper();
         mImgHelper       = new MTImgHelper();
         //  文件的管理类对象;
         mtFileHelper     = new MTFileHelper();
-        folderPath  =   saveDir+File.separator+saveFolder+File.separator+bid+File.separator+"harbor";
+        folderPath  =   saveDir+File.separator+saveFolder+File.separator+barcode+File.separator+"harbor";
 
     }
     private void initEvent(){
@@ -175,34 +160,9 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         btnDetail.setText("历史");
         btnDetail.setOnClickListener(this);
         mGsimg.setOnClickListener(this);
-        btnftochnharbortime.setOnClickListener(this);
-        btnpboxtime.setOnClickListener(this);
-        btnsenttime.setOnClickListener(this);
-        btntranstime.setOnClickListener(this);
-        btnstime.setOnClickListener(this);
         btnCode.setOnClickListener(this);
         btnSearch.setOnClickListener(this);
-        btnOk.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
-        ettranstid.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                ettranstid.setBackgroundColor(Color.WHITE);
-            }
-        });
-        etpercount.setOnFocusChangeListener(this);
-        etperweight.setOnFocusChangeListener(this);
-        ettranstcount.setOnFocusChangeListener(this);
         mGetOrPostHelper=new MTGetOrPostHelper();
         etSearch.addTextChangedListener(new TextWatcher() {
 
@@ -275,14 +235,22 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
             String gid = intent.getStringExtra("bid");
             etSearch.setText(gid);
         }
-        if(requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
+        else if(requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
                 && resultCode == -1 ){
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
             mImgHelper.compressPicture(tmpPath, filePath);
             mImgHelper.clearPicture(tmpPath, null);
-
-            sSize = String.valueOf(mFileHelper.getFileCount(folderPath));
-            state2.setText(sSize);
+            //  进行文件内容的叠加;
+            MEFile meFile=new MEFile(gsimg, filePath);
+            //  将拍照操作放入列表;
+            // TODO 修改的内容;
+            mtFileHelper.fileAdd(meFile);
+            showImgCount();
+        }
+        else if(requestCode ==1){
+            if(resultCode==1){
+                doResetParam();
+            }
         }
     }
     public void onClickBack(View view){
@@ -314,67 +282,10 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                     final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
                     final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
                     mDialog                           = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
-                    gid                               = etSearch.getText().toString().trim();
+                    barcode                              = etSearch.getText().toString().trim();
                     mThread = new LoadInfoThread();
                     mThread.start();
                 }
-                break;
-            case R.id.btnOk:
-                try {
-                    if (bid != null && gid != null) {
-                        gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(),"_");
-                        if (gsimg.equals("")) {
-                            gsimg = "null";
-                        }
-                        ftochnharbortime = MTGetTextUtil.getText(btnftochnharbortime);
-                        pboxtime = MTGetTextUtil.getText(btnpboxtime);
-                        senttime = MTGetTextUtil.getText(btnsenttime);
-                        transtime = MTGetTextUtil.getText(btntranstime);
-                        stimea= MTGetTextUtil.getText(btnstime);
-                        transtid = MTGetTextUtil.getText(ettranstid);
-                        transtcount = MTGetTextUtil.getText(ettranstcount);
-                        percount = MTGetTextUtil.getText(etpercount);
-                        perweight = MTGetTextUtil.getText(etperweight);
-                        wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
-                        vBuilder=new Builder(mContext);
-                        vBuilder.setTitle("信息确认");
-                        showImgCount();
-                        String sContent=
-                                "状态:"+gstate+"\r\n" +
-                                        "商品编号:"+bid+"-"+gid+"\r\n"+
-                                        "图片张数:"+sSize+"\r\n";
-                        sContent+="到中方口岸日:"+ftochnharbortime+"\r\n"+
-                                "装箱日:"+pboxtime+"\r\n"+
-                                "放行日:"+senttime+"\r\n"+
-                                "换装日:"+transtime+"\r\n"+
-                                "发车日/出境日:"+stimea+"\r\n"+
-                                "换装车号:"+transtid+"\r\n"+
-                                "单车件数:"+percount+"\r\n"+
-                                "单车吨数:"+perweight+"\r\n"+
-                                "换装车数:"+transtcount+"\r\n";
-                        vBuilder.setMessage(sContent);
-                        vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface arg0, int arg1) {
-                                if (mThread2 == null) {
-                                    mThread2 = new UpLoadThread();
-                                    mThread2.start();
-                                }
-                            }
-                        });
-                        vBuilder.setNegativeButton(R.string.action_no, null);
-
-                        vBuilder.create();
-                        vBuilder.show();
-                    }
-                    else {
-                        Toast.makeText(mContext, "请进行搜索配对", Toast.LENGTH_SHORT).show();
-                    }
-                }catch (Exception e){
-                    Toast.makeText(this,"请按要求填写内容",Toast.LENGTH_LONG).show();
-                }
-
                 break;
             case R.id.btnFunction:
                 mIntent = new Intent(mContext, HarborHistoryActivity.class);
@@ -384,9 +295,9 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                 if (list.size()>0) {
                 mIntent=new Intent(mContext, HarborAddActivity.class);
                 mBundle=new Bundle();
-                mBundle.putString("busiinvcode", bid);
-                mBundle.putString("barcode", gid);
-                mBundle.putString("cargostatuscenter", gstate);
+                mBundle.putString("barcode", barcode);
+                mBundle.putString("wid", wid);
+                mBundle.putString("cargostatusseaport", gstate);
                 gsimg=mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(),"_");
                 if (gsimg.equals("")) gsimg = "未拍照";
                 mBundle.putString("imgs", gsimg);
@@ -396,75 +307,6 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
 
                 break;
             default:
-                mBuilder = new AlertDialog.Builder(mContext);
-                View view = getLayoutInflater().inflate(
-                        R.layout.activity_datatimepicker, null);
-                mBuilder.setTitle("设置时间");
-                mBuilder.setView(view);
-                DatePicker datePicker = (DatePicker) view
-                        .findViewById(R.id.dpPicker);
-                TimePicker timePicker = (TimePicker) view
-                        .findViewById(R.id.tpPicker);
-                Calendar calendar = Calendar.getInstance();
-
-                int nYear   =  calendar.get(Calendar.YEAR);
-                int nMonth  =  calendar.get(Calendar.MONTH);
-                int nDay    =  calendar.get(Calendar.DAY_OF_MONTH);
-                int nHour   =  calendar.get(Calendar.HOUR_OF_DAY);
-                int nMinute =  calendar.get(Calendar.MINUTE);
-                String month=  nMonth+1<10?"0"+(nMonth+1):""+(nMonth+1);
-                String day  =  nDay<10?"0"+nDay:""+nDay;
-                String hour =  nHour<10?"0"+nHour:""+nHour;
-                String minute= nMinute<10?"0"+nMinute:""+nMinute;
-                date         = nYear + "年" + month + "月" + day + "日";
-                time         = hour + "时" + minute + "分";
-                datePicker.init(nYear, nMonth, nDay, new DatePicker.OnDateChangedListener() {
-
-                    @Override
-                    public void onDateChanged(DatePicker view, int year,
-                                              int monthOfYear, int dayOfMonth) {
-                        // 日历控件;
-                        String month=monthOfYear + 1<10?"0"+(monthOfYear+1):""+(monthOfYear+1);
-                        String day=dayOfMonth<10?"0"+dayOfMonth:""+dayOfMonth;
-                        date = year + "年" + month + "月" + day + "日";
-                    }
-                });
-
-                timePicker.setIs24HourView(true);
-                timePicker
-                        .setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-                            @Override
-                            public void onTimeChanged(TimePicker view,
-                                                      int hourOfDay, int minute) {
-                                String hour=hourOfDay<10?"0"+hourOfDay:""+hourOfDay;
-                                String minutes=minute<10?"0"+minute:""+minute;
-                                time = hour + "时" + minutes + "分";
-                            }
-                        });
-                mBuilder.setPositiveButton(R.string.action_ok,
-                        new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface arg0, int arg1) {
-                                stime = date + time;
-                                switch (v.getId()) {
-                                    case R.id.ftochnharbortime:
-                                    case R.id.pboxtime:
-                                    case R.id.senttime:
-                                    case R.id.transtime:
-                                    case R.id.stime:
-                                        findViewById(v.getId()).setBackgroundColor(Color.WHITE);
-                                        ((Button)findViewById(v.getId())).setText(stime);
-                                        break;
-                                    default:
-                                        break;
-                                }
-
-                            }
-                        });
-                mBuilder.setNegativeButton(R.string.action_no, null);
-                mBuilder.create();
-                mBuilder.show();
                 break;
         }
 
@@ -473,9 +315,9 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         File file;
         if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
             if (list.size()>0) {
-                folderPath = mConfigHelper.getfParentPath() + bid
-                        + File.separator + "harbor" + File.separator + gid;
-                gsimg = "harbor" + gid + "file"
+                folderPath = mConfigHelper.getfParentPath() + barcode
+                        + File.separator + "harbor" + File.separator + barcode;
+                gsimg = "harbor" + barcode + "file"
                         + java.lang.System.currentTimeMillis();
                 file = new File(folderPath);
                 // 生成文件夹的方式;
@@ -526,28 +368,11 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         // 异常按钮重置;
         gstate = "正常";
         mState.setSelection(0);
-        // 拖车号;
-        btnftochnharbortime.setText(MTConfigHelper.SPACE);
-        // 车型
-        btnpboxtime.setText(MTConfigHelper.SPACE);
-        // 铅封号;
-        btnsenttime.setText(MTConfigHelper.SPACE);
-        // 件数;
-        btntranstime.setText(MTConfigHelper.SPACE);
-        // 吨数;
-        btnstime.setText(MTConfigHelper.SPACE);
-        // 车数;
-        ettranstid.setText(MTConfigHelper.SPACE);
-        ettranstcount.setText(MTConfigHelper.SPACE);
-        etpercount.setText(MTConfigHelper.SPACE);
-        etperweight.setText(MTConfigHelper.SPACE);
-        // 发车时间;
-        stime = null;
-        gid = null;
+        barcode = null;
     }
     private void showImgCount(){
         sSize = String.valueOf(mtFileHelper.getListfiles().size());
-        state2.setText(sSize);
+        tvImgCount.setText(sSize);
     }
 
 
@@ -560,8 +385,8 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
             //url        =  "http://172.23.24.155:8080/JYTest02/goods2";
-            param    =  "operType=2&barcode="+gid;
-            response=   mGetOrPostHelper.sendGet(url,param);
+            param    =  "operType=2&barcode="+barcode;
+            //response=   mGetOrPostHelper.sendGet(url,param);
             int nFlag=  MTConfigHelper.NTAG_FAIL;
             JSONObject res;
             JSONObject body;
@@ -640,58 +465,7 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
             myHandler.sendEmptyMessage(nFlag);
         }
     }
-    public class UpLoadThread extends Thread{
-        private String url,
-                param,
-                response,
-                sql,
-                wid;
-        public void run() {
-
-            // 进行相应的登录操作的界面显示;
-            //  01.Http 协议中的Get和Post方法;
-            //
-            url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/harbor";
-            //url        =  "http://172.23.24.155:"+"8080"+"/JYTest02/harbor";
-            wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
-            try {
-                param    =  "operType=1&" +
-                        "bid="+bid+"&" +
-                        "gid="+gid+"&" +
-                        "state="+ URLEncoder.encode(gstate,"utf-8")+"&" +
-                        "simg="+gsimg+"&" +
-                        "ftochnharbortime="+URLEncoder.encode(ftochnharbortime,"utf-8")+"&" +
-                        "pboxtime="+URLEncoder.encode(pboxtime,"utf-8")+"&" +
-                        "senttime="+URLEncoder.encode(senttime,"utf-8")+"&" +
-                        "transtime="+URLEncoder.encode(transtime,"utf-8")+"&" +
-                        "transtid="+transtid+"&" +
-                        "transtcount="+transtcount+"&" +
-                        "percount="+percount+"&" +
-                        "perweight="+perweight+"&" +
-                        "stime="+URLEncoder.encode(stimea,"utf-8")+"&" +
-                        "wid="+wid;
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            response =  mGetOrPostHelper.sendGet(url,param);
-            String gtime = mConfigHelper.getCurrentTime("yyyy年MM月dd日HH时mm分");
-            int nFlag=response.trim().equalsIgnoreCase("success")?MTConfigHelper.NTAG_SUCCESS:MTConfigHelper.NTAG_FAIL;
-            if(nFlag==MTConfigHelper.NTAG_SUCCESS) {
-                sql = "insert into harborinfo (bid,gid,state,simg,ftochnharbortime,pboxtime,senttime,transtime,transtid,transtcount,pertcount,pertweight,gtime,stime) values ('" +
-                        bid + "'," + "'" + gid + "'," + "'" + gstate + "'," + "'" + gsimg + "'," + "'" + ftochnharbortime + "'," + "'" + pboxtime + "'," + "'" + senttime + "'," + "'" + transtime + "'," + "'" + transtid + "'," + "'" + transtcount + "'," + percount + "," + perweight + "," + "'" + gtime + "'," + "'" + stimea + "')";
-                bid = null;
-                gid = null;
-                mDB.execSQL(sql);
-            }
-            myHandler.sendEmptyMessage(nFlag);
-        }
-    }
     private void showData(){
-        folderPath = mConfigHelper.getfParentPath() + bid + File.separator
-                + "harbor" + File.separator + gid;
-        sSize = String.valueOf(mFileHelper.getFileCount(folderPath));
-        state2.setText(sSize);
         mAdapter=new ArrayAdapter<String>(mContext, R.layout.item02, R.id.tvTopic, list);
         mListView.setAdapter(mAdapter);
     }
@@ -699,10 +473,6 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
         if (mThread != null) {
             mThread.interrupt();
             mThread = null;
-        }
-        if (mThread2 != null) {
-            mThread2.interrupt();
-            mThread2 = null;
         }
     }
 }
