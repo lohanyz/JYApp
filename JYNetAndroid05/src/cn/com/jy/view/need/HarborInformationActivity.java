@@ -383,60 +383,60 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                         ;
         @Override
         public void run() {
-            url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
+            url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods";
             //url        =  "http://172.23.24.155:8080/JYTest02/goods2";
-            param    =  "operType=2&barcode="+barcode;
-            //response=   mGetOrPostHelper.sendGet(url,param);
+            param    =  "operType=4&barcode="+barcode;
+            response=   mGetOrPostHelper.sendGet(url,param);
             int nFlag=  MTConfigHelper.NTAG_FAIL;
             JSONObject res;
             JSONObject body;
-//            if(!response.trim().equalsIgnoreCase("fail")) {
-//                nFlag = MTConfigHelper.NTAG_SUCCESS;
-//                try {
-//                    res = new JSONObject(response);
-//                    body = new JSONObject(res.getString("body"));
-//                } catch (JSONException e) {
-//                    res = null;
-//                    body = null;
-//                }
-//                if (body != null) {
-//                    try {
-//                        String busiinvcode = body.getString("busiinvcode");
-//                        String tradecode = body.getString("tradecode");
-//                        String wcode = body.getString("wcode");
-//                        String cname = body.getString("cname");
-//                        String cid = body.getString("cid");
-//                        String csize = body.getString("csize");
-//                        String ctype = body.getString("ctype");
-//                        String sealno = body.getString("sealno");
-//                        String pieces = body.getString("pieces");
-//                        String goodsdesc = body.getString("goodsdesc");
-//                        String grossweight = body.getString("grossweight");
-//                        String grossweightjw = body.getString("grossweightjw");
-//                        String grossweighgn = body.getString("grossweighgn");
-//                        String volume = body.getString("volume");
-//                        String length = body.getString("length");
-//                        String width = body.getString("width");
-//                        String height = body.getString("height");
+            if(!response.trim().equalsIgnoreCase("fail")) {
+                nFlag = MTConfigHelper.NTAG_SUCCESS;
+                try {
+                    res = new JSONObject(response);
+                    body = new JSONObject(res.getString("body"));
+                } catch (JSONException e) {
+                    res = null;
+                    body = null;
+                }
+                if (body != null) {
+                    try {
+                        String busiinvcode = body.getString("busiinvcode");
+                        String tradecode = body.getString("tradecode");
+                        String wcode = body.getString("wcode");
+                        String cname = body.getString("cname");
+                        String cid = body.getString("cid");
+                        String csize = body.getString("csize");
+                        String ctype = body.getString("ctype");
+                        String sealno = body.getString("sealno");
+                        String pieces = body.getString("pieces");
+                        String goodsdesc = body.getString("goodsdesc");
+                        String grossweight = body.getString("grossweight");
+                        String grossweightjw = body.getString("grossweightjw");
+                        String grossweighgn = body.getString("grossweighgn");
+                        String volume = body.getString("volume");
+                        String length = body.getString("length");
+                        String width = body.getString("width");
+                        String height = body.getString("height");
 
-            String busiinvcode = "busiinvcode";
-            String tradecode = "tradecode";
-            String wcode = "wcode";
-            String cname = "cname";
-            String cid = "cid";
-            String csize = "csize";
-            String ctype = "ctype";
-            String sealno = "sealno";
-            String pieces = "pieces";
-            String goodsdesc = "goodsdesc";
-            String grossweight = "grossweight";
-            String grossweightjw = "grossweightjw";
-            String grossweighgn = "grossweighgn";
-            String volume = "volume";
-            String length = "length";
-            String width = "width";
-            String height = "height";
-            nFlag= MTConfigHelper.NTAG_SUCCESS;
+//            String busiinvcode = "busiinvcode";
+//            String tradecode = "tradecode";
+//            String wcode = "wcode";
+//            String cname = "cname";
+//            String cid = "cid";
+//            String csize = "csize";
+//            String ctype = "ctype";
+//            String sealno = "sealno";
+//            String pieces = "pieces";
+//            String goodsdesc = "goodsdesc";
+//            String grossweight = "grossweight";
+//            String grossweightjw = "grossweightjw";
+//            String grossweighgn = "grossweighgn";
+//            String volume = "volume";
+//            String length = "length";
+//            String width = "width";
+//            String height = "height";
+//            nFlag= MTConfigHelper.NTAG_SUCCESS;
                         list.add("业务编号:" + busiinvcode);
                         list.add("业务类型编号:" + tradecode);
                         list.add("建单人:" + wcode);
@@ -455,13 +455,13 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
                         list.add("宽(CM):" + width);
                         list.add("高(CM):" + height);
 
-//                    } catch (JSONException e) {
-//                        nFlag = MTConfigHelper.NTAG_FAIL;
-//                        Log.e("getdata", "run: ", e);
-//                    }
-//                }
-//
-//            }
+                    } catch (JSONException e) {
+                        nFlag = MTConfigHelper.NTAG_FAIL;
+                        Log.e("getdata", "run: ", e);
+                    }
+                }
+
+            }
             myHandler.sendEmptyMessage(nFlag);
         }
     }

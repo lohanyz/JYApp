@@ -144,6 +144,8 @@
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity android:name="cn.com.jy.view.need.BoxAddActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name="cn.com.jy.view.need.PortAddActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
     </application>
 
 </manifest>

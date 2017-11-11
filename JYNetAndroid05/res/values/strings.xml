@@ -121,6 +121,38 @@
     <string name="dtpickupdate">提货时间</string>
     
     <string name="dtstartdate">发车时间</string>
+    <!--口岸-->
+    <string name="preloadcarno">换装车号</string>
+    <string name="preloadcarnum">换装车数</string>
+    <string name="pfactchportdate">实际到中方口岸时间</string>
+    <string name="preloaddate">换装时间</string>
+    <string name="pstartdate">发车时间/出境时间</string>
+    <string name="ppassdate">放行时间</string>
+    <string name="mpackingdate">口岸装箱日</string>
+    <!--箱管-->
+    <string name="ecarryaddress">提箱地</string>
+    <string name="ecarrydate">提箱时间</string>
+    <string name="echinaporttime">返回中方口岸时间</string>
+    <string name="eportstorageroomtime">返回口岸库房时间</string>
+    <string name="etimechangeofport">口岸换装时间</string>
+    <string name="echangenumber">换装车号</string>
+    <string name="efeeofflinetime">下线结费时间</string>
+    <string name="erailwayofflinetime">铁路下线时间</string>
+    <string name="eactualreturntime">实际回空时间</string>
+    <!--港口-->
+    <string name="ptoportdate">到港时间</string>
+    <string name="preinvoicedate_port">换单时间</string>
+    <string name="pjinchangdate">进场时间</string>
+    <string name="ppackingtime">装箱时间</string>
+    <string name="bssj">报数时间</string>
+    <string name="fcchgk">发车车号</string>
+    <string name="dcjsgkdz">单车件数</string>
+    <string name="dcdsgkdz">单车吨数</string>
+    <string name="dsgkdz">车数</string>
+    <string name="startdate">发车时间</string>
+    <string name="blhtl">铁路班列号</string>
+    <string name="cargostatusport">货物状态</string>
+
     
     
     
