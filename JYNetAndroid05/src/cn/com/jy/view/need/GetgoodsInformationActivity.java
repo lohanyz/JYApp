@@ -382,6 +382,8 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 	private void doResetParam() {
 		// 数据列表;
 		list.clear();
+		// 图片列表清空;
+		mtFileHelper.fileDelAll();
 		// 重新加载数据;
 		showImgCount();
 		showData();
@@ -503,29 +505,20 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					try {
 						file.createNewFile();
 					} catch (IOException e) {
-						Toast.makeText(mContext, "照片创建失败!", Toast.LENGTH_LONG)
-								.show();
+						Toast.makeText(mContext, "照片创建失败!", Toast.LENGTH_LONG).show();
 						return;
 					}
 				}
 				mIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 				mIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
 				startActivityForResult(mIntent,MTConfigHelper.NTRACK_GGOODS_PHOTO_TO);
-				
 			} else Toast.makeText(mContext, "请先扫描一维/二维码", Toast.LENGTH_SHORT).show();
-			
 		} else Toast.makeText(mContext, "sdcard无效或没有插入!", Toast.LENGTH_SHORT).show();
-		
 	}
-
 	private void closeThread() {
 		if (mThread != null) {
 			mThread.interrupt();
 			mThread = null;
 		}
-//		if (mThread2 != null) {
-//			mThread2.interrupt();
-//			mThread2 = null;
-//		}
 	}
 }

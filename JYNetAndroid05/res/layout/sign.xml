@@ -177,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textColor="#909090"
+                android:textColor="#b22222"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
