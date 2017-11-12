@@ -240,9 +240,9 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
             mImgHelper.compressPicture(tmpPath, filePath);
             mImgHelper.clearPicture(tmpPath, null);
-            //  进行文件内容的叠加;
+            //	进行文件内容的叠加;
             MEFile meFile=new MEFile(gsimg, filePath);
-            //  将拍照操作放入列表;
+            //	将拍照操作放入列表;
             // TODO 修改的内容;
             mtFileHelper.fileAdd(meFile);
             showImgCount();
@@ -388,13 +388,13 @@ public class HarborInformationActivity extends Activity implements View.OnClickL
             param    =  "operType=4&barcode="+barcode;
             response=   mGetOrPostHelper.sendGet(url,param);
             int nFlag=  MTConfigHelper.NTAG_FAIL;
-            JSONObject res;
+            JSONArray res;
             JSONObject body;
             if(!response.trim().equalsIgnoreCase("fail")) {
                 nFlag = MTConfigHelper.NTAG_SUCCESS;
                 try {
-                    res = new JSONObject(response);
-                    body = new JSONObject(res.getString("body"));
+                    res = new JSONArray(response);
+                    body = res.getJSONObject(0);
                 } catch (JSONException e) {
                     res = null;
                     body = null;

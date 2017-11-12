@@ -103,66 +103,60 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	//	港口信息的表;
 	private String sql_portinfo=
 			"create table portinfo (" +
-					"pid integer primary key ," +
-					"gid varchar(20)," +
-					"bid varchar(20)," +
-					"inporttime varchar(100)," +
-					"ctime varchar(20)," +
-					"intime varchar(20)," +
-					"pboxtime varchar(20),"+
-					"islean varchar(10),"+
-					"state varchar(20),"+
-					"simg varchar(500),"+
-					"lkind varchar(20),"+
-					"reporttime varchar(20),"+
-					"classorderid varchar(20),"+
-					"tid varchar(20),"+
-					"tkind varchar(20),"+
-					"oid varchar(20),"+
-					"percount int(11),"+
-					"perweight double,"+
-					"tformatweight double,"+
-					"tcount int(11),"+
-					"gtime varchar(20),"+
-					"stime varchar(20)"+
+					"_id integer primary key ," +
+					"ptoportdate 	 varchar(32) ,"+
+					"preinvoicedate_port 	 varchar(32) ,"+
+					"pjinchangdate 	 varchar(32) ,"+
+					"ppackingtime 	 varchar(32) ,"+
+					"sfpxpz 	 varchar(32) ,"+
+					"bssj 	 varchar(32) ,"+
+					"fcchgk 	 varchar(32) ,"+
+					"dcjsgkdz 	 varchar(32) ,"+
+					"dcdsgkdz 	 varchar(32) ,"+
+					"dsgkdz 	 varchar(32) ,"+
+					"startdate 	 varchar(32) ,"+
+					"blhtl 	 varchar(32) ,"+
+					"dgtrainwagonno 	 varchar(32) ,"+
+					"dgtraintype 	 varchar(32) ,"+
+					"dgtrainwaybillno 	 varchar(32) ,"+
+					"dgtrainsinglenum 	 varchar(32) ,"+
+					"dgtrainsingleton 	 varchar(32) ,"+
+					"cargostatusport 	 varchar(32) ,"+
+					"dgtrainwagonkg 	 varchar(32) ,"+
+					"dgtrainstartdate 	 varchar(32) ,"+
+					"img 	 			 varchar(1000)"+
 					")";
 	//	箱管信息的表;
 	private String sql_boxmanageinfo=
 			"create table boxmanageinfo (" +
-				"bmid integer primary key ," +
-				"gid varchar(20)," +
-				"bid varchar(20)," +
-				"getboxspace varchar(100)," +
-				"getboxtime varchar(20)," +
-				"backchnportime varchar(20)," +
-				"backportstorehoustime varchar(20),"+
-				"portranstime varchar(20),"+
-				"transtid varchar(20),"+
-				"downlineovertime varchar(20),"+
-				"railwaydownlinetime varchar(20),"+
-				"fbacknulltime varchar(20),"+
-				"state varchar(500),"+
-				"simg varchar(500),"+
-				"stime varchar(20)"+
+				"_id integer primary key ," +
+				"ecarryaddress 	 varchar(32) ,"+
+				"ecarrydate 	 varchar(32) ,"+
+				"echinaporttime 	 varchar(32) ,"+
+				"eportstorageroomtime 	 varchar(32) ,"+
+				"etimechangeofport 	 varchar(32) ,"+
+				"echangenumber 	 varchar(32) ,"+
+				"efeeofflinetime 	 varchar(32) ,"+
+				"erailwayofflinetime 	 varchar(32) ,"+
+				"eactualreturntime 	 varchar(32) ,"+
+				"cargostatusbox 	 varchar(32) ,"+
+				"img 	 			 varchar(1000)"+
 				")";
 	//	口岸信息的表;
 	private String sql_harborinfo=
 			"create table harborinfo (" +
-					"hid integer primary key ," +
-					"gid varchar(20)," +
-					"bid varchar(20)," +
-					"state varchar(500)," +
-					"simg varchar(500)," +
-					"ftochnharbortime varchar(20)," +
-					"pboxtime varchar(20),"+
-					"senttime varchar(20),"+
-					"transtime varchar(20),"+
-					"transtid varchar(20),"+
-					"transtcount varchar(20),"+
-					"pertcount varchar(20),"+
-					"pertweight varchar(20),"+
-					"gtime varchar(20),"+
-					"stime varchar(20)"+
+					"_id integer primary key ," +
+					"pfactchportdate 	 varchar(32) ,"+
+					"mpackingdate 	 varchar(32) ,"+
+					"ppassdate 	 varchar(32) ,"+
+					"preloadcarno 	 varchar(32) ,"+
+					"preloadcarnum 	 varchar(32) ,"+
+					"preloaddate 	 varchar(32) ,"+
+					"msinglecarnum 	 varchar(32) ,"+
+					"msinglecarton 	 varchar(32) ,"+
+					"pstartdate 	 varchar(32) ,"+
+					"cargostatusseaport 	 varchar(32) ,"+
+					"img 	 			 varchar(1000)"+
 					")";
 	//	签收信息的表;
 	private String sql_signinfo=
