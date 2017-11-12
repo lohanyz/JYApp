@@ -46,7 +46,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
     private EditText etecarryaddress,etechangenumber;
     private String ecarryaddress,ecarrydate,echinaporttime,eportstorageroomtime,etimechangeofport,
             echangenumber,efeeofflinetime,erailwayofflinetime,eactualreturntime,cargostatusbox,
-            wid,barcode,img;
+            wid,barcode,img,busiinvcode;
 
     Handler mHandler = new Handler() {
         @Override
@@ -121,6 +121,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
         barcode	  	  =mBundle.getString("barcode");
         cargostatusbox=mBundle.getString("cargostatusbox");
         img 	  	  =mBundle.getString("imgs");
+        busiinvcode 	  	  =mBundle.getString("busiinvcode");
     }
     private void closeThread() {
         if (mThread != null) {
@@ -244,8 +245,12 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                if (mThread == null) {
-                    mThread = new UpLoadThread();
+                if(mThread==null){
+                    // 进度条的内容;
+                    final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+                    final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
+                    mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
+                    mThread=new UpLoadThread();
                     mThread.start();
                 }
             }
@@ -295,6 +300,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                 sql=
                         "insert into boxmanageinfo (" +
                                 "barcode," +
+                                "ecarryaddress," +
                                 "ecarrydate," +
                                 "echinaporttime," +
                                 "eportstorageroomtime," +
@@ -302,9 +308,10 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                                 "echangenumber," +
                                 "efeeofflinetime," +
                                 "erailwayofflinetime," +
-                                "eactualreturntime,cargostatusbox,img" +		//	图片
+                                "eactualreturntime,cargostatusbox,img,busiinvcode" +		//	图片
                                 ") values (" +
                                 "'"+barcode+"'," +
+                                "'"+ecarryaddress+"'," +
                                 "'"+ecarrydate+"'," +
                                 "'"+echinaporttime+"'," +
                                 "'"+eportstorageroomtime+"'," +
@@ -314,11 +321,11 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                                 "'"+erailwayofflinetime+"'," +
                                 "'"+eactualreturntime+"'," +
                                 "'"+cargostatusbox+"'," +
-                                "'"+img+"')";
-                mDB.execSQL(sql);
+                                "'"+img+"'," +
+                                "'"+busiinvcode+"')";
                 mDB.execSQL(sql);
             }
-            mHandler.sendEmptyMessage(nFlag);
+            mHandler.sendEmptyMessage(MTConfigHelper.NTAG_SUCCESS);
         }
     }
 }

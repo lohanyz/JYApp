@@ -67,7 +67,7 @@ public class BoxActivity extends Activity implements OnClickListener {
     private TextView btnDetail;
     private Button mGsimg, btnAdd,
             btnCode, btnSearch;
-    private String barcode, gstate, sSize;
+    private String bid,gid, gstate, sSize;
     private Intent mIntent;
     private ListView mListView;
     private Spinner mState;
@@ -146,8 +146,7 @@ public class BoxActivity extends Activity implements OnClickListener {
         mGsimg = (Button) findViewById(R.id.btnPhoto);
         btnDetail = (TextView) findViewById(R.id.btnFunction);
         btnAdd = (Button) findViewById(R.id.btnAdd);
-        folderPath = saveDir + File.separator + saveFolder + File.separator
-                + barcode + File.separator + "boxmanage";
+
         btnDetail.setText("历史");
         mSpHelper = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,
                 mContext.MODE_APPEND);
@@ -283,7 +282,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                     final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
                     final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
                     mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody, true);
-                    barcode = etSearch.getText().toString().trim();
+                    gid = etSearch.getText().toString().trim();
                     mThread = new LoadInfoThread();
                     mThread.start();
                 }
@@ -291,13 +290,14 @@ public class BoxActivity extends Activity implements OnClickListener {
             case R.id.btnFunction:
                 mIntent = new Intent(mContext, BMHistoryActivity.class);
                 startActivity(mIntent);
+                break;
             case R.id.btnAdd:
                 if (list.size() > 0) {
                     mIntent = new Intent(mContext, BoxAddActivity.class);
                     mBundle = new Bundle();
-                    mBundle.putString("barcode", barcode);
-                    mBundle.putString("wid", wid);
+                    mBundle.putString("barcode", gid);
                     mBundle.putString("cargostatusbox", gstate);
+                    mBundle.putString("busiinvcode", bid);
                     gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
                     if (gsimg.equals("")) gsimg = "未拍照";
                     mBundle.putString("imgs", gsimg);
@@ -314,10 +314,10 @@ public class BoxActivity extends Activity implements OnClickListener {
     public void getPhoto_Ggoods() {
         File file;
         if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
-            if (list.size() > 0) {
-                folderPath = mConfigHelper.getfParentPath() + barcode
-                        + File.separator + "box" + File.separator + barcode;
-                gsimg = "box" + barcode + "file"
+            if (bid != null && gid != null) {
+                folderPath = mConfigHelper.getfParentPath() + bid
+                        + File.separator + "boxmanage" + File.separator + gid;
+                gsimg = bid + "boxmanage" + gid + "file"
                         + java.lang.System.currentTimeMillis();
                 file = new File(folderPath);
                 // 生成文件夹的方式;
@@ -361,7 +361,7 @@ public class BoxActivity extends Activity implements OnClickListener {
         @Override
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/goods";
-            param = "operType=3&barcode=" + barcode;
+            param = "operType=3&barcode=" + gid;
             response= 	mGetOrPostHelper.sendGet(url,param);
             int nFlag = MTConfigHelper.NTAG_FAIL;
             JSONArray res;
@@ -378,7 +378,7 @@ public class BoxActivity extends Activity implements OnClickListener {
 				}
 				if(body!=null){
 					try {
-						String busiinvcode = body.getString("busiinvcode");
+						bid = body.getString("busiinvcode");
 						String billoflading = body.getString("billoflading");
 						String cid = body.getString("cid");
 						String csize = body.getString("csize");
@@ -417,7 +417,7 @@ public class BoxActivity extends Activity implements OnClickListener {
 //            String height = "height";
 //            nFlag = MTConfigHelper.NTAG_SUCCESS;
 
-            list.add("业务编号:" + busiinvcode);
+            list.add("业务编号:" + bid);
             list.add("提单号:" + billoflading);
             list.add("箱号:" + cid);
             list.add("箱尺寸:" + csize);
@@ -451,19 +451,11 @@ public class BoxActivity extends Activity implements OnClickListener {
 
     private void doResetParam() {
         // 数据列表;
-        list.clear();
-        // 重新加载数据;
-        showImgCount();
-        showData();
-        // 异常按钮重置;
-        gstate = "正常";
-        mState.setSelection(0);
-        barcode = null;
+
     }
 
     private void showImgCount() {
         sSize = String.valueOf(mtFileHelper.getListfiles().size());
-        Log.e("sSize", sSize);
         tvImgCount.setText(sSize);
     }
 

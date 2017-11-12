@@ -96,10 +96,10 @@ public class BMHistoryActivity extends Activity implements OnClickListener{
                                     long id) {
                 Intent  intent  =new Intent(BMHistoryActivity.this, BMDetailActivity.class);
                 Bundle  bundle  =new Bundle();
-                String  bmid    =mList.get(position).get("id");
-                String simg = mList.get(position).get("img");
-                bundle.putString("bmid", bmid);
-                bundle.putString("imgs", simg);
+                String  _id		=mList.get(position).get("_id");
+                String  img		=mList.get(position).get("img");
+                bundle.putString("_id", _id);
+                bundle.putString("imgs", img);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -119,22 +119,24 @@ public class BMHistoryActivity extends Activity implements OnClickListener{
         mSetTmp.clear();
         mListBid.clear();
         List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-        sql     =   "select * from boxmanageinfo group by bmid";
+        sql     =   "select * from boxmanageinfo order by _id";
         mCursor =   mDB.rawQuery(sql, null);
         int nCount=0;
         while (mCursor.moveToNext()) {
             nCount++;
-            Map<String, String> map=new HashMap<String, String>();
-            String bmid =   mCursor.getString(mCursor.getColumnIndex("bmid")).toString();
-            String gid  =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String bid  =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-            String gsimg = mCursor.getString(mCursor.getColumnIndex("simg")).toString();
-            if(mSetTmp.add(bid)){
-                mListBid.add(bid);
+            Map<String, String> map = new HashMap<String, String>();
+            String _id		=	mCursor.getString(mCursor.getColumnIndex("_id")).toString();
+            String barcode	=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
+            String img		=	mCursor.getString(mCursor.getColumnIndex("img")).toString();
+            String busiinvcode=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
+            if(mSetTmp.add(busiinvcode)){
+                mListBid.add(busiinvcode);
             }
-            map.put("content", nCount + " --> " + bid + "-" + gid + " [|] " + "  详情");
-            map.put("img", gsimg);
-            map.put("id",bmid);
+
+            map.put("content", nCount+" --> 业务"+busiinvcode+" 条码"+barcode+" 总序 "+_id+"  详情");
+            map.put("img", img);
+
+            map.put("_id",_id);
             list.add(map);
         }
 

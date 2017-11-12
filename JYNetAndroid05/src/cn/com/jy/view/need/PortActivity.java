@@ -69,7 +69,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
     private EditText etSearch;
     private Spinner mState;
     private Spinner splkind;
-    private String gstate, date, time, stime, sSize, wid, barcode;
+    private String gstate, date, time, stime, sSize, wid,bid,gid;
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
     private Intent mIntent;
@@ -96,8 +96,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
             folderPath,     //  文件夹路径;
             filePath,       //  文件路径;
             tmpPath,
-            gsimg,      //  临时路径;
-            inporttime, ctime, intime, pboxtime;
+            gsimg;
     Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -182,7 +181,6 @@ public class PortActivity extends Activity implements View.OnClickListener {
     private void initEvent() {
         mIntent = getIntent();
         mGetOrPostHelper = new MTGetOrPostHelper();
-        folderPath = saveDir + File.separator + saveFolder + File.separator + barcode + File.separator + "port";
         mImgHelper = new MTImgHelper();
         mtFileHelper = new MTFileHelper();
         mGsimg.setOnClickListener(this);
@@ -197,8 +195,9 @@ public class PortActivity extends Activity implements View.OnClickListener {
                 if (list.size() > 0) {
                     mIntent= new Intent(PortActivity.this, PortAddActivity.class);
                     mBundle = new Bundle();
-                    mBundle.putString("barcode", barcode);
+                    mBundle.putString("barcode", gid);
                     mBundle.putString("cargostatusport", gstate);
+                    mBundle.putString("busiinvcode", bid);
                     gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
                     if (gsimg.equals("")) gsimg = "未拍照";
                     mBundle.putString("imgs", gsimg);
@@ -286,7 +285,6 @@ public class PortActivity extends Activity implements View.OnClickListener {
         } else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
                 && resultCode == -1) {
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
-            //	清空照片列表;
             mImgHelper.compressPicture(tmpPath, filePath);
             mImgHelper.clearPicture(tmpPath, null);
             //	进行文件内容的叠加;
@@ -317,6 +315,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnSearch:
                 // 进度条的内容;
+                splkind.setSelection(0);
                 if(mThread==null){
                     int nSize=list.size();
                     if(nSize!=0){
@@ -329,7 +328,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
                     final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
                     final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
                     mDialog                           = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
-                    barcode                              = etSearch.getText().toString().trim();
+                    gid = etSearch.getText().toString().trim();
                     mThread = new LoadInfoThread();
                     mThread.start();
                 }
@@ -346,10 +345,10 @@ public class PortActivity extends Activity implements View.OnClickListener {
     public void getPhoto_Ggoods() {
         File file;
         if (mConfigHelper.getfState().equals(Environment.MEDIA_MOUNTED)) {
-            if (list.size() > 0) {
-                folderPath = mConfigHelper.getfParentPath() + barcode
-                        + File.separator + "port" + File.separator;
-                gsimg = barcode + "port" + "file"
+            if (bid != null && gid != null) {
+                folderPath = mConfigHelper.getfParentPath() + bid
+                        + File.separator + "port" + File.separator + gid;
+                gsimg = bid + "port" + gid + "file"
                         + java.lang.System.currentTimeMillis();
                 file = new File(folderPath);
                 // 生成文件夹的方式;
@@ -359,6 +358,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
                 // 生成2中文件路径:01.临时的 02.永久的
                 tmpPath = folderPath + File.separator + gsimg + "_tmp.jpg";
                 filePath = folderPath + File.separator + gsimg + ".jpg";
+                Log.e("port",tmpPath+":"+filePath);
                 file = new File(tmpPath);
                 if (file.exists()) {
                     file.delete();
@@ -407,7 +407,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
         @Override
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/goods";
-            param = "operType=2&barcode=" + barcode;
+            param = "operType=2&barcode=" + gid;
             response  = mGetOrPostHelper.sendGet(url, param);
             int nFlag = MTConfigHelper.NTAG_FAIL;
             JSONArray res;
@@ -424,7 +424,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
                 }
                 if (body != null) {
                     try {
-                        String busiinvcode = body.getString("busiinvcode");
+                        bid = body.getString("busiinvcode");
                         String tradecode = body.getString("tradecode");
                         String wcode = body.getString("wcode");
                         String billoflading = body.getString("billoflading");
@@ -466,7 +466,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
 //            String height = "height";
 //            nFlag = MTConfigHelper.NTAG_SUCCESS;
 
-            list.add("业务编号:" + busiinvcode);
+            list.add("业务编号:" + bid);
             list.add("业务类型编号:" + tradecode);
             list.add("建单人:" + wcode);
             list.add("提单号:" + billoflading);
@@ -508,9 +508,10 @@ public class PortActivity extends Activity implements View.OnClickListener {
         showData();
         // 异常按钮重置;
         gstate = "正常";
+        splkind.setSelection(0);
         mState.setSelection(0);
-        // bid置空&gid置空;
-        barcode = null;
+        bid = null;
+        gid=null;
     }
 
     private void showImgCount() {

@@ -42,11 +42,13 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     //  全程序内容;
     private Context         mContext;
     //  主要的控件;
-    private TextView        tvTopic,tvShow,btnBack, //  返回按钮;
-    btnFunction;    //  内容信息;
+    private WebView vWvShow;
+    private TextView        tvTopic,    //  内容标题;
+            tvShow,btnBack, //  返回按钮;
+            btnFunction;    //  内容信息;
     private Gallery         mGallery;   //  画廊按钮;
     private ProgressDialog  mDialog;     // 对话框;
-    private String          hid,        //  id主键;
+    private String          _id,       //  id主键;
             sql,
             sResult,
             bid,
@@ -60,13 +62,11 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     private Cursor          mCursor;     //  数据库遍历签;
     private MTConfigHelper  mConfigHelper;// 配置项;
     private MTGetOrPostHelper mGetOrPostHelper;
-    private WebView vWvShow;
-
-    private MTFileHelper mtFileHelper; // 文件配置项;
+    private MTFileHelper      mtFileHelper;
     private MTImgHelper     mImgHelper;  // 图片辅助类;
     //  图片的集合列表;
     private List<BitmapDrawable> listBD = null;
-    private ArrayList<String>    list;
+    private ArrayList<String>    listMapName;
     private MyThread        mThread;     // 线程;
 
 
@@ -122,81 +122,123 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
         //  获取id;
         Intent  mIntent =   getIntent();
         Bundle  mBundle =   mIntent.getExtras();
-        hid         =   mBundle.getString("hid");
+        _id			=	mBundle.getString("_id");
         imgs            =   mBundle.getString("imgs");
+        btnBack.setOnClickListener(this);
         //  数据库加载;
         mSqLiteHelper   =   new MTSQLiteHelper(mContext);
         mDB             =   mSqLiteHelper.getmDB();
         //  数据信息加载;
-        doLoadData();
-        tvShow.setText(sResult);
+        listMapName		=	mtFileHelper.getFileNamesByList(imgs,"_");
+        int size		=	listMapName.size();
+        //	数据信息加载;
+        doLoadData(size);
         //  提货信息路径;
-        folderPath  =   mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
-        //  承装图片的容器;
-        listBD      =   mImgHelper.getBitmap01_2(folderPath, imgs);
-        //  设置图片适配器;
-        mGallery.setAdapter(new ImageAdaper(mContext, listBD));
-        list        =   mtFileHelper.getFileNamesByList(imgs,"_");
-        //  添加事件监听;
-        btnBack.setOnClickListener(this);
-        //  图片长按的上传;
-        mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
+        folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"harbor"+File.separator+gid;
+        //	承装图片的容器;
+        if(size>0){
+            listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);
+            mGallery.setAdapter(new ImageAdaper(mContext, listBD));
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view,
-                                           final int position, long id) {
-                Builder builder=new Builder(mContext);
-                builder.setTitle("提示信息:");
-                builder.setPositiveButton("上传", new DialogInterface.OnClickListener() {
+            //	图片长按的上传;
+            mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        if(mThread==null){
-                            // 进度条的内容;
-                            final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
-                            final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
-                            mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
-                            mThread=new MyThread(position);
-                            mThread.start();
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view,
+                                               final int position, long id) {
+                    Builder builder=new Builder(mContext);
+                    builder.setTitle("提示信息:");
+                    builder.setPositiveButton("上传", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            if(mThread==null){
+                                // 进度条的内容;
+                                final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+                                final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
+                                mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
+                                mThread=new MyThread(position);
+                                mThread.start();
+                            }
                         }
-                    }
-                });
-                builder.setNegativeButton(R.string.action_no, null);
-                builder.create();
-                builder.show();
-                return false;
-            }
-        });
+                    });
+                    builder.setNegativeButton(R.string.action_no, null);
+                    builder.create();
+                    builder.show();
+                    return false;
+                }
+            });
+        }
     }
     //  信息加载;
-    private void doLoadData(){
-        sql     =   "select * from harborinfo where hid="+hid;
+    private void doLoadData(int size){
+        sql     =   "select * from harborinfo where _id="+_id;
         mCursor =   mDB.rawQuery(sql, null);
         while (mCursor.moveToNext()) {
-            //  信息加载;
-            bid     =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-            gid     =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String  state       =   mCursor.getString(mCursor.getColumnIndex("state")).toString();
-            String ftochnharbortime     =   mCursor.getString(mCursor.getColumnIndex("ftochnharbortime")).toString();
-            String pboxtime     =   mCursor.getString(mCursor.getColumnIndex("pboxtime")).toString();
-            String senttime     =   mCursor.getString(mCursor.getColumnIndex("senttime")).toString();
-            String transtime        =   mCursor.getString(mCursor.getColumnIndex("transtime")).toString();
-            String transtid     =   mCursor.getString(mCursor.getColumnIndex("transtid")).toString();
-            int transtcount     =   mCursor.getInt(mCursor.getColumnIndex("transtcount"));
-            int pertcount       =   mCursor.getInt(mCursor.getColumnIndex("pertcount"));
-            double pertweight       =   mCursor.getDouble(mCursor.getColumnIndex("pertweight"));
-            String stime        =   mCursor.getString(mCursor.getColumnIndex("stime")).toString();
-            sResult="商品编号:"+bid+"-"+gid+"\r\n";
-            sResult+="到中方口岸日:"+ftochnharbortime+"\r\n";
-            sResult+="装箱日:"+pboxtime+"\r\n";
-            sResult+="放行日:"+senttime+"\r\n";
-            sResult+="换装日:"+transtime+"\r\n";
-            sResult+="发车日:"+stime+"\r\n";
-            sResult+="换装车号:"+transtid+"\r\n";
-            sResult+="换装车数:"+transtcount+"\r\n";
-            sResult+="单车件数:"+pertcount+"\r\n";
-            sResult+="单车吨数:"+pertweight+"\r\n";
-            sResult+="状态信息:\r\n"+state;
+            gid=mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); //
+            String pfactchportdate=mCursor.getString(mCursor.getColumnIndex("pfactchportdate")).toString(); //
+
+            String mpackingdate=mCursor.getString(mCursor.getColumnIndex("mpackingdate")).toString(); //
+
+            String ppassdate=mCursor.getString(mCursor.getColumnIndex("ppassdate"))
+                    .toString(); //
+            String preloadcarno=mCursor.getString(mCursor.getColumnIndex("preloadcarno"))
+                    .toString(); //
+            String preloadcarnum=mCursor.getString(mCursor.getColumnIndex("preloadcarnum"))
+                    .toString(); //
+
+            String preloaddate=mCursor.getString(mCursor.getColumnIndex("preloaddate"))
+                    .toString(); //
+            String msinglecarnum=mCursor.getString(mCursor.getColumnIndex("msinglecarnum")).toString(); // 拖车(取)发车时间(国内时间)
+            String msinglecarton=mCursor.getString(mCursor.getColumnIndex("msinglecarton"))
+                    .toString(); //
+            String pstartdate=mCursor.getString(mCursor.getColumnIndex("pstartdate")).toString(); // 铁路车型(国内信息)
+            String cargostatusseaport=mCursor.getString(mCursor.getColumnIndex("cargostatusseaport"))
+                    .toString(); //
+            // + // 图片
+            bid=mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
+
+            sResult="<html>" +
+                    "<body>" +
+                    "<table border=\"1\" style=\"width:2000px;\">" +
+                    "<tr bgcolor=\"#00FF00\" align=\"center\">" +
+                    "<td >业务编号</td>" +
+                    "<td >条码信息</td>" +
+                    "<td >实际到中方口岸时间</td>" +
+                    "<td >口岸装箱日</td>" +
+                    "<td >放行时间</td>" +
+                    "<td >换装车号</td>" +
+                    "<td >换装车数</td>" +
+                    "<td >换装时间</td>" +
+                    "<td >单车件数</td>" +
+                    "<td >单车吨数</td>" +
+                    "<td >发车时间/出境时间</td>" +
+                    "<td >货物状态</td>" +
+                    "</tr>";
+            sResult+=
+                    "<tr align=\"center\">" +
+                            "<td >"+bid+"</td>" +
+                            "<td >"+gid+"</td>" +
+                            "<td >"+pfactchportdate+"</td>" +
+                            "<td >"+mpackingdate+"</td>" +
+                            "<td >"+ppassdate+"</td>" +
+                            "<td >"+preloadcarno+"</td>" +
+                            "<td >"+preloadcarnum+"</td>" +
+                            "<td >"+preloaddate+"</td>" +
+                            "<td >"+msinglecarnum+"</td>" +
+                            "<td >"+msinglecarton+"</td>" +
+                            "<td >"+pstartdate+"</td>" +
+                            "<td >"+cargostatusseaport+"</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "<table border=\"1\">" +
+                            "<tr>" +
+                            "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
+                            "</tr>"+
+                            "</table>" +
+                            "</body>" +
+                            "</html>"
+            ;
         }
         if(mCursor!=null){
             mCursor.close();
@@ -208,25 +250,25 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     //  适配器的类;
     public class ImageAdaper extends BaseAdapter{
         private Context mContext;
-        private int     mGalBackgroundItem;
-        private int     nSize;
+        private int 	mGalBackgroundItem;
+        private int 	nSize;
         private List<BitmapDrawable> listBD;
 
         public ImageAdaper(Context mContext,List<BitmapDrawable> list){
             this.mContext = mContext;
-            this.listBD   = list;
-            this.nSize    = list.size();
+            this.listBD	  = list;
+            this.nSize	  = list.size();
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);
-            mGalBackgroundItem    = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
+            mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
             typedArray.recycle();
         }
 
         public int getCount() {
-            return this.nSize;
+            return nSize;
         }
 
         public Object getItem(int position) {
-            return this.listBD.get(position);
+            return listBD.get(position);
         }
 
         public long getItemId(int position) {
@@ -235,8 +277,8 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ImageView imageview = new ImageView(this.mContext);
-            imageview.setImageDrawable(this.listBD.get(position));
+            ImageView imageview = new ImageView(mContext);
+            imageview.setImageDrawable(listBD.get(position));
 
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);
             imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));
@@ -247,17 +289,15 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     }
     //  线程的自定义形式;
     class MyThread extends Thread{
-        private String url,
-                response;
-        private int position;
+        private int    position;
         public MyThread(int position) {
             this.position=position;
         }
         @Override
         public void run() {
-            String path     =   folderPath+File.separator+list.get(position)+".jpg";
-            url             =   "http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
-            response        =   mGetOrPostHelper.uploadFile(url,path,list.get(position));
+            String path		=	folderPath+File.separator+listMapName.get(position)+".jpg";
+            String url		=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+            String response	=	mGetOrPostHelper.uploadFile(url,path,listMapName.get(this.position));
             int nFlag= MTConfigHelper.NTAG_FAIL;
             if(!response.endsWith("fail")){
                 nFlag= MTConfigHelper.NTAG_SUCCESS;

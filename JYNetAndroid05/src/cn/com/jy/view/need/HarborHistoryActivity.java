@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -95,10 +96,11 @@ public class HarborHistoryActivity extends Activity implements OnClickListener{
                                     long id) {
                 Intent  intent  =new Intent(HarborHistoryActivity.this, HarborDetailActivity.class);
                 Bundle  bundle  =new Bundle();
-                String  hid =mList.get(position).get("id");
-                String  simg =mList.get(position).get("img");
-                bundle.putString("hid", hid);
-                bundle.putString("imgs", simg);
+                String  _id		=mList.get(position).get("_id");
+                String  img		=mList.get(position).get("img");
+                Log.e("ds", img );
+                bundle.putString("_id", _id);
+                bundle.putString("imgs", img);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -118,24 +120,24 @@ public class HarborHistoryActivity extends Activity implements OnClickListener{
         mSetTmp.clear();
         mListBid.clear();
         List<Map<String, String>> list=new ArrayList<Map<String,String>>();
-        sql     =   "select * from harborinfo group by bid,gid";
+        sql     =   "select * from harborinfo order by _id";
         mCursor =   mDB.rawQuery(sql, null);
         int nCount=0;
         while (mCursor.moveToNext()) {
             nCount++;
             Map<String, String> map=new HashMap<String, String>();
-            String hid  =   mCursor.getString(mCursor.getColumnIndex("hid")).toString();
-            String gid  =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String bid  =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-            String stime    =   mCursor.getString(mCursor.getColumnIndex("stime")).toString();
-            String gsimg    =   mCursor.getString(mCursor.getColumnIndex("simg")).toString();
-            if(mSetTmp.add(bid)){
-                mListBid.add(bid);
+            String _id		=	mCursor.getString(mCursor.getColumnIndex("_id")).toString();
+            String barcode	=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString();
+            String img		=	mCursor.getString(mCursor.getColumnIndex("img")).toString();
+            String busiinvcode=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
+            if(mSetTmp.add(busiinvcode)){
+                mListBid.add(busiinvcode);
             }
-            map.put("content", nCount+" --> "+bid+"-"+gid+" [|"+stime+"] "+"  详情");
-            map.put("img", gsimg);
 
-            map.put("id",hid);
+            map.put("content", nCount+" --> 业务"+busiinvcode+" 条码"+barcode+" 总序 "+_id+"  详情");
+            map.put("img", img);
+
+            map.put("_id",_id);
             list.add(map);
         }
 

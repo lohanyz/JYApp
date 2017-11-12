@@ -47,7 +47,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
             etdgtrainwaybillno,etdgtrainsinglenum,etdgtrainsingleton,etdgtrainwagonkg;
     private String ptoportdate,preinvoicedate_port,pjinchangdate,ppackingtime,bssj,wid,
             startdate,dgtrainstartdate,sfpxpz,fcchgk,dcjsgkdz,dcdsgkdz,dsgkdz,blhtl,dgtrainwagonno,dgtraintype,
-            dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,dgtrainwagonkg;
+            dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,dgtrainwagonkg,busiinvcode;
 
     private RadioGroup rgsfpxpz;
     private String date,time;
@@ -157,6 +157,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         barcode	  	  =mBundle.getString("barcode");
         cargostatusport=mBundle.getString("cargostatusport");
         slkind 	  =mBundle.getString("slkind");
+        busiinvcode 	  =mBundle.getString("busiinvcode");
         img 	  	  =mBundle.getString("imgs");
     }
 
@@ -362,11 +363,11 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
             String response = mGetOrPostHelper.sendGet(url, param);
             int    nFlag 	= MTConfigHelper.NTAG_FAIL;
 
-            if (!response.equalsIgnoreCase("fail")) {
+            if (!response.trim().equalsIgnoreCase("fail")) {
                 nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
 
                 String sql=
-                        "insert into getgoodsinfo (" +
+                        "insert into portinfo (" +
                                 "barcode," +
                                 "ptoportdate," +
                                 "preinvoicedate_port," +
@@ -376,7 +377,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
                                 "bssj," +
                                 "fcchgk," +
                                 "dcjsgkdz,dcdsgkdz,dsgkdz,startdate,blhtl,dgtrainwagonno,dgtraintype," +
-                                "dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,cargostatusport,dgtrainwagonkg,dgtrainstartdate,img" +		//	图片
+                                "dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,cargostatusport,dgtrainwagonkg,dgtrainstartdate,img,busiinvcode" +		//	图片
                                 ") values (" +
                                 "'"+barcode+"'," +
                                 "'"+ptoportdate+"'," +
@@ -399,7 +400,8 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
                                 "'"+cargostatusport+"'," +
                                 "'"+dgtrainwagonkg+"'," +
                                 "'"+dgtrainstartdate+"'," +
-                                "'"+img+"')";
+                                "'"+img+"'," +
+                                "'"+busiinvcode+"')";
                 mDB.execSQL(sql);
             }
             mHandler.sendEmptyMessage(nFlag);

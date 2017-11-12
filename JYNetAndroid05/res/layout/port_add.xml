@@ -213,25 +213,25 @@
         android:visibility="gone">
         <EditText
             android:id="@+id/etblhtl"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/blhtl" />
         <EditText
             android:id="@+id/etdgtrainwagonno"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/dgtrainwagonno" />
         <EditText
             android:id="@+id/etdgtraintype"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/dgtraintype" />
         <EditText
             android:id="@+id/etdgtrainwaybillno"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/dgtrainwaybillno" />
@@ -256,7 +256,7 @@
         </LinearLayout>
         <EditText
             android:id="@+id/etdgtrainwagonkg"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/dgtrainwagonkg" />

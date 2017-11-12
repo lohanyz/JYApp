@@ -43,11 +43,12 @@ public class PDetailActivity extends Activity implements OnClickListener{
     private Context         mContext;
     //  主要的控件;
     private WebView vWvShow;
-    private TextView        tvTopic,btnFunction,btnBack,    //  内容标题;
-            tvShow; //  内容信息;
+    private TextView        tvTopic,    //  内容标题;
+            tvShow,btnBack, //  返回按钮;
+            btnFunction;    //  内容信息;
     private Gallery         mGallery;   //  画廊按钮;
     private ProgressDialog  mDialog;     // 对话框;
-    private String          pid,        //  id主键;
+    private String          _id,       //  id主键;
             sql,
             sResult,
             bid,
@@ -61,12 +62,11 @@ public class PDetailActivity extends Activity implements OnClickListener{
     private Cursor          mCursor;     //  数据库遍历签;
     private MTConfigHelper  mConfigHelper;// 配置项;
     private MTGetOrPostHelper mGetOrPostHelper;
-
     private MTFileHelper      mtFileHelper;
     private MTImgHelper     mImgHelper;  // 图片辅助类;
     //  图片的集合列表;
     private List<BitmapDrawable> listBD = null;
-    private ArrayList<String>    list;
+    private ArrayList<String>    listMapName;
     private MyThread        mThread;     // 线程;
 
 
@@ -122,109 +122,163 @@ public class PDetailActivity extends Activity implements OnClickListener{
         //  获取id;
         Intent  mIntent =   getIntent();
         Bundle  mBundle =   mIntent.getExtras();
-        pid         =   mBundle.getString("pid");
+        _id			=	mBundle.getString("_id");
         imgs            =   mBundle.getString("imgs");
+        btnBack.setOnClickListener(this);
         //  数据库加载;
         mSqLiteHelper   =   new MTSQLiteHelper(mContext);
         mDB             =   mSqLiteHelper.getmDB();
         //  数据信息加载;
-        doLoadData();
-        tvShow.setText(sResult);
+        listMapName		=	mtFileHelper.getFileNamesByList(imgs,"_");
+        int size		=	listMapName.size();
+        //	数据信息加载;
+        doLoadData(size);
         //  提货信息路径;
-        folderPath  =   mConfigHelper.getfParentPath()+bid+File.separator+"port"+File.separator+gid;
-        //  承装图片的容器;
-        listBD      =   mImgHelper.getBitmap01_2(folderPath, imgs);
-        //  设置图片适配器;
-        mGallery.setAdapter(new ImageAdaper(mContext, listBD));
-        list        =   mtFileHelper.getFileNamesByList(imgs,"_");
-        //  添加事件监听;
-        btnBack.setOnClickListener(this);
-        //  图片长按的上传;
-        mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
+        folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"port"+File.separator+gid;
+        //	承装图片的容器;
+        if(size>0){
+            listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);
+            mGallery.setAdapter(new ImageAdaper(mContext, listBD));
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view,
-                                           final int position, long id) {
-                Builder builder=new Builder(mContext);
-                builder.setTitle("提示信息:");
-                builder.setPositiveButton("上传", new DialogInterface.OnClickListener() {
+            //	图片长按的上传;
+            mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        if(mThread==null){
-                            // 进度条的内容;
-                            final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
-                            final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
-                            mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
-                            mThread=new MyThread(position);
-                            mThread.start();
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view,
+                                               final int position, long id) {
+                    Builder builder=new Builder(mContext);
+                    builder.setTitle("提示信息:");
+                    builder.setPositiveButton("上传", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            if(mThread==null){
+                                // 进度条的内容;
+                                final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+                                final CharSequence strDialogBody  = getString(R.string.tip_dialog_done);
+                                mDialog = ProgressDialog.show(mContext, strDialogTitle, strDialogBody,true);
+                                mThread=new MyThread(position);
+                                mThread.start();
+                            }
                         }
-                    }
-                });
-                builder.setNegativeButton(R.string.action_no, null);
-                builder.create();
-                builder.show();
-                return false;
-            }
-        });
+                    });
+                    builder.setNegativeButton(R.string.action_no, null);
+                    builder.create();
+                    builder.show();
+                    return false;
+                }
+            });
+        }
     }
     //  信息加载;
-    private void doLoadData(){
-        sql     =   "select * from portinfo where pid="+pid;
-        mCursor =   mDB.rawQuery(sql, null);
+    private void doLoadData(int size){
+        sql		=	"select * from portinfo where _id="+_id;
+        mCursor	= 	mDB.rawQuery(sql, null);
         while (mCursor.moveToNext()) {
-            //  信息加载;
-            bid     =   mCursor.getString(mCursor.getColumnIndex("bid")).toString();
-            gid     =   mCursor.getString(mCursor.getColumnIndex("gid")).toString();
-            String  state       =   mCursor.getString(mCursor.getColumnIndex("state")).toString();
-            String inporttime       =   mCursor.getString(mCursor.getColumnIndex("inporttime")).toString();
-            String ctime        =   mCursor.getString(mCursor.getColumnIndex("ctime")).toString();
-            String intime       =   mCursor.getString(mCursor.getColumnIndex("intime")).toString();
-            String pboxtime     =   mCursor.getString(mCursor.getColumnIndex("pboxtime")).toString();
-            String islean       =   mCursor.getString(mCursor.getColumnIndex("islean")).toString();
-            String lkind        =   mCursor.getString(mCursor.getColumnIndex("lkind")).toString();
-            String reporttime       =   mCursor.getString(mCursor.getColumnIndex("reporttime")).toString();
-            String classorderid     =   mCursor.getString(mCursor.getColumnIndex("classorderid")).toString();
-            String tid      =   mCursor.getString(mCursor.getColumnIndex("tid")).toString();
-            String tkind        =   mCursor.getString(mCursor.getColumnIndex("tkind")).toString();
-            String oid      =   mCursor.getString(mCursor.getColumnIndex("oid")).toString();
-            int percount        =   mCursor.getInt(mCursor.getColumnIndex("percount"));
-            double perweight        =   mCursor.getDouble(mCursor.getColumnIndex("perweight"));
-            double tformatweight    =   mCursor.getDouble(mCursor.getColumnIndex("tformatweight"));
-            int tcount      =   mCursor.getInt(mCursor.getColumnIndex("tcount"));
-//            String gtime      =   mCursor.getString(mCursor.getColumnIndex("gtime")).toString();
-            String stime        =   mCursor.getString(mCursor.getColumnIndex("stime")).toString();
+            gid=mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); //
+            String ptoportdate=mCursor.getString(mCursor.getColumnIndex("ptoportdate")).toString(); //
 
-            sResult  = "商品编号:" + bid + "-" + gid + "\r\n";
-            sResult += "到港时间:" + inporttime + "\r\n";
-            sResult += "换单时间:" + ctime + "\r\n";
-            sResult += "进场时间:" + intime + "\r\n";
-            sResult += "装箱时间:" + pboxtime + "\r\n";
-            sResult += "是否偏心/偏重:" + islean + "\r\n";
-            sResult += "运输方式:" + lkind + "\r\n";
-            if(lkind.equals("汽运")) {
-                sResult += "拖车号:" + tid + "\r\n";
-                sResult += "车型:" + tkind + "\r\n";
-                sResult += "铅封号:" + oid + "\r\n";
-                sResult += "单车件数:" + percount + "\r\n";
-                sResult += "单车吨数:" + perweight + "\r\n";
-                sResult += "车数:" + tcount + "\r\n";
-                sResult += "发车时间:" + stime + "\r\n";
+            String preinvoicedate_port=mCursor.getString(mCursor.getColumnIndex("preinvoicedate_port")).toString(); //
 
-            }
-            else{
-                sResult +="报数时间"+reporttime+"\r\n";
-                sResult +="班列号"+classorderid+"\r\n";
-                sResult +="车皮号"+tid+"\r\n";
-                sResult +="铁路车型"+tkind+"\r\n";
-                sResult +="运单号"+oid+"\r\n";
-                sResult +="单车件数"+percount+"\r\n";
-                sResult +="单车吨数"+perweight+"\r\n";
-                sResult +="车皮标重"+tformatweight+"\r\n";
-                sResult +="发车时间"+stime+"\r\n";
-            }
-            sResult=sResult+"状态信息:\r\n"+
-                    state
+            String pjinchangdate=mCursor.getString(mCursor.getColumnIndex("pjinchangdate"))
+                    .toString(); //
+            String ppackingtime=mCursor.getString(mCursor.getColumnIndex("ppackingtime"))
+                    .toString(); //
+            String sfpxpz=mCursor.getString(mCursor.getColumnIndex("sfpxpz"))
+                    .toString(); //
+
+            String bssj=mCursor.getString(mCursor.getColumnIndex("bssj"))
+                    .toString(); //
+            String fcchgk=mCursor.getString(mCursor.getColumnIndex("fcchgk")).toString(); // 拖车(取)发车时间(国内时间)
+            String dcjsgkdz=mCursor.getString(mCursor.getColumnIndex("dcjsgkdz"))
+                    .toString(); //
+            String dcdsgkdz=mCursor.getString(mCursor.getColumnIndex("dcdsgkdz")).toString(); // 铁路车型(国内信息)
+            String dsgkdz=mCursor.getString(mCursor.getColumnIndex("dsgkdz"))
+                    .toString();
+            String startdate=mCursor.getString(mCursor.getColumnIndex("startdate"))
+                    .toString();
+            String blhtl=mCursor.getString(mCursor.getColumnIndex("blhtl"))
+                    .toString();
+            String dgtrainwagonno=mCursor.getString(mCursor.getColumnIndex("dgtrainwagonno"))
+                    .toString();
+            String dgtraintype=mCursor.getString(mCursor.getColumnIndex("dgtraintype"))
+                    .toString();
+            String dgtrainwaybillno=mCursor.getString(mCursor.getColumnIndex("dgtrainwaybillno"))
+                    .toString();
+            String dgtrainsinglenum=mCursor.getString(mCursor.getColumnIndex("dgtrainsinglenum"))
+                    .toString();
+            String dgtrainsingleton=mCursor.getString(mCursor.getColumnIndex("dgtrainsingleton"))
+                    .toString();
+            String cargostatusport=mCursor.getString(mCursor.getColumnIndex("cargostatusport"))
+                    .toString();
+            String dgtrainwagonkg=mCursor.getString(mCursor.getColumnIndex("dgtrainwagonkg"))
+                    .toString();
+            String dgtrainstartdate=mCursor.getString(mCursor.getColumnIndex("dgtrainstartdate"))
+                    .toString();
+            // + // 图片
+            bid=mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
+
+            sResult="<html>" +
+                    "<body>" +
+                    "<table border=\"1\" style=\"width:2000px;\">" +
+                    "<tr bgcolor=\"#00FF00\" align=\"center\">" +
+                    "<td >业务编号</td>" +
+                    "<td >条码信息</td>" +
+                    "<td >到港时间</td>" +
+                    "<td >换单时间</td>" +
+                    "<td >进场时间</td>" +
+                    "<td >装箱时间</td>" +
+                    "<td >是否偏心/偏重</td>" +
+                    "<td >报数时间</td>" +
+                    "<td >发车车号</td>" +
+                    "<td >单车件数</td>" +
+                    "<td >单车吨数</td>" +
+                    "<td >车数</td>" +
+                    "<td >发车时间</td>" +
+                    "<td >铁路班列号</td>" +
+                    "<td >铁路车皮号</td>" +
+                    "<td >铁路车型</td>" +
+                    "<td >铁路运单号</td>" +
+                    "<td >单车件数</td>" +
+                    "<td >单车吨数</td>" +
+                    "<td >货物状态</td>" +
+                    "<td >铁路车皮标重</td>" +
+                    "<td >发车时间</td>" +
+
+                    "</tr>";
+            sResult+=
+                    "<tr align=\"center\">" +
+                            "<td >"+bid+"</td>" +
+                            "<td >"+gid+"</td>" +
+                            "<td >"+ptoportdate+"</td>" +
+                            "<td >"+preinvoicedate_port+"</td>" +
+                            "<td >"+pjinchangdate+"</td>" +
+                            "<td >"+ppackingtime+"</td>" +
+                            "<td >"+sfpxpz+"</td>" +
+                            "<td >"+bssj+"</td>" +
+                            "<td >"+fcchgk+"</td>" +
+                            "<td >"+dcjsgkdz+"</td>" +
+                            "<td >"+dcdsgkdz+"</td>" +
+                            "<td >"+dsgkdz+"</td>" +
+                            "<td >"+startdate+"</td>" +
+                            "<td >"+blhtl+"</td>" +
+                            "<td >"+dgtrainwagonno+"</td>" +
+                            "<td >"+dgtraintype+"</td>" +
+                            "<td >"+dgtrainwaybillno+"</td>" +
+                            "<td >"+dgtrainsinglenum+"</td>" +
+                            "<td >"+dgtrainsingleton+"</td>" +
+                            "<td >"+cargostatusport+"</td>" +
+                            "<td >"+dgtrainwagonkg+"</td>" +
+                            "<td >"+dgtrainstartdate+"</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "<table border=\"1\">" +
+                            "<tr>" +
+                            "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
+                            "</tr>"+
+                            "</table>" +
+                            "</body>" +
+                            "</html>"
             ;
         }
         if(mCursor!=null){
@@ -237,25 +291,25 @@ public class PDetailActivity extends Activity implements OnClickListener{
     //  适配器的类;
     public class ImageAdaper extends BaseAdapter{
         private Context mContext;
-        private int     mGalBackgroundItem;
-        private int     nSize;
+        private int 	mGalBackgroundItem;
+        private int 	nSize;
         private List<BitmapDrawable> listBD;
 
         public ImageAdaper(Context mContext,List<BitmapDrawable> list){
             this.mContext = mContext;
-            this.listBD   = list;
-            this.nSize    = list.size();
+            this.listBD	  = list;
+            this.nSize	  = list.size();
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);
-            mGalBackgroundItem    = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
+            mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);
             typedArray.recycle();
         }
 
         public int getCount() {
-            return this.nSize;
+            return nSize;
         }
 
         public Object getItem(int position) {
-            return this.listBD.get(position);
+            return listBD.get(position);
         }
 
         public long getItemId(int position) {
@@ -264,8 +318,8 @@ public class PDetailActivity extends Activity implements OnClickListener{
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ImageView imageview = new ImageView(this.mContext);
-            imageview.setImageDrawable(this.listBD.get(position));
+            ImageView imageview = new ImageView(mContext);
+            imageview.setImageDrawable(listBD.get(position));
 
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);
             imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));
@@ -276,17 +330,15 @@ public class PDetailActivity extends Activity implements OnClickListener{
     }
     //  线程的自定义形式;
     class MyThread extends Thread{
-        private String url,
-                response;
-        private int position;
+        private int    position;
         public MyThread(int position) {
             this.position=position;
         }
         @Override
         public void run() {
-            String path     =   folderPath+File.separator+list.get(position)+".jpg";
-            url             =   "http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
-            response        =   mGetOrPostHelper.uploadFile(url,path,list.get(position));
+            String path		=	folderPath+File.separator+listMapName.get(position)+".jpg";
+            String url		=	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/upPhoto";
+            String response	=	mGetOrPostHelper.uploadFile(url,path,listMapName.get(this.position));
             int nFlag= MTConfigHelper.NTAG_FAIL;
             if(!response.endsWith("fail")){
                 nFlag= MTConfigHelper.NTAG_SUCCESS;
