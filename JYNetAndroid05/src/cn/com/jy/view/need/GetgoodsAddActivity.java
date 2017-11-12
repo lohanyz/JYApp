@@ -420,7 +420,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 						
 			}
 			message+="货物状态:"+cargostatuscenter+"\r\n"+//	货物状态
-					"图:"+img ;		//	图
+					"图:"+getImgCount(img)+"张" ;		//	图
 			vBuilder.setMessage(message);
 			vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 				
@@ -541,4 +541,16 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 			mThread = null;
 		}
 	}
+	private int getImgCount(String str){
+		int count=0;
+		if(str.contains("_")){
+			String[] strs=str.split("_");
+			count=strs.length;
+		}else if(!str.equals("未拍照")){
+			count=1;
+		}else count=0;
+		
+		return count;
+	}
+	
 }
