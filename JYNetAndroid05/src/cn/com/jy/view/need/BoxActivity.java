@@ -75,7 +75,7 @@ public class BoxActivity extends Activity implements OnClickListener {
     private Builder mBuilder;
     private Bundle mBundle;
     private ArrayList<MEFile> listfile;
-    //	TODO 02.修改的相关内容;
+    //  TODO 02.修改的相关内容;
     private LoadInfoThread mThread; // 线程内容;
     // 帮助类;
     private MTConfigHelper mConfigHelper;
@@ -101,7 +101,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                     Toast.makeText(mContext, R.string.tip_success, Toast.LENGTH_SHORT).show();
                     mtFileHelper.fileDelAll();
                     break;
-                //	02.失败;
+                //  02.失败;
                 case MTConfigHelper.NTAG_FAIL:
                     Toast.makeText(mContext, R.string.tip_fail, Toast.LENGTH_LONG).show();
                     break;
@@ -127,7 +127,7 @@ public class BoxActivity extends Activity implements OnClickListener {
         mContext = BoxActivity.this;
         mIntent = getIntent();
         mImgHelper = new MTImgHelper();
-        //	文件的管理类对象;
+        //  文件的管理类对象;
         mtFileHelper = new MTFileHelper();
         mConfigHelper = new MTConfigHelper();
         mGetOrPostHelper = new MTGetOrPostHelper();
@@ -242,17 +242,22 @@ public class BoxActivity extends Activity implements OnClickListener {
             String gid = intent.getStringExtra("bid");
             etSearch.setText(gid);
         }
-        if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
+        else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
                 && resultCode == -1) {
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
             mImgHelper.compressPicture(tmpPath, filePath);
             mImgHelper.clearPicture(tmpPath, null);
-            //	进行文件内容的叠加;
+            //  进行文件内容的叠加;
             MEFile meFile = new MEFile(gsimg, filePath);
-            //	将拍照操作放入列表;
+            //  将拍照操作放入列表;
             // TODO 修改的内容;
             mtFileHelper.fileAdd(meFile);
             showImgCount();
+        }
+        else if (requestCode == 1) {
+            if (resultCode == 1) {
+                doResetParam();
+            }
         }
     }
 
@@ -263,9 +268,9 @@ public class BoxActivity extends Activity implements OnClickListener {
                 getPhoto_Ggoods();
                 break;
             case R.id.btnCode:
-                //	跳转至专门的intent控件;
+                //  跳转至专门的intent控件;
                 mIntent = new Intent(mContext, FlushActivity.class);
-                //	有返回值的跳转;
+                //  有返回值的跳转;
                 startActivityForResult(mIntent, MTConfigHelper.NTRACK_GGOODS_GID_TO);
                 break;
 
@@ -362,40 +367,40 @@ public class BoxActivity extends Activity implements OnClickListener {
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/goods";
             param = "operType=3&barcode=" + gid;
-            response= 	mGetOrPostHelper.sendGet(url,param);
+            response=   mGetOrPostHelper.sendGet(url,param);
             int nFlag = MTConfigHelper.NTAG_FAIL;
             JSONArray res;
             JSONObject body;
-			if(!response.trim().equalsIgnoreCase("fail")){
-				nFlag= MTConfigHelper.NTAG_SUCCESS;
-				try {
+            if(!response.trim().equalsIgnoreCase("fail")){
+                nFlag= MTConfigHelper.NTAG_SUCCESS;
+                try {
                     res = new JSONArray(response);
                     body = res.getJSONObject(0);
 
-				} catch (JSONException e) {
-					res = null;
-					body = null;
-				}
-				if(body!=null){
-					try {
-						bid = body.getString("busiinvcode");
-						String billoflading = body.getString("billoflading");
-						String cid = body.getString("cid");
-						String csize = body.getString("csize");
-						String ctype = body.getString("ctype");
-						String cowner = body.getString("cowner");
-						String goodsdesc = body.getString("goodsdesc");
-						String etransportationmode = body.getString("etransportationmode");
-						String cname = body.getString("cname");
-						String sealno = body.getString("sealno");
-						String pieces = body.getString("pieces");
-						String grossweight = body.getString("grossweight");
-						String grossweightjw = body.getString("grossweightjw");
-						String grossweighgn = body.getString("grossweighgn");
-						String volume = body.getString("volume");
-						String length = body.getString("length");
-						String width = body.getString("width");
-						String height = body.getString("height");
+                } catch (JSONException e) {
+                    res = null;
+                    body = null;
+                }
+                if(body!=null){
+                    try {
+                        bid = body.getString("busiinvcode");
+                        String billoflading = body.getString("billoflading");
+                        String cid = body.getString("cid");
+                        String csize = body.getString("csize");
+                        String ctype = body.getString("ctype");
+                        String cowner = body.getString("cowner");
+                        String goodsdesc = body.getString("goodsdesc");
+                        String etransportationmode = body.getString("etransportationmode");
+                        String cname = body.getString("cname");
+                        String sealno = body.getString("sealno");
+                        String pieces = body.getString("pieces");
+                        String grossweight = body.getString("grossweight");
+                        String grossweightjw = body.getString("grossweightjw");
+                        String grossweighgn = body.getString("grossweighgn");
+                        String volume = body.getString("volume");
+                        String length = body.getString("length");
+                        String width = body.getString("width");
+                        String height = body.getString("height");
 
 //            String busiinvcode = "busiinvcode";
 //            String billoflading = "billoflading";
@@ -436,13 +441,13 @@ public class BoxActivity extends Activity implements OnClickListener {
             list.add("宽(CM):" + width);
             list.add("高(CM):" + height);
 
-					}catch (JSONException e){
-						nFlag=MTConfigHelper.NTAG_FAIL;
-						Log.e("getdata", "run: ", e);
-					}
+                    }catch (JSONException e){
+                        nFlag=MTConfigHelper.NTAG_FAIL;
+                        Log.e("getdata", "run: ", e);
+                    }
 
-				}
-			}
+                }
+            }
 
             myHandler.sendEmptyMessage(nFlag);
         }
@@ -451,7 +456,15 @@ public class BoxActivity extends Activity implements OnClickListener {
 
     private void doResetParam() {
         // 数据列表;
-
+        list.clear();
+        // 重新加载数据;
+        showImgCount();
+        showData();
+        // 异常按钮重置;
+        gstate = "正常";
+        mState.setSelection(0);
+        bid = null;
+        gid=null;
     }
 
     private void showImgCount() {
@@ -461,7 +474,7 @@ public class BoxActivity extends Activity implements OnClickListener {
 
     private void showData() {
         mAdapter = new ArrayAdapter<String>(mContext, R.layout.item02, R.id.tvTopic, list);
-        //	显示的列表和适配器绑定;
+        //  显示的列表和适配器绑定;
         mListView.setAdapter(mAdapter);
     }
 
