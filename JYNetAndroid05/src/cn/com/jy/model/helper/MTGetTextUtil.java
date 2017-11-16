@@ -10,6 +10,9 @@ public class MTGetTextUtil {
 		String string;
 		try {
 			string=v.getText().toString();
+			if(string.equals("")){
+				string="null";
+			}
 		} catch (Exception e) {
 			string="null";
 		}
@@ -19,6 +22,9 @@ public class MTGetTextUtil {
 		String string;
 		try {
 			string=v.getText().toString();
+			if(string.equals("")){
+				string="null";
+			}
 		} catch (Exception e) {
 			string="null";
 		}
@@ -28,6 +34,9 @@ public class MTGetTextUtil {
 		String string;
 		try {
 			string=v.getText().toString();
+			if(string.equals("")){
+				string="null";
+			}
 		} catch (Exception e) {
 			string="null";
 		}
