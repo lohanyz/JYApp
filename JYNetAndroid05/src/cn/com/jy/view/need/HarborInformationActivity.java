@@ -7,8 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,7 +16,6 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -26,13 +23,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,21 +35,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import cn.com.jy.activity.R;
 import cn.com.jy.model.entity.MEFile;
-import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
-import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTImgHelper;
-import cn.com.jy.model.helper.MTSQLiteHelper;
-import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
 public class HarborInformationActivity extends Activity implements OnClickListener {
     private ArrayList<String> list;
@@ -63,7 +50,6 @@ public class HarborInformationActivity extends Activity implements OnClickListen
     private ProgressDialog mDialog;
     private TextView tvTopic, tvImgCount;
     private EditText etSearch;
-    private String wid;
     private TextView btnDetail;
     private Button mGsimg, btnAdd,
             btnCode, btnSearch;
@@ -82,13 +68,9 @@ public class HarborInformationActivity extends Activity implements OnClickListen
     private MTGetOrPostHelper mGetOrPostHelper;
     private MTImgHelper mImgHelper;
     private MTFileHelper mtFileHelper;
-    //
-    private MTSharedpreferenceHelper mSpHelper; // 首选项存储;
 
-    private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
-    private SQLiteDatabase mDB; // 数据库件;
-    private String saveDir = Environment.getExternalStorageDirectory()
-            .getPath() + File.separator + "jyFile", saveFolder = "photo", folderPath, // 文件夹路径;
+    private String  
+            folderPath, // 文件夹路径;
             filePath, // 文件路径;
             tmpPath, gsimg; // 临时路径;
     @SuppressLint("HandlerLeak")
@@ -121,7 +103,6 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         init();
     }
 
-    @SuppressWarnings("static-access")
     private void init() {
         list = new ArrayList<String>();
         mContext = HarborInformationActivity.this;
@@ -131,9 +112,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         mtFileHelper = new MTFileHelper();
         mConfigHelper = new MTConfigHelper();
         mGetOrPostHelper = new MTGetOrPostHelper();
-        //mFileHelper = new FileHelper();
-        mSqLiteHelper = new MTSQLiteHelper(mContext);
-        mDB = mSqLiteHelper.getmDB();
+
         mImgHelper = new MTImgHelper();
         listfile = mtFileHelper.getListfiles();
         mListView = (ListView) findViewById(R.id.lvResult);
@@ -148,8 +127,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
         btnAdd = (Button) findViewById(R.id.btnAdd);
 
         btnDetail.setText("历史");
-        mSpHelper = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,
-                mContext.MODE_APPEND);
+  
         tvTopic.setText("口岸");
         mGsimg.setOnClickListener(this);
         btnCode.setOnClickListener(this);

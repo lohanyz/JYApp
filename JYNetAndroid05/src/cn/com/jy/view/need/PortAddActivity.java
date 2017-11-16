@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -38,7 +37,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     private Context mContext;
     private Intent  mIntent;
     /*控件内容*/
-    private TextView vTopic,vBack,vFunction,btnBack;
+    private TextView vTopic,vBack,vFunction;
     private LinearLayout layTrain,layTruck;
     private String barcode,cargostatusport,slkind,img;
     private Button vOk,btptoportdate,btpreinvoicedate_port,btpjinchangdate,btppackingtime,btbssj,
@@ -106,7 +105,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         btbssj= (Button) findViewById(R.id.btbssj);
         btstartdate= (Button) findViewById(R.id.btstartdate);
         btdgtrainstartdate= (Button) findViewById(R.id.btdgtrainstartdate);
-        btnBack= (TextView) findViewById(R.id.btnBack);
+        vBack= (TextView) findViewById(R.id.btnBack);
         rgsfpxpz= (RadioGroup) findViewById(R.id.sfpxpz);
         etfcchgk= (EditText) findViewById(R.id.etfcchgk);
         etdcjsgkdz= (EditText) findViewById(R.id.etdcjsgkdz);
@@ -137,7 +136,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         btbssj.setOnClickListener(this);
         btstartdate.setOnClickListener(this);
         btdgtrainstartdate.setOnClickListener(this);
-        btnBack.setOnClickListener(this);
+        vBack.setOnClickListener(this);
 
     }
     private void checkView(){
@@ -315,7 +314,6 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
                     mThread=new UpLoadThread();
                     mThread.start();
                 }
-
             }
         });
         vBuilder.setNegativeButton(R.string.action_no, null);
@@ -326,40 +324,37 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     public class UpLoadThread extends Thread {
         @Override
         public void run() {
-
             // 进行相应的登录操作的界面显示;
             // 01.Http 协议中的Get和Post方法;
             String url  = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/port";
             String param= null;
             try {
                 param=
-                        "operType=1" +
-                                "&barcode="+barcode+
-                                "&ptoportdate="+ URLEncoder.encode(ptoportdate,"utf-8") +
-                                "&preinvoicedate_port="+URLEncoder.encode(preinvoicedate_port,"utf-8") +
-                                "&pjinchangdate="+pjinchangdate +
-                                "&ppackingtime=" +ppackingtime+
-                                "&sfpxpz=" +sfpxpz+
-                                "&bssj="+URLEncoder.encode(bssj,"utf-8") +
-                                "&fcchgk="+URLEncoder.encode(fcchgk,"utf-8") +
-                                "&dcjsgkdz="+URLEncoder.encode(dcjsgkdz,"utf-8")+
-                                "&dcdsgkdz=" +URLEncoder.encode(dcdsgkdz,"utf-8")+
-                                "&dsgkdz=" +URLEncoder.encode(dsgkdz,"utf-8")+
-                                "&startdate=" +startdate+
-                                "&blhtl=" +URLEncoder.encode(blhtl,"utf-8")+
-                                "&dgtrainwagonno=" +dgtrainwagonno+
-                                "&dgtraintype=" +dgtraintype+
-                                "&dgtrainwaybillno=" +URLEncoder.encode(dgtrainwaybillno,"utf-8")+
-                                "&dgtrainsinglenum=" +URLEncoder.encode(dgtrainsinglenum,"utf-8")+
-                                "&dgtrainsingleton=" +URLEncoder.encode(dgtrainsingleton,"utf-8")+
-                                "&cargostatusport=" +URLEncoder.encode(cargostatusport,"utf-8")+
-                                "&dgtrainwagonkg=" +dgtrainwagonkg+
-                                "&dgtrainstartdate=" +dgtrainstartdate+
-                                "&img="+URLEncoder.encode(img,"utf-8")+
-                                "&busiinvcode="+URLEncoder.encode(busiinvcode,"utf-8")+
-                                "&wid="+wid;
-
-
+                    "operType=1" +
+                    "&barcode="+barcode+
+                    "&ptoportdate="+ URLEncoder.encode(ptoportdate,"utf-8") +
+                    "&preinvoicedate_port="+URLEncoder.encode(preinvoicedate_port,"utf-8") +
+                    "&pjinchangdate="+pjinchangdate +
+                    "&ppackingtime=" +ppackingtime+
+                    "&sfpxpz=" +sfpxpz+
+                    "&bssj="+URLEncoder.encode(bssj,"utf-8") +
+                    "&fcchgk="+URLEncoder.encode(fcchgk,"utf-8") +
+                    "&dcjsgkdz="+URLEncoder.encode(dcjsgkdz,"utf-8")+
+                    "&dcdsgkdz=" +URLEncoder.encode(dcdsgkdz,"utf-8")+
+                    "&dsgkdz=" +URLEncoder.encode(dsgkdz,"utf-8")+
+                    "&startdate=" +startdate+
+                    "&blhtl=" +URLEncoder.encode(blhtl,"utf-8")+
+                    "&dgtrainwagonno=" +dgtrainwagonno+
+                    "&dgtraintype=" +dgtraintype+
+                    "&dgtrainwaybillno=" +URLEncoder.encode(dgtrainwaybillno,"utf-8")+
+                    "&dgtrainsinglenum=" +URLEncoder.encode(dgtrainsinglenum,"utf-8")+
+                    "&dgtrainsingleton=" +URLEncoder.encode(dgtrainsingleton,"utf-8")+
+                    "&cargostatusport=" +URLEncoder.encode(cargostatusport,"utf-8")+
+                    "&dgtrainwagonkg=" +dgtrainwagonkg+
+                    "&dgtrainstartdate=" +dgtrainstartdate+
+                    "&img="+URLEncoder.encode(img,"utf-8")+
+                    "&busiinvcode="+URLEncoder.encode(busiinvcode,"utf-8")+
+                    "&wid="+wid;
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

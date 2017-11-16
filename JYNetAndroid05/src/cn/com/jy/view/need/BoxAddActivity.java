@@ -1,5 +1,6 @@
 package cn.com.jy.view.need;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -29,6 +30,7 @@ import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
+@SuppressLint("HandlerLeak")
 public class BoxAddActivity extends Activity implements View.OnClickListener {
     private Context mContext;
     private Intent mIntent;
@@ -46,7 +48,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
     private EditText etecarryaddress,etechangenumber;
     private String ecarryaddress,ecarrydate,echinaporttime,eportstorageroomtime,etimechangeofport,
             echangenumber,efeeofflinetime,erailwayofflinetime,eactualreturntime,cargostatusbox,
-            wid,barcode,img,busiinvcode;
+            barcode,img,busiinvcode;
 
     Handler mHandler = new Handler() {
         @Override
@@ -105,7 +107,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
         mSqLiteHelper = new MTSQLiteHelper(mContext);
         mGetOrPostHelper = new MTGetOrPostHelper();
         mDB 		  = mSqLiteHelper.getmDB();
-        wid 		  = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+//        wid 		  = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         btnOk.setOnClickListener(this);
         btecarrydate.setOnClickListener(this);
         btechinaporttime.setOnClickListener(this);
@@ -224,7 +226,7 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
         efeeofflinetime = MTGetTextUtil.getText(btefeeofflinetime);
         erailwayofflinetime = MTGetTextUtil.getText(bterailwayofflinetime);
         eactualreturntime = MTGetTextUtil.getText(bteactualreturntime);
-        wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+//        wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         AlertDialog.Builder vBuilder=new AlertDialog.Builder(mContext);
         vBuilder.setTitle("信息确认");
         String 	message = "二维码:"+barcode+"\r\n";

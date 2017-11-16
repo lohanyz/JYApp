@@ -1,13 +1,12 @@
 package cn.com.jy.view.need;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,15 +21,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
-import android.app.AlertDialog.Builder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,23 +33,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import cn.com.jy.activity.R;
 import cn.com.jy.model.entity.MEFile;
-import cn.com.jy.model.entity.Trainorder;
-import cn.com.jy.model.entity.Truckorder;
-import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
-import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTImgHelper;
-import cn.com.jy.model.helper.MTSQLiteHelper;
-import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
 /**
  * Created by loh on 2017/8/24.
@@ -62,14 +48,14 @@ import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
 public class PortActivity extends Activity implements View.OnClickListener {
     private Context mContext;
-    private TextView tvTopic, btnDetail, btnBack, state2;
+    private TextView tvTopic, btnDetail, vBack, state2;
     private ProgressDialog mDialog;
 
     private Button mGsimg, btnCode, btnSearch;
     private EditText etSearch;
     private Spinner mState;
     private Spinner splkind;
-    private String gstate, date, time, stime, sSize, wid,bid,gid;
+    private String gstate,sSize,bid,gid;
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
     private Intent mIntent;
@@ -85,19 +71,13 @@ public class PortActivity extends Activity implements View.OnClickListener {
     private MTGetOrPostHelper mGetOrPostHelper;
     private MTImgHelper mImgHelper;
     private MTFileHelper mtFileHelper;
-    //
-    private Builder vBuilder;
-    private MTSharedpreferenceHelper mSpHelper; // 首选项存储;
-
-    private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
-    private SQLiteDatabase mDB; // 数据库件;
-    private String saveDir = Environment.getExternalStorageDirectory().getPath() + File.separator + "jyFile",
-            saveFolder = "photo",
-            folderPath,     //  文件夹路径;
-            filePath,       //  文件路径;
-            tmpPath,
-            gsimg;
-    Handler myHandler = new Handler() {
+    
+    private String  folderPath,     //  文件夹路径;
+		            filePath,       //  文件路径;
+		            tmpPath,
+		            gsimg;
+    @SuppressLint("HandlerLeak")
+	Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mDialog.dismiss();
@@ -126,14 +106,10 @@ public class PortActivity extends Activity implements View.OnClickListener {
         initView();
         initEvent();
     }
-
-    private void initView() {
+    
+	private void initView() {
         mContext = PortActivity.this;
         mConfigHelper = new MTConfigHelper();
-        mSqLiteHelper = new MTSQLiteHelper(mContext);
-        mDB = mSqLiteHelper.getmDB();
-        mSpHelper = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,
-                mContext.MODE_APPEND);
         mGetOrPostHelper = new MTGetOrPostHelper();
         mImgHelper = new MTImgHelper();
         //  文件的管理类对象;
@@ -141,7 +117,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
         listfile = mtFileHelper.getListfiles();
         tvTopic = (TextView) findViewById(R.id.tvTopic);
         mListView = (ListView) findViewById(R.id.lvResult);
-        btnBack = (TextView) findViewById(R.id.btnBack);
+        vBack = (TextView) findViewById(R.id.btnBack);
         btnDetail = (TextView) findViewById(R.id.btnFunction);
         mState = (Spinner) findViewById(R.id.gstate);
         mGsimg = (Button) findViewById(R.id.btnPhoto);
@@ -151,7 +127,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
         splkind = (Spinner) findViewById(R.id.lkind);
         etSearch = (EditText) findViewById(R.id.etSearch);
         list = new ArrayList<String>();
-        ArrayAdapter adap = new ArrayAdapter<String>(this, R.layout.spinerlayout, new String[]{"运  输  方  式  ▼", "汽   运", "铁   路"});
+        ArrayAdapter<String> adap = new ArrayAdapter<String>(this, R.layout.spinerlayout, new String[]{"运  输  方  式  ▼", "汽   运", "铁   路"});
         splkind.setAdapter(adap);
         btnDetail.setText("历史");
         tvTopic.setText("港口");
@@ -187,6 +163,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
         btnDetail.setOnClickListener(this);
         btnCode.setOnClickListener(this);
         btnSearch.setOnClickListener(this);
+        vBack.setOnClickListener(this);
         splkind.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
@@ -304,6 +281,20 @@ public class PortActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(final View v) {
         switch (v.getId()) {
+	        case R.id.btnBack:
+	        	int n = listfile.size();
+	            if (n != 0) {
+	                for (MEFile item : listfile) {
+	                    String path = item.getPath();
+	                    File file = new File(path);
+	                    if (file.exists()) {
+	                        file.delete();
+	                    }
+	                }
+	            }
+	            finish();
+	        	
+	        	break;
             case R.id.btnPhoto:
                 getPhoto_Ggoods();
                 break;
@@ -385,21 +376,6 @@ public class PortActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    public void onClickBack(View view) {
-
-        int n = listfile.size();
-        if (n != 0) {
-            for (MEFile item : listfile) {
-                String path = item.getPath();
-                File file = new File(path);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-        }
-        finish();
-    }
-
     public class LoadInfoThread extends Thread {
         private String url,
                 param, response;
@@ -444,48 +420,27 @@ public class PortActivity extends Activity implements View.OnClickListener {
                         String length = body.getString("length");
                         String width = body.getString("width");
                         String height = body.getString("height");
-//            String busiinvcode = "busiinvcode";
-//            String tradecode = "tradecode";
-//            String wcode = "wcode";
-//            String billoflading = "billoflading";
-//            String shipcorm = "shipcorm";
-//            String shipexparrivaldate = "shipexparrivaldate";
-//            String cname = "cname";
-//            String cid = "cid";
-//            String goodsdesc = "goodsdesc";
-//            String csize = "csize";
-//            String ctype = "ctype";
-//            String sealno = "sealno";
-//            String pieces = "pieces";
-//            String grossweight = "grossweight";
-//            String grossweightjw = "grossweightjw";
-//            String grossweighgn = "grossweighgn";
-//            String volume = "volume";
-//            String length = "length";
-//            String width = "width";
-//            String height = "height";
-//            nFlag = MTConfigHelper.NTAG_SUCCESS;
-
-            list.add("业务编号:" + bid);
-            list.add("业务类型编号:" + tradecode);
-            list.add("建单人:" + wcode);
-            list.add("提单号:" + billoflading);
-            list.add("船公司:" + shipcorm);
-            list.add("预计到港时间:" + shipexparrivaldate);
-            list.add("品名:" + cname);
-            list.add("箱号:" + cid);
-            list.add("包装类型:" + goodsdesc);
-            list.add("箱尺寸:" + csize);
-            list.add("箱型:" + ctype);
-            list.add("铅封号:" + sealno);
-            list.add("件数:" + pieces);
-            list.add("毛重量:" + grossweight);
-            list.add("毛重-境外(KGS):" + grossweightjw);
-            list.add("毛重-国内(KGS):" + grossweighgn);
-            list.add("体积（CBM）:" + volume);
-            list.add("长(CM):" + length);
-            list.add("宽(CM):" + width);
-            list.add("高(CM):" + height);
+                        /*信息列表*/
+			            list.add("业务编号:" + bid);
+			            list.add("业务类型编号:" + tradecode);
+			            list.add("建单人:" + wcode);
+			            list.add("提单号:" + billoflading);
+			            list.add("船公司:" + shipcorm);
+			            list.add("预计到港时间:" + shipexparrivaldate);
+			            list.add("品名:" + cname);
+			            list.add("箱号:" + cid);
+			            list.add("包装类型:" + goodsdesc);
+			            list.add("箱尺寸:" + csize);
+			            list.add("箱型:" + ctype);
+			            list.add("铅封号:" + sealno);
+			            list.add("件数:" + pieces);
+			            list.add("毛重量:" + grossweight);
+			            list.add("毛重-境外(KGS):" + grossweightjw);
+			            list.add("毛重-国内(KGS):" + grossweighgn);
+			            list.add("体积（CBM）:" + volume);
+			            list.add("长(CM):" + length);
+			            list.add("宽(CM):" + width);
+			            list.add("高(CM):" + height);
 
                     } catch (JSONException e) {
                         nFlag = MTConfigHelper.NTAG_FAIL;

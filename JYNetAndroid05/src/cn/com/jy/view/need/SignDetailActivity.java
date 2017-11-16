@@ -196,7 +196,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 			bid 	=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
 			sResult="<html>" +
 						"<body>" +
-							"<table border=\"1\">" +
+							"<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
 								"<tr bgcolor=\"#00FF00\" align=\"center\">" +
 									"<td>业务编号</td>"+
 									"<td>二维码</td>"+
@@ -295,14 +295,13 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		}
 	 }
 	 
-	 @Override
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		closeThread();
 		mSqLiteHelper.doCloseDataBase();
 	}
-	
-	
+
 	@Override
 	public void onClick(View view) {
 		int nVid=view.getId();

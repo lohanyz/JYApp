@@ -4,6 +4,7 @@ import java.util.List;
 
 import cn.com.jy.activity.R;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 
+@SuppressLint("ViewConstructor")
 public class SpinerPopWindow<T> extends PopupWindow {
 	private LayoutInflater inflater;
 	private ListView mListView;
@@ -38,8 +40,9 @@ public class SpinerPopWindow<T> extends PopupWindow {
 		setFocusable(true);
     		ColorDrawable dw = new ColorDrawable(0x00);
 		setBackgroundDrawable(dw);
-		mListView = (ListView) view.findViewById(R.id.listview);
-		mListView.setAdapter(mAdapter=new MyAdapter());
+		mListView 	= (ListView) view.findViewById(R.id.listview);
+		mAdapter	= new MyAdapter();
+		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(clickListener);
 	}
 	
@@ -59,6 +62,7 @@ public class SpinerPopWindow<T> extends PopupWindow {
 			return position;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder=null;

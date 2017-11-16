@@ -11,7 +11,6 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 
 public class MTImgHelper {
 	public MTImgHelper() {

@@ -222,7 +222,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 			
 			sResult="<html>" +
 						"<body>" +
-							"<table border=\"1\" style=\"width:2000px;\">" +
+							"<table border=\"1\" style=\"width:2000px;font-family:'宋体';font-size:20px\">" +
 						"<tr bgcolor=\"#00FF00\" align=\"center\">" +
 							"<td >业务编号</td>" +
 							"<td >条码信息</td>" +
@@ -249,7 +249,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 							"<td >车数(送)</td>" +
 							"<td >发车时间(送)</td>" +
 						"</tr>";
-			sResult+=
+				sResult+=
 								"<tr align=\"center\">" +
 										"<td >"+bid+"</td>" +
 										"<td >"+gid+"</td>" +
@@ -277,7 +277,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 										"<td >"+dgstartdate+"</td>" +
 								 "</tr>" +
 							"</table>" +
-							"<table border=\"1\">" +
+							"<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
 							 "<tr>" +
 							 "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
 							 "</tr>"+

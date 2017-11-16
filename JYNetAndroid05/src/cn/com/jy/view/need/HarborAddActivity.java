@@ -1,5 +1,6 @@
 package cn.com.jy.view.need;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -30,13 +30,13 @@ import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTSQLiteHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
+@SuppressLint("HandlerLeak")
 public class HarborAddActivity extends Activity implements View.OnClickListener {
     private Context mContext;
     private Intent mIntent;
     /*控件内容*/
     private TextView vTopic,vBack,vFunction;
-    private EditText etpreloadcarno,etpreloadcarnum,etmsinglecarnum,etmsinglecarton,
-    etSvehiclescoll;
+    private EditText etpreloadcarno,etpreloadcarnum,etmsinglecarnum,etmsinglecarton;
     private Button btpfactchportdate,btmpackingdate,btppassdate,btpreloaddate,btpstartdate,btnOk;
     private ProgressDialog mDialog; // 对话方框;
     private String date,time;
@@ -49,7 +49,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
 
     private String pfactchportdate,mpackingdate,ppassdate,preloadcarno,
             preloadcarnum,preloaddate,msinglecarnum,msinglecarton,
-            pstartdate,cargostatusseaport,wid,barcode,img,busiinvcode;
+            pstartdate,cargostatusseaport,barcode,img,busiinvcode;
 
     Handler mHandler = new Handler() {
         @Override
@@ -112,7 +112,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         mSqLiteHelper = new MTSQLiteHelper(mContext);
         mGetOrPostHelper = new MTGetOrPostHelper();
         mDB           = mSqLiteHelper.getmDB();
-        wid           = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+//        wid           = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         btnOk.setOnClickListener(this);
         btpfactchportdate.setOnClickListener(this);
         btmpackingdate.setOnClickListener(this);
@@ -217,7 +217,6 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         msinglecarnum = MTGetTextUtil.getText(etmsinglecarnum);
         msinglecarton = MTGetTextUtil.getText(etmsinglecarton);
         pstartdate = MTGetTextUtil.getText(btpstartdate);
-        wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         AlertDialog.Builder vBuilder=new AlertDialog.Builder(mContext);
         vBuilder.setTitle("信息确认");
         String  message = "二维码:"+barcode+"\r\n";

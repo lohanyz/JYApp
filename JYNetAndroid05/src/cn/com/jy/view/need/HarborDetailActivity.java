@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.jy.activity.R;
-import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
@@ -44,8 +43,8 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     //  主要的控件;
     private WebView vWvShow;
     private TextView        tvTopic,    //  内容标题;
-            tvShow,btnBack, //  返回按钮;
-            btnFunction;    //  内容信息;
+            				btnBack, //  返回按钮;
+            				btnFunction;    //  内容信息;
     private Gallery         mGallery;   //  画廊按钮;
     private ProgressDialog  mDialog;     // 对话框;
     private String          _id,       //  id主键;
@@ -103,7 +102,6 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
     //  控件初始化;
     private void initView(){
         tvTopic         =   (TextView) findViewById(R.id.tvTopic);
-        //tvShow            =   (TextView) findViewById(R.id.tvShow);
         vWvShow         =   (WebView) findViewById(R.id.wvShow);
         btnBack         =   (TextView) findViewById(R.id.btnBack);
         btnFunction     =   (TextView) findViewById(R.id.btnFunction);
@@ -200,7 +198,7 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
 
             sResult="<html>" +
                     "<body>" +
-                    "<table border=\"1\" style=\"width:2000px;\">" +
+                    "<table border=\"1\" style=\"width:2000px;font-family:'宋体';font-size:20px\">" +
                     "<tr bgcolor=\"#00FF00\" align=\"center\">" +
                     "<td >业务编号</td>" +
                     "<td >条码信息</td>" +
@@ -231,7 +229,7 @@ public class HarborDetailActivity extends Activity implements OnClickListener{
                             "<td >"+cargostatusseaport+"</td>" +
                             "</tr>" +
                             "</table>" +
-                            "<table border=\"1\">" +
+                            "<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
                             "<tr>" +
                             "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
                             "</tr>"+

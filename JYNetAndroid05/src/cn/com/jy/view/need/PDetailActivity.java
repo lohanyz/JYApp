@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.jy.activity.R;
-import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
@@ -44,7 +43,7 @@ public class PDetailActivity extends Activity implements OnClickListener{
     //  主要的控件;
     private WebView vWvShow;
     private TextView        tvTopic,    //  内容标题;
-            tvShow,btnBack, //  返回按钮;
+            vBack, //  返回按钮;
             btnFunction;    //  内容信息;
     private Gallery         mGallery;   //  画廊按钮;
     private ProgressDialog  mDialog;     // 对话框;
@@ -103,9 +102,8 @@ public class PDetailActivity extends Activity implements OnClickListener{
     //  控件初始化;
     private void initView(){
         tvTopic         =   (TextView) findViewById(R.id.tvTopic);
-        //tvShow            =   (TextView) findViewById(R.id.tvShow);
         vWvShow         =   (WebView) findViewById(R.id.wvShow);
-        btnBack         =   (TextView) findViewById(R.id.btnBack);
+        vBack       	=   (TextView) findViewById(R.id.btnBack);
         btnFunction     =   (TextView) findViewById(R.id.btnFunction);
         mGallery        =   (Gallery) findViewById(R.id.gallery);
     }
@@ -122,9 +120,9 @@ public class PDetailActivity extends Activity implements OnClickListener{
         //  获取id;
         Intent  mIntent =   getIntent();
         Bundle  mBundle =   mIntent.getExtras();
-        _id			=	mBundle.getString("_id");
+        _id				=	mBundle.getString("_id");
         imgs            =   mBundle.getString("imgs");
-        btnBack.setOnClickListener(this);
+        vBack.setOnClickListener(this);
         //  数据库加载;
         mSqLiteHelper   =   new MTSQLiteHelper(mContext);
         mDB             =   mSqLiteHelper.getmDB();
@@ -220,7 +218,7 @@ public class PDetailActivity extends Activity implements OnClickListener{
 
             sResult="<html>" +
                     "<body>" +
-                    "<table border=\"1\" style=\"width:2000px;\">" +
+                    "<table border=\"1\" style=\"width:2000px;font-family:'宋体';font-size:20px\">" +
                     "<tr bgcolor=\"#00FF00\" align=\"center\">" +
                     "<td >业务编号</td>" +
                     "<td >条码信息</td>" +
@@ -271,14 +269,14 @@ public class PDetailActivity extends Activity implements OnClickListener{
                             "<td >"+dgtrainwagonkg+"</td>" +
                             "<td >"+dgtrainstartdate+"</td>" +
                             "</tr>" +
-                            "</table>" +
-                            "<table border=\"1\">" +
-                            "<tr>" +
-                            "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
-                            "</tr>"+
-                            "</table>" +
-                            "</body>" +
-                            "</html>"
+                     "</table>" +
+                     "<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
+	                     "<tr>" +
+	                     	"<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
+	                     "</tr>"+
+                     "</table>" +
+                     "</body>" +
+                     "</html>"
             ;
         }
         if(mCursor!=null){
