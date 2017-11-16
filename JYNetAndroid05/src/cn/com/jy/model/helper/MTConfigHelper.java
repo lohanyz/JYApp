@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,8 +42,8 @@ public class MTConfigHelper {
 	//	数据库管理;
 	public static final int 	NID_DB_VERSION	 =	3;
 	public static final String 	SNAME_DB	  	 =	"myDB.db";
-	public static final String  TAG_IP_ADDRESS	 =	"172.23.123.109";
-	public static final int	    TAG_PORT		 =	8888;
+	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
+	public static final int	    TAG_PORT		 =	8080;
 	public static final String  TAG_PROGRAM		 =	"JYTest01";
 	public static final int	    TAG_COUNT_TIMEOUT=	6000;
 	private int   screenWidth;
@@ -92,5 +95,45 @@ public class MTConfigHelper {
 		SimpleDateFormat df = new SimpleDateFormat(format);//设置日期格式
 		long l=System.currentTimeMillis();
 		return df.format(l);
+	}
+	public String setDataFormat(EditText et){
+		String data="0";
+		try {			
+			data=et.getText().toString().trim();
+			if(data.equals("")){
+				return "0";
+			}
+		} catch (Exception e) {
+			return "0";
+		}
+		return data;
+	}
+
+	public String setStringFormat(EditText et) {
+		String string="未填";
+		try {
+			string=et.getText().toString().trim();
+			if(string.equals("")){
+				return "未填";
+			}
+		} catch (Exception e) {
+			return "未填";
+		}
+		if (string.equals(""))
+			return "未填";
+		return string;
+	}
+	
+	public String setTimeFormat(Button btn){
+		String time=null;
+		try {
+			time=btn.getText().toString().trim();
+			if(!time.contains("年")){
+				return "未填";	
+			}
+		} catch (Exception e) {
+			return "未填";
+		}
+		return time;
 	}
 }

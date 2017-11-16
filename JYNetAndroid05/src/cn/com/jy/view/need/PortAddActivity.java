@@ -1,5 +1,6 @@
 package cn.com.jy.view.need;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -56,7 +57,8 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     private SQLiteDatabase mDB; // 数据库件;
     private MTGetOrPostHelper mGetOrPostHelper;
     private UpLoadThread      mThread;
-    Handler mHandler = new Handler() {
+    @SuppressLint("HandlerLeak")
+	Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             int nFlag = msg.what;
@@ -156,9 +158,10 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         Log.e("bundle", mBundle.toString() );
         barcode       =mBundle.getString("barcode");
         cargostatusport=mBundle.getString("cargostatusport");
-        slkind    =mBundle.getString("slkind");
-        busiinvcode       =mBundle.getString("busiinvcode");
+        slkind    	  =mBundle.getString("slkind");
+        busiinvcode   =mBundle.getString("busiinvcode");
         img           =mBundle.getString("imgs");
+        Log.i("MyLog", "barcode="+barcode+" cargostatusport="+cargostatusport+" slkind="+slkind+" busiinvcode="+busiinvcode+" img="+img);
     }
 
     @Override

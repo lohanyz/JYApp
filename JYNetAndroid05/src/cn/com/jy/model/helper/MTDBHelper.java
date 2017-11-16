@@ -104,6 +104,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	private String sql_portinfo=
 			"create table portinfo (" +
 					"_id integer primary key ," +
+					"barcode 	 varchar(32) not null," +		//	二维码信息;
 					"ptoportdate 	 varchar(32) ,"+
 					"preinvoicedate_port 	 varchar(32) ,"+
 					"pjinchangdate 	 varchar(32) ,"+
@@ -124,12 +125,13 @@ public class MTDBHelper extends SQLiteOpenHelper {
 					"cargostatusport 	 varchar(32) ,"+
 					"dgtrainwagonkg 	 varchar(32) ,"+
 					"dgtrainstartdate 	 varchar(32) ,"+
-					"img 	 			 varchar(1000)"+
-					")";
+					"img 	 			 varchar(1000)," +		//	图片
+					"busiinvcode		 varchar(32) not null)";	
 	//	箱管信息的表;
 	private String sql_boxmanageinfo=
 			"create table boxmanageinfo (" +
 				"_id integer primary key ," +
+				"barcode 	 varchar(32) not null," +		//	二维码信息;
 				"ecarryaddress 	 varchar(32) ,"+
 				"ecarrydate 	 varchar(32) ,"+
 				"echinaporttime 	 varchar(32) ,"+
@@ -140,12 +142,13 @@ public class MTDBHelper extends SQLiteOpenHelper {
 				"erailwayofflinetime 	 varchar(32) ,"+
 				"eactualreturntime 	 varchar(32) ,"+
 				"cargostatusbox 	 varchar(32) ,"+
-				"img 	 			 varchar(1000)"+
-				")";
+				"img 	 			 varchar(1000)," +		//	图片
+				"busiinvcode		 varchar(32) not null)";	
 	//	口岸信息的表;
 	private String sql_harborinfo=
 			"create table harborinfo (" +
 					"_id integer primary key ," +
+					"barcode 	 varchar(32) not null," +		//	二维码信息;
 					"pfactchportdate 	 varchar(32) ,"+
 					"mpackingdate 	 varchar(32) ,"+
 					"ppassdate 	 varchar(32) ,"+
@@ -156,8 +159,8 @@ public class MTDBHelper extends SQLiteOpenHelper {
 					"msinglecarton 	 varchar(32) ,"+
 					"pstartdate 	 varchar(32) ,"+
 					"cargostatusseaport 	 varchar(32) ,"+
-					"img 	 			 varchar(1000)"+
-					")";
+					"img 	 			 varchar(1000)," +		//	图片
+					"busiinvcode		 varchar(32) not null)";	
 	//	签收信息的表;
 	private String sql_signinfo=
 			"create table signinfo ( " +
