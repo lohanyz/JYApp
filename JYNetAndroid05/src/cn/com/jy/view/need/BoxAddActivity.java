@@ -289,7 +289,8 @@ public class BoxAddActivity extends Activity implements View.OnClickListener {
                         "erailwayofflinetime=" + erailwayofflinetime + "&" +
                         "eactualreturntime=" + eactualreturntime + "&" +
                         "cargostatusbox=" + cargostatusbox + "&" +
-                        "wid=" + wid;
+                        "wid=" + wid+"&"+
+                        "busiinvcode="+busiinvcode;
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

@@ -45,7 +45,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
     private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
     private SQLiteDatabase mDB; // 数据库件;
     private MTGetOrPostHelper mGetOrPostHelper;
-    private UpLoadThread	  mThread;
+    private UpLoadThread      mThread;
 
     private String pfactchportdate,mpackingdate,ppassdate,preloadcarno,
             preloadcarnum,preloaddate,msinglecarnum,msinglecarton,
@@ -85,9 +85,9 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
     }
     private void initView(){
         mContext =  HarborAddActivity.this;
-        vBack	 =	(TextView) findViewById(R.id.btnBack);
-        vTopic	 =	(TextView) findViewById(R.id.tvTopic);
-        vFunction= 	(TextView) findViewById(R.id.btnFunction);
+        vBack    =  (TextView) findViewById(R.id.btnBack);
+        vTopic   =  (TextView) findViewById(R.id.tvTopic);
+        vFunction=  (TextView) findViewById(R.id.btnFunction);
 
         etpreloadcarno= (EditText) findViewById(R.id.preloadcarno);
         etmsinglecarnum= (EditText) findViewById(R.id.Dtsingletrailernum);
@@ -111,8 +111,8 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         mSpHelper     = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,Context.MODE_APPEND);
         mSqLiteHelper = new MTSQLiteHelper(mContext);
         mGetOrPostHelper = new MTGetOrPostHelper();
-        mDB 		  = mSqLiteHelper.getmDB();
-        wid 		  = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+        mDB           = mSqLiteHelper.getmDB();
+        wid           = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         btnOk.setOnClickListener(this);
         btpfactchportdate.setOnClickListener(this);
         btmpackingdate.setOnClickListener(this);
@@ -151,20 +151,20 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
     }
     private void setViewDate(Context mContext,final Button btn){
         AlertDialog.Builder vBuilder   = new AlertDialog.Builder(mContext);
-		/*布局控件*/
-        View 	   view 	  = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
+        /*布局控件*/
+        View       view       = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
         vBuilder.setTitle("设置时间");
         vBuilder.setView(view);
-		/*时间日期有关控件*/
+        /*时间日期有关控件*/
         DatePicker datePicker = (DatePicker) view.findViewById(R.id.dpPicker);
         TimePicker timePicker = (TimePicker) view.findViewById(R.id.tpPicker);
         Calendar calendar   = Calendar.getInstance();
 
-        int 	   nYear 	  = calendar.get(Calendar.YEAR);
-        int 	   nMonth 	  = calendar.get(Calendar.MONTH);
-        int 	   nDay 	  = calendar.get(Calendar.DAY_OF_MONTH);
-        int 	   nHour 	  = calendar.get(Calendar.HOUR_OF_DAY);
-        int 	   nMinute 	  = calendar.get(Calendar.MINUTE);
+        int        nYear      = calendar.get(Calendar.YEAR);
+        int        nMonth     = calendar.get(Calendar.MONTH);
+        int        nDay       = calendar.get(Calendar.DAY_OF_MONTH);
+        int        nHour      = calendar.get(Calendar.HOUR_OF_DAY);
+        int        nMinute    = calendar.get(Calendar.MINUTE);
 
         date = nYear + "年" + (nMonth + 1) + "月" + nDay + "日";
         time = nHour + "时" + nMinute + "分";
@@ -200,11 +200,11 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         vBuilder.show();
     }
     private void getInfo(){
-        mIntent		  =getIntent();
+        mIntent       =getIntent();
         Bundle mBundle=mIntent.getExtras();
-        barcode	  	  =mBundle.getString("barcode");
+        barcode       =mBundle.getString("barcode");
         cargostatusseaport=mBundle.getString("cargostatusseaport");
-        img 	  	  =mBundle.getString("imgs");
+        img           =mBundle.getString("imgs");
         busiinvcode=mBundle.getString("busiinvcode");
     }
     private void getDataInfo(){
@@ -220,7 +220,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
         wid = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         AlertDialog.Builder vBuilder=new AlertDialog.Builder(mContext);
         vBuilder.setTitle("信息确认");
-        String 	message = "二维码:"+barcode+"\r\n";
+        String  message = "二维码:"+barcode+"\r\n";
         message+="实际到中方口岸日:"+pfactchportdate+"\r\n"+
                 "口岸装箱日:"+mpackingdate+"\r\n"+
                 "放行时间:"+ppassdate+"\r\n"+
@@ -231,8 +231,8 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                 "单车吨数:"+msinglecarton+"\r\n"+
                 "发车时间/出境时间:"+pstartdate+"\r\n";
 
-        message+="货物状态:"+cargostatusseaport+"\r\n"+//	货物状态
-                "图:"+img ;		//	图
+        message+="货物状态:"+cargostatusseaport+"\r\n"+//   货物状态
+                "图:"+img ;      //  图
         vBuilder.setMessage(message);
         vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 
@@ -283,7 +283,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                         "pstartdate=" + pstartdate + "&" +
                         "cargostatusseaport=" + cargostatusseaport + "&" +
                         "wid=" + wid+ "&" +
-                        "busiinvcode"+busiinvcode;
+                        "busiinvcode="+busiinvcode;
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -301,7 +301,7 @@ public class HarborAddActivity extends Activity implements View.OnClickListener 
                                 "preloadcarnum," +
                                 "preloaddate," +
                                 "msinglecarnum," +
-                                "msinglecarton,pstartdate,cargostatusseaport,img,busiinvcode" +		//	图片
+                                "msinglecarton,pstartdate,cargostatusseaport,img,busiinvcode" +     //  图片
                                 ") values (" +
                                 "'"+barcode+"'," +
                                 "'"+pfactchportdate+"'," +

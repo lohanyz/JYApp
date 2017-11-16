@@ -35,7 +35,7 @@ import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
 public class PortAddActivity extends Activity implements View.OnClickListener{
     private Context mContext;
-    private Intent	mIntent;
+    private Intent  mIntent;
     /*控件内容*/
     private TextView vTopic,vBack,vFunction,btnBack;
     private LinearLayout layTrain,layTruck;
@@ -55,7 +55,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
     private SQLiteDatabase mDB; // 数据库件;
     private MTGetOrPostHelper mGetOrPostHelper;
-    private UpLoadThread	  mThread;
+    private UpLoadThread      mThread;
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -90,9 +90,9 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     }
     private void initView(){
         mContext =  PortAddActivity.this;
-        vBack	 =	(TextView) findViewById(R.id.btnBack);
-        vTopic	 =	(TextView) findViewById(R.id.tvTopic);
-        vFunction= 	(TextView) findViewById(R.id.btnFunction);
+        vBack    =  (TextView) findViewById(R.id.btnBack);
+        vTopic   =  (TextView) findViewById(R.id.tvTopic);
+        vFunction=  (TextView) findViewById(R.id.btnFunction);
         layTrain= (LinearLayout) findViewById(R.id.layTrain);
         layTruck= (LinearLayout) findViewById(R.id.layTruck);
 
@@ -125,8 +125,8 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         mSpHelper     = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,Context.MODE_APPEND);
         mSqLiteHelper = new MTSQLiteHelper(mContext);
         mGetOrPostHelper = new MTGetOrPostHelper();
-        mDB 		  = mSqLiteHelper.getmDB();
-        wid 		  = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
+        mDB           = mSqLiteHelper.getmDB();
+        wid           = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
         vOk.setOnClickListener(this);
         btptoportdate.setOnClickListener(this);
         btpreinvoicedate_port.setOnClickListener(this);
@@ -151,14 +151,14 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
         }
     }
     private void getInfo(){
-        mIntent		  =getIntent();
+        mIntent       =getIntent();
         Bundle mBundle=mIntent.getExtras();
         Log.e("bundle", mBundle.toString() );
-        barcode	  	  =mBundle.getString("barcode");
+        barcode       =mBundle.getString("barcode");
         cargostatusport=mBundle.getString("cargostatusport");
-        slkind 	  =mBundle.getString("slkind");
-        busiinvcode 	  =mBundle.getString("busiinvcode");
-        img 	  	  =mBundle.getString("imgs");
+        slkind    =mBundle.getString("slkind");
+        busiinvcode       =mBundle.getString("busiinvcode");
+        img           =mBundle.getString("imgs");
     }
 
     @Override
@@ -197,20 +197,20 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
     }
     private void setViewDate(Context mContext,final Button btn){
         AlertDialog.Builder vBuilder   = new AlertDialog.Builder(mContext);
-		/*布局控件*/
-        View 	   view 	  = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
+        /*布局控件*/
+        View       view       = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
         vBuilder.setTitle("设置时间");
         vBuilder.setView(view);
-		/*时间日期有关控件*/
+        /*时间日期有关控件*/
         DatePicker datePicker = (DatePicker) view.findViewById(R.id.dpPicker);
         TimePicker timePicker = (TimePicker) view.findViewById(R.id.tpPicker);
         Calendar calendar   = Calendar.getInstance();
 
-        int 	   nYear 	  = calendar.get(Calendar.YEAR);
-        int 	   nMonth 	  = calendar.get(Calendar.MONTH);
-        int 	   nDay 	  = calendar.get(Calendar.DAY_OF_MONTH);
-        int 	   nHour 	  = calendar.get(Calendar.HOUR_OF_DAY);
-        int 	   nMinute 	  = calendar.get(Calendar.MINUTE);
+        int        nYear      = calendar.get(Calendar.YEAR);
+        int        nMonth     = calendar.get(Calendar.MONTH);
+        int        nDay       = calendar.get(Calendar.DAY_OF_MONTH);
+        int        nHour      = calendar.get(Calendar.HOUR_OF_DAY);
+        int        nMinute    = calendar.get(Calendar.MINUTE);
 
         date = nYear + "年" + (nMonth + 1) + "月" + nDay + "日";
         time = nHour + "时" + nMinute + "分";
@@ -278,27 +278,27 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
 
             message+=
                     "铁路信息----->\r\n"+
-                            "铁路车皮号:"+dgtrainwagonno+"\r\n"+//	铁路车皮号(国内信息)
-                            "铁路车型:"+dgtraintype+"\r\n"+//	铁路车型(国内信息)
-                            "铁路运单号:"+dgtrainwaybillno+"\r\n"+//	铁路运单号(国内信息)
-                            "铁路单车件数:"+dgtrainsinglenum +"\r\n"+	//	铁路单车件数(国内信息)
-                            "铁路单车吨数:"+dgtrainsingleton+"\r\n"+//	铁路单车吨数
-                            "铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//	铁路车皮标重
-                            "发车时间:"+dgtrainstartdate+"\r\n";//	铁路发运日
+                            "铁路车皮号:"+dgtrainwagonno+"\r\n"+//   铁路车皮号(国内信息)
+                            "铁路车型:"+dgtraintype+"\r\n"+//   铁路车型(国内信息)
+                            "铁路运单号:"+dgtrainwaybillno+"\r\n"+// 铁路运单号(国内信息)
+                            "铁路单车件数:"+dgtrainsinglenum +"\r\n"+ //  铁路单车件数(国内信息)
+                            "铁路单车吨数:"+dgtrainsingleton+"\r\n"+//    铁路单车吨数
+                            "铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//  铁路车皮标重
+                            "发车时间:"+dgtrainstartdate+"\r\n";//  铁路发运日
 
         }else {
             message+=
                     "拖车信息----->\r\n"+
-                            "报数时间:"+bssj+"\r\n"+		//	拖车(取)拖车号(国内信息)
-                            "发车车号:"+fcchgk+"\r\n"+					//	铅封号(货物信息)
-                            "单车件数:"+dcjsgkdz+"\r\n"+//	拖车(取)单车件数
-                            "单车吨数:"+dcdsgkdz+"\r\n"+//	拖车(取)单车吨数
-                            "车数:"+dsgkdz+"\r\n"+	//	车数(取)(仓储)
+                            "报数时间:"+bssj+"\r\n"+        //  拖车(取)拖车号(国内信息)
+                            "发车车号:"+fcchgk+"\r\n"+                  //  铅封号(货物信息)
+                            "单车件数:"+dcjsgkdz+"\r\n"+//  拖车(取)单车件数
+                            "单车吨数:"+dcdsgkdz+"\r\n"+//  拖车(取)单车吨数
+                            "车数:"+dsgkdz+"\r\n"+    //  车数(取)(仓储)
 
                             "发车时间:"+startdate+"\r\n";
         }
-        message+="货物状态:"+cargostatusport+"\r\n"+//	货物状态
-                "图:"+img ;		//	图
+        message+="货物状态:"+cargostatusport+"\r\n"+//  货物状态
+                "图:"+img ;      //  图
         vBuilder.setMessage(message);
         vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 
@@ -353,6 +353,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
                                 "&dgtrainwagonkg=" +dgtrainwagonkg+
                                 "&dgtrainstartdate=" +dgtrainstartdate+
                                 "&img="+URLEncoder.encode(img,"utf-8")+
+                                "&busiinvcode="+URLEncoder.encode(busiinvcode,"utf-8")+
                                 "&wid="+wid;
 
 
@@ -361,10 +362,10 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
             }
 
             String response = mGetOrPostHelper.sendGet(url, param);
-            int    nFlag 	= MTConfigHelper.NTAG_FAIL;
+            int    nFlag    = MTConfigHelper.NTAG_FAIL;
 
             if (!response.trim().equalsIgnoreCase("fail")) {
-                nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
+                nFlag       = MTConfigHelper.NTAG_SUCCESS;
 
                 String sql=
                         "insert into portinfo (" +
@@ -377,7 +378,7 @@ public class PortAddActivity extends Activity implements View.OnClickListener{
                                 "bssj," +
                                 "fcchgk," +
                                 "dcjsgkdz,dcdsgkdz,dsgkdz,startdate,blhtl,dgtrainwagonno,dgtraintype," +
-                                "dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,cargostatusport,dgtrainwagonkg,dgtrainstartdate,img,busiinvcode" +		//	图片
+                                "dgtrainwaybillno,dgtrainsinglenum,dgtrainsingleton,cargostatusport,dgtrainwagonkg,dgtrainstartdate,img,busiinvcode" +      //  图片
                                 ") values (" +
                                 "'"+barcode+"'," +
                                 "'"+ptoportdate+"'," +
