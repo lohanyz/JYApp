@@ -300,7 +300,7 @@ public class HarborInformationActivity extends Activity implements OnClickListen
                     mIntent = new Intent(mContext, HarborAddActivity.class);
                     mBundle = new Bundle();
                     mBundle.putString("barcode", gid);
-                    mBundle.putString("cargostatusbox", gstate);
+                    mBundle.putString("cargostatusseaport", gstate);
                     mBundle.putString("busiinvcode", bid);
                     gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
                     if (gsimg.equals("")) gsimg = "未拍照";
