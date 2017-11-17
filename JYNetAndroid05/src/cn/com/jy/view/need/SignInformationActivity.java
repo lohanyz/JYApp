@@ -404,7 +404,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							String cid	=obj.getString("cid");
 							String csize=obj.getString("csize");
 							String ctype=obj.getString("ctype");
-							String seaino=obj.getString("seaino");
+							String sealno=obj.getString("sealno");
 							String pieces=obj.getString("pieces");
 							String goodsdesc	=obj.getString("goodsdesc");
 							String grossweight	=obj.getString("grossweight");
@@ -421,7 +421,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							list.add("箱号:"+cid);
 							list.add("箱尺寸:"+csize);
 							list.add("箱型:"+ctype);
-							list.add("铅封号:"+seaino);
+							list.add("铅封号:"+sealno);
 							list.add("件数:"+pieces);
 							list.add("包装类型:"+goodsdesc);
 							list.add("毛重量:"+grossweight);

@@ -428,7 +428,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 							String cid 	 	 = obj.getString("cid");
 							String csize  	 = obj.getString("csize");
 							String ctype 	 = obj.getString("ctype");
-							String seaino 	 = obj.getString("seaino");
+							String sealno 	 = obj.getString("sealno");
 							String goodsdesc 	= obj.getString("goodsdesc");
 							
 							String pieces 	    = obj.getString("pieces");
@@ -449,7 +449,7 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 							list.add("箱号(货物信息):" + cid);
 							list.add("箱尺寸(货物信息):" + csize);
 							list.add("箱型(货物信息):" + ctype);
-							list.add("铅封号(货物信息):" + seaino);
+							list.add("铅封号(货物信息):" + sealno);
 							list.add("包装类型:" + goodsdesc);
 							list.add("件数:" + pieces);
 							list.add("毛重量(货物信息):" + grossweight);

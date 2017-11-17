@@ -42,7 +42,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	private LinearLayout layTrain,layTruck;
 	private EditText	 
 						 vdttrailerno ,		//	拖车(取)拖车号(国内信息)
-						 vseaino 	 ,		//	铅封号(货物信息)
+						 vsealno 	 ,		//	铅封号(货物信息)
 						 vdtsingletrailernum,//	拖车(取)单车件数
 						 vdtsingletrailerton,//	拖车(取)单车吨数
 						 vsvehiclescoll	 ,	//	车数(取)(仓储)
@@ -75,7 +75,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 						 barcode ,
 						 dttrailerno ,		//	拖车(取)拖车号(国内信息)
 							
-						 seaino 	 ,		//	铅封号(货物信息)
+						 sealno 	 ,		//	铅封号(货物信息)
 							
 						 dtsingletrailernum,//	拖车(取)单车件数
 						 dtsingletrailerton,//	拖车(取)单车吨数
@@ -163,7 +163,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		layTruck =	(LinearLayout) findViewById(R.id.layTruck);
 		/*控件声明*/		 
 		vdttrailerno		=(EditText) findViewById(R.id.etDttrailerno) ;		//	拖车(取)拖车号(国内信息)
-		vseaino	 		=(EditText) findViewById(R.id.etSeaino);
+		vsealno	 		=(EditText) findViewById(R.id.etSeaino);
 		vdtsingletrailernum=(EditText) findViewById(R.id.etDtsingletrailernum);
 		vdtsingletrailerton=(EditText) findViewById(R.id.etDtsingletrailerton);
 		vsvehiclescoll		=(EditText) findViewById(R.id.etSvehiclescoll);
@@ -361,7 +361,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	private void getDataInfo(){
 					
 			dttrailerno			=setStringFormat(vdttrailerno);	//	拖车(取)拖车号(国内信息)			
-			seaino				=setStringFormat(vseaino);		//	铅封号(货物信息)
+			sealno				=setStringFormat(vsealno);		//	铅封号(货物信息)
 			dtsingletrailernum	=setDataFormat(vdtsingletrailernum);//	拖车(取)单车件数			
 			dtsingletrailerton	=setDataFormat(vdtsingletrailerton);//	拖车(取)单车吨数
 			svehiclescoll		=setDataFormat(vsvehiclescoll);	//	车数(取)(仓储)
@@ -402,7 +402,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				message+=
 					"拖车信息----->\r\n"+	
 					"拖车(取)拖车号:"+dttrailerno+"\r\n"+		//	拖车(取)拖车号(国内信息)	
-					"铅封号:"+seaino+"\r\n"+					//	铅封号(货物信息)
+					"铅封号:"+sealno+"\r\n"+					//	铅封号(货物信息)
 					"拖车(取)单车件数:"+dtsingletrailernum+"\r\n"+//	拖车(取)单车件数
 					"拖车(取)单车吨数:"+dtsingletrailerton+"\r\n"+//	拖车(取)单车吨数
 					"车数(取):"+svehiclescoll+"\r\n"+	//	车数(取)(仓储)
@@ -456,7 +456,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				"operType=1" +
 				"&barcode="+barcode+
 				"&dttrailerno="+URLEncoder.encode(dttrailerno,"utf-8") +
-				"&seaino="+URLEncoder.encode(seaino,"utf-8") +
+				"&sealno="+URLEncoder.encode(sealno,"utf-8") +
 				"&dtsingletrailernum="+dtsingletrailernum +
 				"&dtsingletrailerton=" +dtsingletrailerton+
 				"&svehiclescoll=" +svehiclescoll+
@@ -496,7 +496,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				"insert into getgoodsinfo (" +
 				"barcode," +
 				"dttrailerno," +
-				"seaino," +
+				"sealno," +
 				"dtsingletrailernum," +
 				"dtsingletrailerton," +
 				"svehiclescoll," +
@@ -507,7 +507,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				") values (" +
 				"'"+barcode+"'," +
 				"'"+dttrailerno+"'," +
-				"'"+seaino+"'," +
+				"'"+sealno+"'," +
 				"'"+dtsingletrailernum+"'," +
 				"'"+dtsingletrailerton+"'," +
 				"'"+svehiclescoll+"'," +

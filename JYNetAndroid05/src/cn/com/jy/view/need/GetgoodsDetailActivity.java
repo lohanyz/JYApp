@@ -176,7 +176,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 			gid=mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); // 二维码信息;
 			String dttrailerno=mCursor.getString(mCursor.getColumnIndex("dttrailerno")).toString(); // 拖车(取)拖车号(国内信息)
 
-			String seaino=mCursor.getString(mCursor.getColumnIndex("seaino")).toString(); // 铅封号(货物信息)
+			String sealno=mCursor.getString(mCursor.getColumnIndex("sealno")).toString(); // 铅封号(货物信息)
 
 			String dtsingletrailernum=mCursor.getString(mCursor.getColumnIndex("dtsingletrailernum"))
 					.toString(); // 拖车(取)单车件数
@@ -254,7 +254,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 										"<td >"+bid+"</td>" +
 										"<td >"+gid+"</td>" +
 										"<td >"+dttrailerno+"</td>" +
-										"<td >"+seaino+"</td>" +
+										"<td >"+sealno+"</td>" +
 										"<td >"+dtsingletrailernum+"</td>" +
 										"<td >"+dtsingletrailerton+"</td>" +
 										"<td >"+svehiclescoll+"</td>" +

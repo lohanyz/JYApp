@@ -69,7 +69,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	"barcode 	 varchar(32) not null," +		//	二维码信息;
 	"dttrailerno varchar(32) not null," +		//	拖车(取)拖车号(国内信息)
 	
-	"seaino 	 varchar(32) not null," +		//	铅封号(货物信息)
+	"sealno 	 varchar(32) not null," +		//	铅封号(货物信息)
 	
 	"dtsingletrailernum	 varchar(32) not null," +		//	拖车(取)单车件数
 	"dtsingletrailerton	 varchar(32) not null,"+	    //	拖车(取)单车吨数
