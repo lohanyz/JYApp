@@ -42,9 +42,9 @@ public class MTConfigHelper {
 	//	数据库管理;
 	public static final int 	NID_DB_VERSION	 =	3;
 	public static final String 	SNAME_DB	  	 =	"myDB.db";
-//	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
-	public static final String  TAG_IP_ADDRESS	 =	"172.23.123.109";
-	public static final int	    TAG_PORT		 =	8888;
+	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
+//	public static final String  TAG_IP_ADDRESS	 =	"172.23.123.109";
+	public static final int	    TAG_PORT		 =	8080;
 	public static final String  TAG_PROGRAM		 =	"JYTest01";
 	public static final int	    TAG_COUNT_TIMEOUT=	6000;
 	private int   screenWidth;
