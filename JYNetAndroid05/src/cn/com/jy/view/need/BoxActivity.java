@@ -7,6 +7,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +18,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -23,10 +26,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -35,15 +41,21 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import cn.com.jy.activity.R;
 import cn.com.jy.model.entity.MEFile;
+import cn.com.jy.model.helper.FileHelper;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
+import cn.com.jy.model.helper.MTGetTextUtil;
 import cn.com.jy.model.helper.MTImgHelper;
-
+import cn.com.jy.model.helper.MTSQLiteHelper;
+import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 
 public class BoxActivity extends Activity implements OnClickListener {
     private ArrayList<String> list;
@@ -51,10 +63,11 @@ public class BoxActivity extends Activity implements OnClickListener {
     private ProgressDialog mDialog;
     private TextView tvTopic, tvImgCount;
     private EditText etSearch;
+    private String wid;
     private TextView btnDetail;
     private Button mGsimg, btnAdd,
             btnCode, btnSearch;
-    private String bid,gid, gstate, sSize;
+    private String bid, gid, gstate, sSize;
     private Intent mIntent;
     private ListView mListView;
     private Spinner mState;
@@ -69,9 +82,13 @@ public class BoxActivity extends Activity implements OnClickListener {
     private MTGetOrPostHelper mGetOrPostHelper;
     private MTImgHelper mImgHelper;
     private MTFileHelper mtFileHelper;
-    
-    private String 
-            folderPath, // 文件夹路径;
+    //
+    private MTSharedpreferenceHelper mSpHelper; // 首选项存储;
+
+    private MTSQLiteHelper mSqLiteHelper;// 数据库的帮助类;
+    private SQLiteDatabase mDB; // 数据库件;
+    private String saveDir = Environment.getExternalStorageDirectory()
+            .getPath() + File.separator + "jyFile", saveFolder = "photo", folderPath, // 文件夹路径;
             filePath, // 文件路径;
             tmpPath, gsimg; // 临时路径;
     @SuppressLint("HandlerLeak")
@@ -104,6 +121,7 @@ public class BoxActivity extends Activity implements OnClickListener {
         init();
     }
 
+    @SuppressWarnings("static-access")
     private void init() {
         list = new ArrayList<String>();
         mContext = BoxActivity.this;
@@ -113,7 +131,9 @@ public class BoxActivity extends Activity implements OnClickListener {
         mtFileHelper = new MTFileHelper();
         mConfigHelper = new MTConfigHelper();
         mGetOrPostHelper = new MTGetOrPostHelper();
-   
+        //mFileHelper = new FileHelper();
+        mSqLiteHelper = new MTSQLiteHelper(mContext);
+        mDB = mSqLiteHelper.getmDB();
         mImgHelper = new MTImgHelper();
         listfile = mtFileHelper.getListfiles();
         mListView = (ListView) findViewById(R.id.lvResult);
@@ -128,7 +148,8 @@ public class BoxActivity extends Activity implements OnClickListener {
         btnAdd = (Button) findViewById(R.id.btnAdd);
 
         btnDetail.setText("历史");
-
+        mSpHelper = new MTSharedpreferenceHelper(mContext, MTConfigHelper.CONFIG_SELF,
+                mContext.MODE_APPEND);
         tvTopic.setText("箱管");
         mGsimg.setOnClickListener(this);
         btnCode.setOnClickListener(this);
@@ -172,17 +193,26 @@ public class BoxActivity extends Activity implements OnClickListener {
                         edit.setSingleLine(false);
                         edit.setLines(6);
                         mBuilder.setView(edit);
-                        mBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+                        mBuilder.setPositiveButton(R.string.action_ok,
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface arg0,
+                                                        int arg1) {
+                                        String tmp = edit.getText().toString().trim();
+                                        if (!tmp.equals("")) {
+                                            gstate = tmp;
+                                        }
+                                    }
+                                });
+                        mBuilder.setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
 
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
-                                String tmp = edit.getText().toString().trim();
-                                if (!tmp.equals("")) {
-                                    gstate = tmp;
-                                }
+                                gstate = "正常";
+                                mState.setSelection(0);
                             }
                         });
-                        mBuilder.setNegativeButton(R.string.action_no, null);
                         mBuilder.create();
                         mBuilder.show();
                         break;
@@ -220,8 +250,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                 && resultCode == MTConfigHelper.NTRACK_FLUSH_TO_MENU) {
             String gid = intent.getStringExtra("bid");
             etSearch.setText(gid);
-        }
-        else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
+        } else if (requestCode == MTConfigHelper.NTRACK_GGOODS_PHOTO_TO
                 && resultCode == -1) {
             Toast.makeText(mContext, "拍照完成", Toast.LENGTH_SHORT).show();
             mImgHelper.compressPicture(tmpPath, filePath);
@@ -232,8 +261,7 @@ public class BoxActivity extends Activity implements OnClickListener {
             // TODO 修改的内容;
             mtFileHelper.fileAdd(meFile);
             showImgCount();
-        }
-        else if (requestCode == 1) {
+        } else if (requestCode == 1) {
             if (resultCode == 1) {
                 doResetParam();
             }
@@ -346,12 +374,12 @@ public class BoxActivity extends Activity implements OnClickListener {
         public void run() {
             url = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":" + MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM + "/goods";
             param = "operType=3&barcode=" + gid;
-            response=   mGetOrPostHelper.sendGet(url,param);
+            response = mGetOrPostHelper.sendGet(url, param);
             int nFlag = MTConfigHelper.NTAG_FAIL;
             JSONArray res;
             JSONObject body;
-            if(!response.trim().equalsIgnoreCase("fail")){
-                nFlag= MTConfigHelper.NTAG_SUCCESS;
+            if (!response.trim().equalsIgnoreCase("fail")) {
+                nFlag = MTConfigHelper.NTAG_SUCCESS;
                 try {
                     res = new JSONArray(response);
                     body = res.getJSONObject(0);
@@ -360,7 +388,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                     res = null;
                     body = null;
                 }
-                if(body!=null){
+                if (body != null) {
                     try {
                         bid = body.getString("busiinvcode");
                         String billoflading = body.getString("billoflading");
@@ -380,29 +408,27 @@ public class BoxActivity extends Activity implements OnClickListener {
                         String length = body.getString("length");
                         String width = body.getString("width");
                         String height = body.getString("height");
+                        list.add("业务编号:" + bid);
+                        list.add("提单号:" + billoflading);
+                        list.add("箱号:" + cid);
+                        list.add("箱尺寸:" + csize);
+                        list.add("箱型:" + ctype);
+                        list.add("箱属:" + cowner);
+                        list.add("包装类型:" + goodsdesc);
+                        list.add("回程运输方式:" + etransportationmode);
+                        list.add("品名:" + cname);
+                        list.add("铅封号:" + sealno);
+                        list.add("件数:" + pieces);
+                        list.add("毛重量:" + grossweight);
+                        list.add("毛重-境外(KGS):" + grossweightjw);
+                        list.add("毛重-国内(KGS):" + grossweighgn);
+                        list.add("体积（CBM）:" + volume);
+                        list.add("长(CM):" + length);
+                        list.add("宽(CM):" + width);
+                        list.add("高(CM):" + height);
 
-
-            list.add("业务编号:" + bid);
-            list.add("提单号:" + billoflading);
-            list.add("箱号:" + cid);
-            list.add("箱尺寸:" + csize);
-            list.add("箱型:" + ctype);
-            list.add("箱属:" + cowner);
-            list.add("包装类型:" + goodsdesc);
-            list.add("回程运输方式:" + etransportationmode);
-            list.add("品名:" + cname);
-            list.add("铅封号:" + sealno);
-            list.add("件数:" + pieces);
-            list.add("毛重量:" + grossweight);
-            list.add("毛重-境外(KGS):" + grossweightjw);
-            list.add("毛重-国内(KGS):" + grossweighgn);
-            list.add("体积（CBM）:" + volume);
-            list.add("长(CM):" + length);
-            list.add("宽(CM):" + width);
-            list.add("高(CM):" + height);
-
-                    }catch (JSONException e){
-                        nFlag=MTConfigHelper.NTAG_FAIL;
+                    } catch (JSONException e) {
+                        nFlag = MTConfigHelper.NTAG_FAIL;
                         Log.e("getdata", "run: ", e);
                     }
 
@@ -424,7 +450,7 @@ public class BoxActivity extends Activity implements OnClickListener {
         gstate = "正常";
         mState.setSelection(0);
         bid = null;
-        gid=null;
+        gid = null;
     }
 
     private void showImgCount() {
