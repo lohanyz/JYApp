@@ -205,7 +205,7 @@ public class PortActivity extends Activity implements View.OnClickListener {
                     mBundle.putString("cargostatusport", gstate);
                     mBundle.putString("busiinvcode", bid);
                     gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
-                    if (gsimg.equals("")) gsimg = "未拍照";
+                    if (gsimg.equals("")) gsimg = "0张";
                     mBundle.putString("imgs", gsimg);
 
                     switch (position) {

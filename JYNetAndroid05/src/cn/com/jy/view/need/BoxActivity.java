@@ -311,7 +311,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                     mBundle.putString("cargostatusbox", gstate);
                     mBundle.putString("busiinvcode", bid);
                     gsimg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(), "_");
-                    if (gsimg.equals("")) gsimg = "未拍照";
+                    if (gsimg.equals("")) gsimg = "0张";
                     mBundle.putString("imgs", gsimg);
                     mIntent.putExtras(mBundle);
                     startActivityForResult(mIntent, 1);
@@ -408,6 +408,7 @@ public class BoxActivity extends Activity implements OnClickListener {
                         String length = body.getString("length");
                         String width = body.getString("width");
                         String height = body.getString("height");
+
                         list.add("业务编号:" + bid);
                         list.add("提单号:" + billoflading);
                         list.add("箱号:" + cid);

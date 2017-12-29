@@ -10,11 +10,11 @@ public class MTGetTextUtil {
 		String string;
 		try {
 			string=v.getText().toString();
-			if(string.equals("")){
-				string="null";
+			if(string.equals("")||!string.contains("年")){
+				string="未填";
 			}
 		} catch (Exception e) {
-			string="null";
+			string="未填";
 		}
 		return string;
 	}
@@ -23,10 +23,10 @@ public class MTGetTextUtil {
 		try {
 			string=v.getText().toString();
 			if(string.equals("")){
-				string="null";
+				string="0";
 			}
 		} catch (Exception e) {
-			string="null";
+			string="0";
 		}
 		return string;
 	}
@@ -35,10 +35,10 @@ public class MTGetTextUtil {
 		try {
 			string=v.getText().toString();
 			if(string.equals("")){
-				string="null";
+				string="0";
 			}
 		} catch (Exception e) {
-			string="null";
+			string="0";
 		}
 		return string;
 	}
@@ -47,7 +47,7 @@ public class MTGetTextUtil {
 		try {
 			string=v.getSelectedItem().toString();
 		} catch (Exception e) {
-			string="null";
+			string="0";
 		}
 		return string;
 	}
