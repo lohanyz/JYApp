@@ -63,13 +63,13 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					  vFunction;  // 功能按钮;
 					 ;
 
-	private Builder   vBuilder;   // 对话框;
+	private Builder   vBuilder;    // 对话框;
 	private Spinner   vState;
-	private EditText  etoid, 	  // 运输号;
-					  etSearch 	  // 搜索的框;
+	private EditText  etoid, 	   // 运输号;
+					  etSearch 	   // 搜索的框;
 					  ;
 	private ListView  vListView;
-	private ProgressDialog mDialog; // 对话方框;
+	private ProgressDialog mDialog;// 对话方框;
 	private ArrayAdapter<String> mAdapter;
 	/*参数定义*/
 	private String   slkind, 	  // 标题栏;
@@ -78,8 +78,8 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					 bid, gstate   = "正常", 
 					 gsimg 		   = "null", 
 					 folderPath, // 文件夹路径;
-					 filePath, 	// 文件路径;
-					 tmpPath, 	// 临时路径;
+					 filePath, 	 // 文件路径;
+					 tmpPath, 	 // 临时路径;
 					 sSize;
 	private ArrayList<String> 	 list;
 	//	TODO 01.新增的相关内容;
@@ -97,13 +97,13 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 	Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			int nFlag = msg.what;
+			Bundle bundle= msg.getData();
+			int    nFlag = bundle.getInt("flag");
 			mDialog.dismiss();
 			switch (nFlag) {
 			// 01.成功;
 			case MTConfigHelper.NTAG_SUCCESS:
-				Toast.makeText(mContext, R.string.tip_success,
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, R.string.tip_success,Toast.LENGTH_SHORT).show();
 				mtFileHelper.fileDelAll();
 				break;
 			// 02.失败;
@@ -194,8 +194,8 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 		vSearch.setOnClickListener(this);
 
 		vPhoto.setOnClickListener(this);
-		vOk.setOnClickListener(this);
-
+		vOk.setOnClickListener(this);		
+		
 		// 进行事件监听的添加;
 		vState.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -398,18 +398,19 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 
 	// 定义的线程——自定义的线程内容;
 	public class LoadInfoThread extends Thread {
-		private String url, param, response;
-
 		@Override
 		public void run() {
 			// 进行相应的登录操作的界面显示;
 			// 01.Http 协议中的Get和Post方法;
-			url 	  = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods";
-			param 	  = "operType=1&barcode=" + taskid;
-			response  = mGetOrPostHelper.sendGet(url, param);
-			int nFlag = MTConfigHelper.NTAG_FAIL;
-
-			if (!response.equalsIgnoreCase("fail")) {
+			String url 	  	 = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods";
+			String param 	 = "operType=1&barcode=" + taskid;
+			String response  = mGetOrPostHelper.sendGet(url, param);
+			int    nFlag 	 = MTConfigHelper.NTAG_FAIL;
+			//	发送包;
+			Message	msg		 = new Message();
+			Bundle	bundle	 = new Bundle();
+			
+			if (!response.trim().equalsIgnoreCase("fail")) {
 				nFlag = MTConfigHelper.NTAG_SUCCESS;
 				try {
 					JSONArray array = new JSONArray(response);
@@ -466,7 +467,9 @@ public class GetgoodsInformationActivity extends Activity implements OnClickList
 					nFlag = MTConfigHelper.NTAG_FAIL;
 				}
 			}
-			mHandler.sendEmptyMessage(nFlag);
+			bundle.putInt("flag", nFlag);
+			msg.setData(bundle);
+			mHandler.sendMessage(msg);
 		}
 	}
 	// TODO 修改的内容;

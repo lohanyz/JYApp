@@ -57,15 +57,15 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 						 vdtrailermodelsdely,//	拖车车型(送)(调度)
 						 vdgsingletrailernum,//	拖车(送)单车件数(国内信息)
 						 vdgsingletrailerton,//	拖车(送)单车吨数(国内信息)
-						 vsvehiclesdely	  	 //	车数(送)(仓储)						 
+						 vsvehiclesdely	  ,	 //	车数(送)(仓储)						 
+						 vdtpickupdate	 ,	//	拖车(取)提货时间(国内时间)
+						 vdtstartdate	 ,	//	拖车(取)发车时间(国内时间)
+						 vdloadingtime	 ,	//	装车时间(调度)
+						 vdgtrainstartdate ,	//	铁路发运日
+						 vdgstartdate	 	//	拖车(送)发车时间(国内信息)
 						 ;
 	
-	private Button		vdloadingtime	 ,	//	装车时间(调度)
-						vdgtrainstartdate ,	//	铁路发运日
-						vdtpickupdate	 ,	//	拖车(取)提货时间(国内时间)
-						vdtstartdate	 ,	//	拖车(取)发车时间(国内时间)
-						vdgstartdate	 ,	//	拖车(送)发车时间(国内信息)
-						vOk
+	private Button		vOk
 						 ;
 	private ProgressDialog mDialog; // 对话方框;
 	/*自定义参量*/
@@ -112,14 +112,17 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	private SQLiteDatabase 	  mDB; // 数据库件;
 	private MTGetOrPostHelper mGetOrPostHelper;
 	private UpLoadThread	  mThread;
-	
+	private MTConfigHelper	  mtConfigHelper;
 	
 	@SuppressLint("HandlerLeak")
 	Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			int nFlag = msg.what;
+			//	控制符的标签;
+			Bundle bundle= msg.getData();
+			int    nFlag = bundle.getInt("flag");
 			mDialog.dismiss();
+			
 			switch (nFlag) {
 			// 01.成功;
 			case MTConfigHelper.NTAG_SUCCESS:
@@ -135,7 +138,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 			closeThread();
 			if(nFlag==1){
 				setResult(1, mIntent);
-				    finish();                                              
+				finish();                                              
 			}
 		}
 	};
@@ -155,7 +158,6 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	}	
 	
 	private void initView(){
-		mContext =  GetgoodsAddActivity.this;
 		vBack	 =	(TextView) findViewById(R.id.btnBack);
 		vTopic	 =	(TextView) findViewById(R.id.tvTopic);
 		vFunction= 	(TextView) findViewById(R.id.btnFunction);
@@ -180,16 +182,20 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		vdgsingletrailerton=(EditText) findViewById(R.id.etDgsingletrailerton);
 		vsvehiclesdely		=(EditText) findViewById(R.id.etSvehiclesdely);
 		/*按钮触发*/
-		vdloadingtime		=(Button) findViewById(R.id.btnDloadingtime);
-		vdgtrainstartdate	=(Button) findViewById(R.id.btnDgtrainstartdate);
-		vdtpickupdate		=(Button) findViewById(R.id.btnDtpickupdate);
-		vdtstartdate		=(Button) findViewById(R.id.btnDtstartdate);
-		vdgstartdate		=(Button) findViewById(R.id.btnDgstartdate);
-		vOk				=(Button) findViewById(R.id.btnOk);
+		vdloadingtime		=(EditText) findViewById(R.id.btnDloadingtime);
+		vdgtrainstartdate	=(EditText) findViewById(R.id.btnDgtrainstartdate);
+		vdtpickupdate		=(EditText) findViewById(R.id.btnDtpickupdate);
+		vdtstartdate		=(EditText) findViewById(R.id.btnDtstartdate);
+		vdgstartdate		=(EditText) findViewById(R.id.btnDgstartdate);
+		vOk					=(Button) findViewById(R.id.btnOk);
 		 
 	}
 	
 	private void initEvent(){
+		mContext	=	GetgoodsAddActivity.this;
+		mtConfigHelper=new MTConfigHelper();
+		
+		
 		vFunction.setVisibility(View.GONE);
 		vBack.setOnClickListener(this);
 		getInfo();
@@ -207,7 +213,14 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		mDB 		  = mSqLiteHelper.getmDB();
 		wid 		  = mSpHelper.getValue(MTConfigHelper.CONFIG_SELF_WID);
 		vOk.setOnClickListener(this);
-		
+		//	检测数值型的内容信息;
+		mtConfigHelper.checkDataFormat(mContext,vdtsingletrailernum);//	拖车(取)单车件数
+		mtConfigHelper.checkDataFormat(mContext,vdtsingletrailerton);//	拖车(取)单车吨数
+		mtConfigHelper.checkDataFormat(mContext,vsvehiclescoll);	 //	车数(取)(仓储)
+		mtConfigHelper.checkDataFormat(mContext,vdgsingletrailernum);//	拖车(送)单车件数(国内信息)
+		mtConfigHelper.checkDataFormat(mContext,vdgsingletrailerton);//	拖车(送)单车吨数(国内信息)
+		mtConfigHelper.checkDataFormat(mContext,vsvehiclesdely);	 //	车数(送)(仓储)				
+		//
 	}
 	//	获取数据;
 	private void getInfo(){
@@ -263,11 +276,9 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		default:
 			break;
 		}
-		
 	}
-	
-	
-	private void setViewDate(Context mContext,final Button btn){
+
+	private void setViewDate(Context mContext,final EditText btn){
 		Builder    vBuilder   = new Builder(mContext);
 		/*布局控件*/
 		View 	   view 	  = getLayoutInflater().inflate(R.layout.activity_datatimepicker, null);
@@ -317,130 +328,103 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		vBuilder.create();
 		vBuilder.show();
 	}
-	private String setDataFormat(EditText et){
-		String data="0";
-		try {			
-			data=et.getText().toString().trim();
-			if(data.equals("")){
-				return "0";
-			}
-		} catch (Exception e) {
-			return "0";
-		}
-		return data;
-	}
-
-	private String setStringFormat(EditText et) {
-		String string="未填";
-		try {
-			string=et.getText().toString().trim();
-			if(string.equals("")){
-				return "未填";
-			}
-		} catch (Exception e) {
-			return "未填";
-		}
-		if (string.equals(""))
-			return "未填";
-		return string;
-	}
-	
-	private String setTimeFormat(Button btn){
-		String time=null;
-		try {
-			time=btn.getText().toString().trim();
-			if(!time.contains("年")){
-				return "未填";	
-			}
-		} catch (Exception e) {
-			return "未填";
-		}
-		return time;
-	}
-	
 	private void getDataInfo(){
-					
-			dttrailerno			=setStringFormat(vdttrailerno);	//	拖车(取)拖车号(国内信息)			
-			sealno				=setStringFormat(vsealno);		//	铅封号(货物信息)
-			dtsingletrailernum	=setDataFormat(vdtsingletrailernum);//	拖车(取)单车件数			
-			dtsingletrailerton	=setDataFormat(vdtsingletrailerton);//	拖车(取)单车吨数
-			svehiclescoll		=setDataFormat(vsvehiclescoll);	//	车数(取)(仓储)
-			dgtrainwagonno		=setStringFormat(vdgtrainwagonno);	//	铁路车皮号(国内信息)			
-			dgtraintype			=setStringFormat(vdgtraintype);	//	铁路车型(国内信息)
-			dgtrainwaybillno	=setStringFormat(vdgtrainwaybillno);	//	铁路运单号(国内信息)
-			dgtrainsinglenum	=setDataFormat(vdgtrainsinglenum);	//	铁路单车件数(国内信息)
-			svehiclesdely		=setDataFormat(vsvehiclesdely);
-			dgtrainsingleton	=setDataFormat(vdgtrainsingleton);	//	铁路单车吨数
-			dgtrainwagonkg		=setDataFormat(vdgtrainwagonkg);	//	铁路车皮标重
-			dgtrailerno			=setStringFormat(vdgtrailerno);	 //	拖车送拖车号(国内信息)
-			dtrailermodelsdely	=setStringFormat(vdtrailermodelsdely);//	拖车车型(送)(调度)
-			dgsingletrailernum	=setDataFormat(vdgsingletrailernum);//	拖车(送)单车件数(国内信息)
-			dgsingletrailerton	=setDataFormat(vdgsingletrailerton);//	拖车(送)单车吨数(国内信息)
-			dloadingtime		=setTimeFormat(vdloadingtime);	//	装车时间(调度)
-			dgtrainstartdate	=setTimeFormat(vdgtrainstartdate);	//	铁路发运日
-			dtpickupdate		=setTimeFormat(vdtpickupdate);	//	拖车(取)提货时间(国内时间)
-			dgstartdate			=setTimeFormat(vdgstartdate);	
-			dtstartdate			=setTimeFormat(vdtstartdate);	//	拖车(取)发车时间(国内时间)
-			Builder 	vBuilder=new Builder(mContext);
+	
+			dttrailerno			=mtConfigHelper.setStringFormat(vdttrailerno);	//	拖车(取)拖车号(国内信息)		
 			
-			
-			String 		message = "二维码:"+barcode+"\r\n";
-			if(pslkind.equals("铁路")){
-			
-				message+=
-					"铁路信息----->\r\n"+
-					"铁路车皮号:"+dgtrainwagonno+"\r\n"+//	铁路车皮号(国内信息)
-					"铁路车型:"+dgtraintype+"\r\n"+//	铁路车型(国内信息)
-					"铁路运单号:"+dgtrainwaybillno+"\r\n"+//	铁路运单号(国内信息)
-					"铁路单车件数:"+dgtrainsinglenum +"\r\n"+	//	铁路单车件数(国内信息)
-					"铁路单车吨数:"+dgtrainsingleton+"\r\n"+//	铁路单车吨数
-					"铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//	铁路车皮标重
-					"装车时间:"+dloadingtime+"\r\n"+//	装车时间(调度)
-					"铁路发运日:"+dgtrainstartdate+"\r\n";//	铁路发运日
+			sealno				=mtConfigHelper.setStringFormat(vsealno);		//	铅封号(货物信息)
+			//
+			dtsingletrailernum	=mtConfigHelper.setDataFormat(vdtsingletrailernum);//	拖车(取)单车件数			
+			//
+			dtsingletrailerton	=mtConfigHelper.setDataFormat(vdtsingletrailerton);//	拖车(取)单车吨数
+			//
+			svehiclescoll		=mtConfigHelper.setDataFormat(vsvehiclescoll);	//	车数(取)(仓储)
+			//
+			dgtrainwagonno		=mtConfigHelper.setStringFormat(vdgtrainwagonno);	//	铁路车皮号(国内信息)			
+			dgtraintype			=mtConfigHelper.setStringFormat(vdgtraintype);	//	铁路车型(国内信息)
+			dgtrainwaybillno	=mtConfigHelper.setStringFormat(vdgtrainwaybillno);	//	铁路运单号(国内信息)
+			//
+			dgtrainsinglenum	=mtConfigHelper.setDataFormat(vdgtrainsinglenum);	//	铁路单车件数(国内信息)
+			svehiclesdely		=mtConfigHelper.setDataFormat(vsvehiclesdely);
+			//
+			dgtrainsingleton	=mtConfigHelper.setDataFormat(vdgtrainsingleton);	//	铁路单车吨数
+			//
+			dgtrainwagonkg		=mtConfigHelper.setDataFormat(vdgtrainwagonkg);	//	铁路车皮标重
+			dgtrailerno			=mtConfigHelper.setStringFormat(vdgtrailerno);	 //	拖车送拖车号(国内信息)
+			dtrailermodelsdely	=mtConfigHelper.setStringFormat(vdtrailermodelsdely);//	拖车车型(送)(调度)
+			//
+			dgsingletrailernum	=mtConfigHelper.setDataFormat(vdgsingletrailernum);//	拖车(送)单车件数(国内信息)
+			//
+			dgsingletrailerton	=mtConfigHelper.setDataFormat(vdgsingletrailerton);//	拖车(送)单车吨数(国内信息)
+			dloadingtime		=mtConfigHelper.setTimeFormat(vdloadingtime);	//	装车时间(调度)
+			dgtrainstartdate	=mtConfigHelper.setTimeFormat(vdgtrainstartdate);	//	铁路发运日
+			dtpickupdate		=mtConfigHelper.setTimeFormat(vdtpickupdate);	//	拖车(取)提货时间(国内时间)
+			dgstartdate			=mtConfigHelper.setTimeFormat(vdgstartdate);	
+			dtstartdate			=mtConfigHelper.setTimeFormat(vdtstartdate);	//	拖车(取)发车时间(国内时间)
+			if(dtsingletrailernum.equals("-1")||dtsingletrailerton.equals("-1")||svehiclescoll.equals("-1")
+			   ||dgtrainsinglenum.equals("-1")||dgtrainsingleton.equals("-1")||dgtrainwagonkg.equals("-1")
+			   ||dgsingletrailernum.equals("-1")||dgsingletrailerton.equals("-1")
+			   ){
+				Toast.makeText(mContext, "输入格式不正确,请重新输入", Toast.LENGTH_SHORT).show();
+			}else{
+				Builder 	vBuilder=new Builder(mContext);
+				String 		message = "二维码:"+barcode+"\r\n";
+				if(pslkind.equals("铁路")){
 				
-			}else {
-				message+=
-					"拖车信息----->\r\n"+	
-					"拖车(取)拖车号:"+dttrailerno+"\r\n"+		//	拖车(取)拖车号(国内信息)	
-					"铅封号:"+sealno+"\r\n"+					//	铅封号(货物信息)
-					"拖车(取)单车件数:"+dtsingletrailernum+"\r\n"+//	拖车(取)单车件数
-					"拖车(取)单车吨数:"+dtsingletrailerton+"\r\n"+//	拖车(取)单车吨数
-					"车数(取):"+svehiclescoll+"\r\n"+	//	车数(取)(仓储)
+					message+=
+						"铁路信息----->\r\n"+
+						"铁路车皮号:"+dgtrainwagonno+"\r\n"+//	铁路车皮号(国内信息)
+						"铁路车型:"+dgtraintype+"\r\n"+//	铁路车型(国内信息)
+						"铁路运单号:"+dgtrainwaybillno+"\r\n"+//	铁路运单号(国内信息)
+						"铁路单车件数:"+dgtrainsinglenum +"\r\n"+	//	铁路单车件数(国内信息)
+						"铁路单车吨数:"+dgtrainsingleton+"\r\n"+//	铁路单车吨数
+						"铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//	铁路车皮标重
+						"装车时间:"+dloadingtime+"\r\n"+//	装车时间(调度)
+						"铁路发运日:\r\n"+dgtrainstartdate+"\r\n";//	铁路发运日
 					
-					"拖车(取)提货时间:"+dtpickupdate+"\r\n"+	//	拖车(取)提货时间(国内时间)
-					"拖车(取)发车时间:"+dtstartdate+"\r\n"+	//	拖车(取)发车时间(国内时间)
-					"--------------------------\r\n"+
-					"拖车(送)拖车号:"+dgtrailerno+"\r\n"+		//	拖车送拖车号(国内信息)
-					"拖车车型(送):"+dtrailermodelsdely+"\r\n"+		//	拖车车型(送)(调度)
-					"拖车(送)单车件数:"+dgsingletrailernum+"\r\n"+		//	拖车(送)单车件数(国内信息)
-					"拖车(送)单车吨数:"+dgsingletrailerton+"\r\n"+		//	拖车(送)单车吨数(国内信息)
-					"车数(送):"+svehiclesdely+"\r\n"+	//	车数(送)(仓储)
-					
-					"拖车(送)发车时间:"+dgstartdate+"\r\n";	//	拖车(送)发车时间(国内信息)
+				}else {
+					message+=
+						"拖车信息----->\r\n"+	
+						"拖车(取)拖车号:"+dttrailerno+"\r\n"+		//	拖车(取)拖车号(国内信息)	
+						"铅封号:"+sealno+"\r\n"+					//	铅封号(货物信息)
+						"拖车(取)单车件数:"+dtsingletrailernum+"\r\n"+//	拖车(取)单车件数
+						"拖车(取)单车吨数:"+dtsingletrailerton+"\r\n"+//	拖车(取)单车吨数
+						"车数(取):"+svehiclescoll+"\r\n"+	//	车数(取)(仓储)
 						
-			}
-			message+="货物状态:"+cargostatuscenter+"\r\n"+//	货物状态
-					"图:"+getImgCount(img)+"张" ;		//	图
-			vBuilder.setMessage(message);
-			vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-					if(mThread==null){
-						// 进度条的内容;
-						final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
-						final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
-						mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
-						mThread=new UpLoadThread();
-						mThread.start();
-					}
-					
+						"拖车(取)提货时间:\r\n"+dtpickupdate+"\r\n"+	//	拖车(取)提货时间(国内时间)
+						"拖车(取)发车时间:\r\n"+dtstartdate+"\r\n"+	//	拖车(取)发车时间(国内时间)
+						"--------------------------\r\n"+
+						"拖车(送)拖车号:"+dgtrailerno+"\r\n"+		//	拖车送拖车号(国内信息)
+						"拖车车型(送):"+dtrailermodelsdely+"\r\n"+		//	拖车车型(送)(调度)
+						"拖车(送)单车件数:"+dgsingletrailernum+"\r\n"+		//	拖车(送)单车件数(国内信息)
+						"拖车(送)单车吨数:"+dgsingletrailerton+"\r\n"+		//	拖车(送)单车吨数(国内信息)
+						"车数(送):"+svehiclesdely+"\r\n"+	//	车数(送)(仓储)
+						
+						"拖车(送)发车时间:\r\n"+dgstartdate+"\r\n";	//	拖车(送)发车时间(国内信息)
+							
 				}
-			});
-			vBuilder.setNegativeButton(R.string.action_no, null);
-			vBuilder.create();
-			vBuilder.show();
-
+				message+="货物状态:"+cargostatuscenter+"\r\n"+//	货物状态
+						"图:"+getImgCount(img)+"张" ;		//	图
+				vBuilder.setMessage(message);
+				vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface arg0, int arg1) {
+						if(mThread==null){
+							// 进度条的内容;
+							final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+							final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
+							mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
+							mThread=new UpLoadThread();
+							mThread.start();
+						}
+						
+					}
+				});
+				vBuilder.setNegativeButton(R.string.action_no, null);
+				vBuilder.create();
+				vBuilder.show();	
+			}
 	}
 	
 	public class UpLoadThread extends Thread {
@@ -449,8 +433,12 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 
 			// 进行相应的登录操作的界面显示;
 			// 01.Http 协议中的Get和Post方法;
-			String url  = "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
-			String param= null;
+			String  url  	= "http://" + MTConfigHelper.TAG_IP_ADDRESS + ":"+ MTConfigHelper.TAG_PORT + "/" + MTConfigHelper.TAG_PROGRAM+ "/goods2";
+			String  param	= null;
+			String  response= null;
+			int     nFlag 	= MTConfigHelper.NTAG_FAIL;
+			Message msg		= new Message();
+			Bundle	bundle	= new Bundle();
 			try {
 				param=
 				"operType=1" +
@@ -486,10 +474,9 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				e.printStackTrace();
 			}
 
-			String response = mGetOrPostHelper.sendGet(url, param);
-			int    nFlag 	= MTConfigHelper.NTAG_FAIL;
+			response 		= mGetOrPostHelper.sendGet(url, param);
 
-			if (!response.equalsIgnoreCase("fail")) {
+			if (!response.trim().equalsIgnoreCase("fail")) {
 				nFlag 	    = MTConfigHelper.NTAG_SUCCESS;
 
 				String sql=
@@ -532,7 +519,9 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 				"'"+busiinvcode+"')";		
 				mDB.execSQL(sql);
 			}
-			mHandler.sendEmptyMessage(nFlag);
+			bundle.putInt("flag", nFlag);
+			msg.setData(bundle);
+			mHandler.sendMessage(msg);
 		}
 	}	
 	private void closeThread() {

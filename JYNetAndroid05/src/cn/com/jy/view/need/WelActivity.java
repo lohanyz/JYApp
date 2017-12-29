@@ -62,8 +62,10 @@ public class WelActivity extends Activity implements OnFocusChangeListener,OnCli
 			@Override
 			public void handleMessage(Message msg) {
 				//	控制符的标签;
-				int nFlag	=	msg.what;
+				Bundle bundle= msg.getData();
+				int    nFlag = bundle.getInt("flag");
 				//	关闭对话方框;
+				
 				mDialog.dismiss();
 				//	判断标记内容; 
 				switch (nFlag) {
@@ -181,20 +183,20 @@ public class WelActivity extends Activity implements OnFocusChangeListener,OnCli
 		}
 		
 		class MyThread extends Thread{
-			private String 	url,		// 链接url;
-							param,		// 参数 			
-							response; 	// 网络回应参数;
 			@Override
 			public void run() {
 				// 进行相应的登录操作的界面显示;
-				url		 =	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/login";
-				param	 =	"operType=1&wid="+ wid + "&wpwd=" + wpwd;
-				response = 	mGetOrPostHelper.sendGet(url,param);
-
-				// 控制Handler的部分内容;
-				int nFlag= 	MTConfigHelper.NTAG_FAIL;
+				String  url		 =	"http://"+MTConfigHelper.TAG_IP_ADDRESS+":"+MTConfigHelper.TAG_PORT+"/"+MTConfigHelper.TAG_PROGRAM+"/login";
+				String  param	 =	"operType=1&wid="+ wid + "&wpwd=" + wpwd;
+				String  response = 	mGetOrPostHelper.sendGet(url,param);
+				int     nFlag	 = 	MTConfigHelper.NTAG_FAIL;
+				Message	msg		 =  new Message();
+				Bundle	bundle	 =	new Bundle();
+				// 以上是参数部分的
+				
 				// 判断种类;
-				if(!response.equalsIgnoreCase("fail")){
+				if(!response.trim().equalsIgnoreCase("fail")){
+					
 					nFlag= MTConfigHelper.NTAG_SUCCESS;
 					try {
 						JSONArray array = 	new JSONArray(response);
@@ -219,7 +221,9 @@ public class WelActivity extends Activity implements OnFocusChangeListener,OnCli
 						nFlag			=	MTConfigHelper.NTAG_FAIL;
 					}
 				}
-				mHandler.sendEmptyMessage(nFlag);
+				bundle.putInt("flag", nFlag);
+				msg.setData(bundle);
+				mHandler.sendMessage(msg);
 			}
 		}
 		private void closeThread(){

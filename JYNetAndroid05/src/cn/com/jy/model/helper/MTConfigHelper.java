@@ -3,9 +3,13 @@ package cn.com.jy.model.helper;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -43,7 +47,7 @@ public class MTConfigHelper {
 	public static final int 	NID_DB_VERSION	 =	3;
 	public static final String 	SNAME_DB	  	 =	"myDB.db";
 	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
-//	public static final String  TAG_IP_ADDRESS	 =	"172.23.123.109";
+//	public static final String  TAG_IP_ADDRESS	 =	"192.168.99.239";
 	public static final int	    TAG_PORT		 =	8080;
 	public static final String  TAG_PROGRAM		 =	"JYTest01";
 	public static final int	    TAG_COUNT_TIMEOUT=	6000;
@@ -98,15 +102,58 @@ public class MTConfigHelper {
 		long l=System.currentTimeMillis();
 		return df.format(l);
 	}
+
+	public void checkDataFormat(final Context context,final EditText et){
+		et.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+				String data =et.getText().toString().trim();
+				if(!data.equals("")){					
+					double d 	=0.0d;
+					try {					
+						d=Double.parseDouble(data);
+					} catch (Exception e) {					
+						Toast.makeText(context, "\""+data+"\"不是数字格式", Toast.LENGTH_SHORT).show();
+						Log.i("MyLog", "数据异常"+d);
+					}
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+			}
+			
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				
+			}
+		});
+	}
+	
+	
+	
+	//	数据的标准化;
 	public String setDataFormat(EditText et){
-		String data="0";
+		String data ="1";
+		double d	=0.0;
 		try {			
 			data=et.getText().toString().trim();
 			if(data.equals("")){
-				return "0";
+				return "1";
 			}
+			if(!data.equals("")){
+				try {					
+					d=Double.parseDouble(data);
+				} catch (Exception e) {
+					Log.i("MyLog", "校验:"+d);
+					return "-1";
+				}
+			}
+			
 		} catch (Exception e) {
-			return "0";
+			return "1";
 		}
 		return data;
 	}
@@ -126,6 +173,18 @@ public class MTConfigHelper {
 		return string;
 	}
 	
+	public String setTimeFormat(EditText btn){
+		String time=null;
+		try {
+			time=btn.getText().toString().trim();
+			if(!time.contains("年")){
+				return "未填";	
+			}
+		} catch (Exception e) {
+			return "未填";
+		}
+		return time;
+	}
 	public String setTimeFormat(Button btn){
 		String time=null;
 		try {

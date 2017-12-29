@@ -92,28 +92,30 @@
             android:hint="@string/dgtrainwagonkg"
             android:inputType="number" />
 
-        <Button
+        <EditText
             android:id="@+id/btnDloadingtime"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:background="@drawable/btn07"
-            android:text="@string/dloadingtime"
-            android:textColor="#ffffff"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dloadingtime"
+            android:inputType="text"
+            android:textColor="#000000"
             android:textSize="20sp" />
 
-        <Button
+        <EditText
             android:id="@+id/btnDgtrainstartdate"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:background="@drawable/btn07"
-            android:text="@string/dgtrainstartdate"
-            android:textColor="#ffffff"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dgtrainstartdate"
+            android:inputType="text"
+            android:textColor="#000000"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -191,28 +193,30 @@
                 android:hint="@string/svehiclescoll" />
         </LinearLayout>
 
-        <Button
+        <EditText
             android:id="@+id/btnDtpickupdate"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:background="@drawable/btn07"
-            android:text="@string/dtpickupdate"
-            android:textColor="#ffffff"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dtpickupdate"
+            android:inputType="text"
+            android:textColor="#000000"
             android:textSize="20sp" />
 
-        <Button
+        <EditText
             android:id="@+id/btnDtstartdate"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:background="@drawable/btn07"
-            android:text="@string/dtstartdate"
-            android:textColor="#ffffff"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dtstartdate"
+            android:inputType="text"
+            android:textColor="#000000"
             android:textSize="20sp" />
 
         <View
@@ -220,8 +224,7 @@
             android:layout_height="10dp"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:layout_marginTop="5dp"
-            />
+            android:layout_marginTop="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -278,16 +281,17 @@
                 android:hint="@string/svehiclescoll" />
         </LinearLayout>
 
-        <Button
+        <EditText
             android:id="@+id/btnDgstartdate"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:background="@drawable/btn07"
-            android:text="@string/dtstartdate"
-            android:textColor="#ffffff"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dtstartdate"
+            android:inputType="text"
+            android:textColor="#000000"
             android:textSize="20sp" />
     </LinearLayout>
 
