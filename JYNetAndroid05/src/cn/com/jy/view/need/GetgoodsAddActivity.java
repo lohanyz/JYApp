@@ -8,7 +8,6 @@ import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
-import cn.com.jy.model.helper.MTScreenHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -21,11 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
@@ -193,8 +189,6 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	private void initEvent(){
 		mContext		=	GetgoodsAddActivity.this;
 		mtConfigHelper	=	new MTConfigHelper();
-		//
-		
 		
 		vFunction.setVisibility(View.GONE);
 		vBack.setOnClickListener(this);
@@ -367,63 +361,72 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 			   ){
 				Toast.makeText(mContext, "输入格式不正确,请重新输入", Toast.LENGTH_SHORT).show();
 			}else{
-				Builder 	vBuilder=new Builder(mContext);
-				String 		message = "二维码:"+barcode+"\r\n";
-				if(pslkind.equals("铁路")){
-				
-					message+=
-						"铁路信息----->\r\n"+
-						"铁路车皮号:"+dgtrainwagonno+"\r\n"+//	铁路车皮号(国内信息)
-						"铁路车型:"+dgtraintype+"\r\n"+//	铁路车型(国内信息)
-						"铁路运单号:"+dgtrainwaybillno+"\r\n"+//	铁路运单号(国内信息)
-						"铁路单车件数:"+dgtrainsinglenum +"\r\n"+	//	铁路单车件数(国内信息)
-						"铁路单车吨数:"+dgtrainsingleton+"\r\n"+//	铁路单车吨数
-						"铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//	铁路车皮标重
-						"装车时间:"+dloadingtime+"\r\n"+//	装车时间(调度)
-						"铁路发运日:\r\n"+dgtrainstartdate+"\r\n";//	铁路发运日
+				if(dttrailerno.equals("未填")&&sealno.equals("未填")&&
+						dtsingletrailernum.equals("未填")&&dtsingletrailerton.equals("未填")&&
+						svehiclescoll.equals("未填")&&dgtrainwagonno.equals("未填")&&dgtraintype.equals("未填")&&
+						dgtrainwaybillno.equals("未填")&&dgtrainsinglenum.equals("未填")&&dgsingletrailerton.equals("未填")&&
+						dloadingtime.equals("未填")&&dgtrainstartdate.equals("未填")&&dtpickupdate.equals("未填")&&
+						dgstartdate.equals("未填")&&dtstartdate.equals("未填")){	
+					Toast.makeText(mContext, "空值请填写", Toast.LENGTH_SHORT).show();
+				}else{
+					Builder 	vBuilder=new Builder(mContext);
+					String 		message = "二维码:"+barcode+"\r\n";
+					if(pslkind.equals("铁路")){
 					
-				}else {
-					message+=
-						"拖车信息----->\r\n"+	
-						"拖车(取)拖车号:"+dttrailerno+"\r\n"+		//	拖车(取)拖车号(国内信息)	
-						"铅封号:"+sealno+"\r\n"+					//	铅封号(货物信息)
-						"拖车(取)单车件数:"+dtsingletrailernum+"\r\n"+//	拖车(取)单车件数
-						"拖车(取)单车吨数:"+dtsingletrailerton+"\r\n"+//	拖车(取)单车吨数
-						"车数(取):"+svehiclescoll+"\r\n"+	//	车数(取)(仓储)
+						message+=
+							"铁路信息----->\r\n"+
+							"铁路车皮号:"+dgtrainwagonno+"\r\n"+//	铁路车皮号(国内信息)
+							"铁路车型:"+dgtraintype+"\r\n"+//	铁路车型(国内信息)
+							"铁路运单号:"+dgtrainwaybillno+"\r\n"+//	铁路运单号(国内信息)
+							"铁路单车件数:"+dgtrainsinglenum +"\r\n"+	//	铁路单车件数(国内信息)
+							"铁路单车吨数:"+dgtrainsingleton+"\r\n"+//	铁路单车吨数
+							"铁路车皮标重:"+dgtrainwagonkg+"\r\n"+//	铁路车皮标重
+							"装车时间:"+dloadingtime+"\r\n"+//	装车时间(调度)
+							"铁路发运日:\r\n"+dgtrainstartdate+"\r\n";//	铁路发运日
 						
-						"拖车(取)提货时间:\r\n"+dtpickupdate+"\r\n"+	//	拖车(取)提货时间(国内时间)
-						"拖车(取)发车时间:\r\n"+dtstartdate+"\r\n"+	//	拖车(取)发车时间(国内时间)
-						"--------------------------\r\n"+
-						"拖车(送)拖车号:"+dgtrailerno+"\r\n"+		//	拖车送拖车号(国内信息)
-						"拖车车型(送):"+dtrailermodelsdely+"\r\n"+		//	拖车车型(送)(调度)
-						"拖车(送)单车件数:"+dgsingletrailernum+"\r\n"+		//	拖车(送)单车件数(国内信息)
-						"拖车(送)单车吨数:"+dgsingletrailerton+"\r\n"+		//	拖车(送)单车吨数(国内信息)
-						"车数(送):"+svehiclesdely+"\r\n"+	//	车数(送)(仓储)
-						
-						"拖车(送)发车时间:\r\n"+dgstartdate+"\r\n";	//	拖车(送)发车时间(国内信息)
+					}else {
+						message+=
+							"拖车信息----->\r\n"+	
+							"拖车(取)拖车号:"+dttrailerno+"\r\n"+		//	拖车(取)拖车号(国内信息)	
+							"铅封号:"+sealno+"\r\n"+					//	铅封号(货物信息)
+							"拖车(取)单车件数:"+dtsingletrailernum+"\r\n"+//	拖车(取)单车件数
+							"拖车(取)单车吨数:"+dtsingletrailerton+"\r\n"+//	拖车(取)单车吨数
+							"车数(取):"+svehiclescoll+"\r\n"+	//	车数(取)(仓储)
 							
-				}
-				message+="货物状态:"+cargostatuscenter+"\r\n"+//	货物状态
-						"图:"+getImgCount(img)+"张" ;		//	图
-				vBuilder.setMessage(message);
-				vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface arg0, int arg1) {
-						if(mThread==null){
-							// 进度条的内容;
-							final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
-							final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
-							mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
-							mThread=new UpLoadThread();
-							mThread.start();
-						}
-						
+							"拖车(取)提货时间:\r\n"+dtpickupdate+"\r\n"+	//	拖车(取)提货时间(国内时间)
+							"拖车(取)发车时间:\r\n"+dtstartdate+"\r\n"+	//	拖车(取)发车时间(国内时间)
+							"--------------------------\r\n"+
+							"拖车(送)拖车号:"+dgtrailerno+"\r\n"+		//	拖车送拖车号(国内信息)
+							"拖车车型(送):"+dtrailermodelsdely+"\r\n"+		//	拖车车型(送)(调度)
+							"拖车(送)单车件数:"+dgsingletrailernum+"\r\n"+		//	拖车(送)单车件数(国内信息)
+							"拖车(送)单车吨数:"+dgsingletrailerton+"\r\n"+		//	拖车(送)单车吨数(国内信息)
+							"车数(送):"+svehiclesdely+"\r\n"+	//	车数(送)(仓储)
+							
+							"拖车(送)发车时间:\r\n"+dgstartdate+"\r\n";	//	拖车(送)发车时间(国内信息)
+								
 					}
-				});
-				vBuilder.setNegativeButton(R.string.action_no, null);
-				vBuilder.create();
-				vBuilder.show();	
+					message+="货物状态:"+cargostatuscenter+"\r\n"+//	货物状态
+							"图:"+getImgCount(img)+"张" ;		//	图
+					vBuilder.setMessage(message);
+					vBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							if(mThread==null){
+								// 进度条的内容;
+								final CharSequence strDialogTitle = getString(R.string.tip_dialog_wait);
+								final CharSequence strDialogBody = getString(R.string.tip_dialog_done);
+								mDialog = ProgressDialog.show(mContext, strDialogTitle,strDialogBody, true);
+								mThread=new UpLoadThread();
+								mThread.start();
+							}
+							
+						}
+					});
+					vBuilder.setNegativeButton(R.string.action_no, null);
+					vBuilder.create();
+					vBuilder.show();
+				} 
 			}
 	}
 	

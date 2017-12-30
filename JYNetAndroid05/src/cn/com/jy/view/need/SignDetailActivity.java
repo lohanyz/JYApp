@@ -10,6 +10,7 @@ import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+import cn.com.jy.model.helper.MTScreenHelper;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -25,8 +26,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -70,7 +73,10 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private List<BitmapDrawable> listBD = null;
 	private ArrayList<String>    listMapName;
 	private MyThread		mThread;	 // 线程;
-	
+	/*设置内容*/
+	private Display 		  mDisplay; // 为获取屏幕宽、高
+	private Window 			  mWindow;	
+	private MTScreenHelper 	  mtScreenHelper;
 	
 	@SuppressLint("HandlerLeak")
 	Handler mHandler = new Handler() {
@@ -125,6 +131,18 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		mGetOrPostHelper=	new MTGetOrPostHelper();
 		mtFileHelper	=	new MTFileHelper();
 		mImgHelper		=	new MTImgHelper();
+		
+		//	设置内容;
+		mDisplay 		= 	getWindowManager().getDefaultDisplay();
+		mWindow			= 	getWindow(); 
+		mtScreenHelper  =	new MTScreenHelper(mDisplay, mWindow);
+		int screenWidth =   mtScreenHelper.getScreenWidth();
+		int screenHeight=   mtScreenHelper.getScreenHeight();
+		int tablewidth	=(int) (screenWidth*15f);
+		int wordsize	=(int) (screenHeight*0.07f);
+		int nImgHeight	=	screenHeight-5*wordsize;
+		
+		
 		//	控件的初始化;
 		btnFunction.setVisibility(View.GONE);
 		tvTopic.setText("签收信息详情");
@@ -144,8 +162,8 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		int 	size	=	listMapName.size();
 		
 		//	数据信息加载;
-		doLoadData(size);
-//		tvShow.setText(sResult);
+		doLoadData(size,tablewidth,wordsize);
+
 		//	提货信息路径;
 		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"sign"+File.separator+gid;
 		if(size>0){
@@ -153,7 +171,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		//	承装图片的容器;
 		listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);
 		//	设置图片适配器;
-		mGallery.setAdapter(new ImageAdaper(mContext, listBD)); 
+		mGallery.setAdapter(new ImageAdaper(mContext, listBD,nImgHeight)); 
 		//	图片长按的上传;
 		mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -185,8 +203,9 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		}
 	}
 	//	信息加载;
-	private void doLoadData(int size){
+	private void doLoadData(int size,int tablewidth,int wordsize){
 		sql		=	"select * from signinfo where _id="+_id;
+		tablewidth=wordsize*3*7;
 		mCursor	= 	mDB.rawQuery(sql, null);
 		while (mCursor.moveToNext()) {	
 			//	信息加载;
@@ -196,7 +215,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 			bid 	=	mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();
 			sResult="<html>" +
 						"<body>" +
-							"<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
+							"<table border=\"1\" style=\"width:"+tablewidth+"px;font-family:'宋体';font-size:"+wordsize+"px\">" +
 								"<tr bgcolor=\"#00FF00\" align=\"center\">" +
 									"<td>业务编号</td>"+
 									"<td>二维码</td>"+
@@ -234,11 +253,13 @@ public class SignDetailActivity extends Activity implements OnClickListener{
         private int 	mGalBackgroundItem;
         private int 	nSize;
         private List<BitmapDrawable> listBD;
+        private int 	nImgHeight;
         
-        public ImageAdaper(Context mContext,List<BitmapDrawable> list){  
+        public ImageAdaper(Context mContext,List<BitmapDrawable> list,int nImgHeight){  
             this.mContext = mContext;  
             this.listBD	  = list;
             this.nSize	  = list.size();
+            this.nImgHeight=nImgHeight;
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);  
             mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);  
             typedArray.recycle();
@@ -262,7 +283,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
             imageview.setImageDrawable(this.listBD.get(position));	            	
             
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);  
-            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));  
+            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,nImgHeight));  
             imageview.setBackgroundResource(mGalBackgroundItem);  
             notifyDataSetChanged();
             return imageview;   

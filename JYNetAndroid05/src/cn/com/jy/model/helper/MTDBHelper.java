@@ -65,7 +65,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	
 	private String sql_getgoodsinfo=
 	"create table getgoodsinfo ( " +
-	"_id integer primary key ," 		+ 		//	id编号;
+	"_id integer primary key autoincrement," + 		//	id编号;
 	"barcode 	 varchar(32) not null," +		//	二维码信息;
 	"dttrailerno varchar(32) not null," +		//	拖车(取)拖车号(国内信息)
 	
@@ -103,7 +103,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	//	港口信息的表;
 	private String sql_portinfo=
 			"create table portinfo (" +
-					"_id integer primary key ," +
+					"_id integer primary key autoincrement," +
 					"barcode 	 varchar(32) not null," +		//	二维码信息;
 					"ptoportdate 	 varchar(32) ,"+
 					"preinvoicedate_port 	 varchar(32) ,"+
@@ -130,7 +130,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	//	箱管信息的表;
 	private String sql_boxmanageinfo=
 			"create table boxmanageinfo (" +
-				"_id integer primary key ," +
+				"_id integer primary key autoincrement," +
 				"barcode 	 varchar(32) not null," +		//	二维码信息;
 				"ecarryaddress 	 varchar(32) ,"+
 				"ecarrydate 	 varchar(32) ,"+
@@ -147,7 +147,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	//	口岸信息的表;
 	private String sql_harborinfo=
 			"create table harborinfo (" +
-					"_id integer primary key ," +
+					"_id integer primary key autoincrement," +
 					"barcode 	 varchar(32) not null," +		//	二维码信息;
 					"pfactchportdate 	 varchar(32) ,"+
 					"mpackingdate 	 varchar(32) ,"+
@@ -164,7 +164,7 @@ public class MTDBHelper extends SQLiteOpenHelper {
 	//	签收信息的表;
 	private String sql_signinfo=
 			"create table signinfo ( " +
-			"_id integer 	 primary key ," + 		//	id编号;
+			"_id integer 	 primary key autoincrement," + 		//	id编号;
 			"barcode 	 	 varchar(32) not null," +		//	二维码信息;
 			"receiptdate	 varchar(32) not null," +		//	签收时间
 			"cargostatussign varchar(500) not null," +		//	货物状态

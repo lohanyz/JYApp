@@ -126,7 +126,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		int screenWidth =   mtScreenHelper.getScreenWidth();
 		int screenHeight=   mtScreenHelper.getScreenHeight();
 		int tablewidth	=(int) (screenWidth*15f);
-		int wordsize	=(int) (screenHeight*0.08f);
+		int wordsize	=(int) (screenHeight*0.07f);
 		int nImgHeight	=	screenHeight-4*wordsize;
 		
 		//	控件的初始化;
@@ -188,7 +188,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	//	信息加载;
 	private void doLoadData(int size,int tablewidth,int wordsize){
 		sql		=	"select * from getgoodsinfo where _id="+_id;
-		tablewidth=wordsize*24*10;
+		tablewidth=wordsize*24*7;
 		mCursor	= 	mDB.rawQuery(sql, null);
 		while (mCursor.moveToNext()) {	
 			gid					=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); // 二维码信息;
@@ -279,12 +279,12 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 										"<td >"+svehiclesdely+"</td>" +
 										"<td >"+dgstartdate+"</td>" +
 								 "</tr>" +
-							"</table>" +
+							"</table><br/>" +
 							"<table border=\"2\" style=\"font-family:'宋体';font-weight:bold;font-size:"+wordsize+"px\">" +
 							 "<tr>" +
 							 "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
 							 "</tr>"+
-							"</table>" +
+							"</table><br/><br/>" +
 						"</body>" +
 					"</html>"
 					;

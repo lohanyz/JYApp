@@ -1,6 +1,8 @@
 package cn.com.jy.model.helper;
 
+import android.R;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.os.Environment;
 import android.text.Editable;
@@ -131,17 +133,24 @@ public class MTConfigHelper {
 			}
 		});
 	}
-	
+	public void giveTip(Context	mContext){
+		Builder builder=new Builder(mContext);
+		builder.setTitle("提示");
+		builder.setMessage("前四个功能点尚在维护....");
+		builder.setNegativeButton(R.string.no, null);
+		builder.create();
+		builder.show();
+	}
 	
 	
 	//	数据的标准化;
 	public String setDataFormat(EditText et){
-		String data ="1";
+		String data ="未填";
 		double d	=0.0;
 		try {			
 			data=et.getText().toString().trim();
 			if(data.equals("")){
-				return "1";
+				return "未填";
 			}
 			if(!data.equals("")){
 				try {					
@@ -153,7 +162,7 @@ public class MTConfigHelper {
 			}
 			
 		} catch (Exception e) {
-			return "1";
+			return "未填";
 		}
 		return data;
 	}
