@@ -9,6 +9,7 @@ import cn.com.jy.model.helper.MTFileHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTImgHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+import cn.com.jy.model.helper.MTScreenHelper;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -23,8 +24,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -68,7 +71,11 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	private List<BitmapDrawable> listBD = null;// 承装图片的列表;
 	private ArrayList<String>    listMapName;  // 承装文件夹的列表;
 	private MyThread			 mThread;	   // 线程;
-	
+	/*设置内容*/
+	private Display 		  mDisplay; // 为获取屏幕宽、高
+	private Window 			  mWindow;	
+	private MTScreenHelper 	  mtScreenHelper;
+
 	@SuppressLint("HandlerLeak")
 	Handler mHandler = new Handler() {
 		@Override
@@ -112,13 +119,23 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		mGetOrPostHelper=	new MTGetOrPostHelper();
 		mtFileHelper	= 	new MTFileHelper();
 		mImgHelper		=	new MTImgHelper();
+		//	设置内容;
+		mDisplay 		= 	getWindowManager().getDefaultDisplay();
+		mWindow			= 	getWindow(); 
+		mtScreenHelper  =	new MTScreenHelper(mDisplay, mWindow);
+		int screenWidth =   mtScreenHelper.getScreenWidth();
+		int screenHeight=   mtScreenHelper.getScreenHeight();
+		int tablewidth	=(int) (screenWidth*15f);
+		int wordsize	=(int) (screenHeight*0.08f);
+		int nImgHeight	=	screenHeight-4*wordsize;
+		
 		//	控件的初始化;
 		btnFunction.setVisibility(View.GONE);
 		tvTopic.setText("提货信息详情");
 		//	获取id;
 		Intent	mIntent =	getIntent();
 		Bundle	mBundle =	mIntent.getExtras();
-		_id			=	mBundle.getString("_id");
+		_id				=	mBundle.getString("_id");
 		imgs			=	mBundle.getString("imgs");
 		//	数据库加载;
 		mSqLiteHelper	=	new MTSQLiteHelper(mContext);
@@ -129,13 +146,13 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 		listMapName		=	mtFileHelper.getFileNamesByList(imgs,"_");
 		int size		=	listMapName.size();
 		//	数据信息加载;
-		doLoadData(size);
+		doLoadData(size,tablewidth,wordsize);
 		//	提货信息路径;
-		folderPath	=	mConfigHelper.getfParentPath()+bid+File.separator+"ggoods"+File.separator+gid;
+		folderPath		=	mConfigHelper.getfParentPath()+bid+File.separator+"ggoods"+File.separator+gid;
 		//	承装图片的容器;
 		if(size>0){
 			listBD		=	mImgHelper.getBitmap01_2(folderPath, imgs);
-			mGallery.setAdapter(new ImageAdaper(mContext, listBD)); 
+			mGallery.setAdapter(new ImageAdaper(mContext, listBD,nImgHeight)); 
 			
 			//	图片长按的上传;
 			mGallery.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -169,60 +186,46 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 	}
 
 	//	信息加载;
-	private void doLoadData(int size){
+	private void doLoadData(int size,int tablewidth,int wordsize){
 		sql		=	"select * from getgoodsinfo where _id="+_id;
+		tablewidth=wordsize*24*10;
 		mCursor	= 	mDB.rawQuery(sql, null);
 		while (mCursor.moveToNext()) {	
-			gid=mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); // 二维码信息;
-			String dttrailerno=mCursor.getString(mCursor.getColumnIndex("dttrailerno")).toString(); // 拖车(取)拖车号(国内信息)
+			gid					=	mCursor.getString(mCursor.getColumnIndex("barcode")).toString(); // 二维码信息;
+			String dttrailerno	=	mCursor.getString(mCursor.getColumnIndex("dttrailerno")).toString(); // 拖车(取)拖车号(国内信息)
 
-			String sealno=mCursor.getString(mCursor.getColumnIndex("sealno")).toString(); // 铅封号(货物信息)
+			String sealno		=	mCursor.getString(mCursor.getColumnIndex("sealno")).toString(); // 铅封号(货物信息)
 
-			String dtsingletrailernum=mCursor.getString(mCursor.getColumnIndex("dtsingletrailernum"))
-					.toString(); // 拖车(取)单车件数
-			String dtsingletrailerton=mCursor.getString(mCursor.getColumnIndex("dtsingletrailerton"))
-					.toString(); // 拖车(取)单车吨数
-			String svehiclescoll=mCursor.getString(mCursor.getColumnIndex("svehiclescoll"))
-					.toString(); // 车数(取)(仓储)
+			String dtsingletrailernum	=	mCursor.getString(mCursor.getColumnIndex("dtsingletrailernum")).toString(); // 拖车(取)单车件数
+			String dtsingletrailerton	=	mCursor.getString(mCursor.getColumnIndex("dtsingletrailerton")).toString(); // 拖车(取)单车吨数
+			String svehiclescoll		=	mCursor.getString(mCursor.getColumnIndex("svehiclescoll")).toString(); // 车数(取)(仓储)
 
-			String dtpickupdate=mCursor.getString(mCursor.getColumnIndex("dtpickupdate"))
-					.toString(); // 拖车(取)提货时间(国内时间)
-			String dtstartdate=mCursor.getString(mCursor.getColumnIndex("dtstartdate")).toString(); // 拖车(取)发车时间(国内时间)
-			String dgtrainwagonno=mCursor.getString(mCursor.getColumnIndex("dgtrainwagonno"))
-					.toString(); // 铁路车皮号(国内信息)
-			String dgtraintype=mCursor.getString(mCursor.getColumnIndex("dgtraintype")).toString(); // 铁路车型(国内信息)
-			String dgtrainwaybillno=mCursor.getString(mCursor.getColumnIndex("dgtrainwaybillno"))
-					.toString(); // 铁路运单号(国内信息)
-			String dgtrainsinglenum=mCursor.getString(mCursor.getColumnIndex("dgtrainsinglenum"))
-					.toString(); // 铁路单车件数(国内信息)
-			String cargostatuscenter=mCursor.getString(mCursor.getColumnIndex("cargostatuscenter"))
-					.toString(); // 货物状态
-			String dgtrainsingleton=mCursor.getString(mCursor.getColumnIndex("dgtrainsingleton"))
-					.toString(); // 铁路单车吨数
-			String dgtrainwagonkg=mCursor.getString(mCursor.getColumnIndex("dgtrainwagonkg"))
-					.toString(); // 铁路车皮标重
-			String dloadingtime=mCursor.getString(mCursor.getColumnIndex("dloadingtime"))
-					.toString(); // 装车时间(调度)
-			String dgtrainstartdate=mCursor.getString(mCursor.getColumnIndex("dgtrainstartdate"))
-					.toString(); // 铁路发运日
-			String dgtrailerno=mCursor.getString(mCursor.getColumnIndex("dgtrailerno")).toString(); // 拖车送拖车号(国内信息)
-			String dtrailermodelsdely=mCursor.getString(mCursor.getColumnIndex("dtrailermodelsdely"))
-					.toString(); // 拖车车型(送)(调度)
-			String dgsingletrailernum=mCursor.getString(mCursor.getColumnIndex("dgsingletrailernum"))
-					.toString(); // 拖车(送)单车件数(国内信息)
-			String dgsingletrailerton=mCursor.getString(mCursor.getColumnIndex("dgsingletrailerton"))
-					.toString(); // 拖车(送)单车吨数(国内信息)
-			String svehiclesdely=mCursor.getString(mCursor.getColumnIndex("svehiclesdely"))
-					.toString(); // 车数(送)(仓储)
+			String dtpickupdate =	mCursor.getString(mCursor.getColumnIndex("dtpickupdate")).toString(); // 拖车(取)提货时间(国内时间)
+			String dtstartdate	=	mCursor.getString(mCursor.getColumnIndex("dtstartdate")).toString(); // 拖车(取)发车时间(国内时间)
+			String dgtrainwagonno=	mCursor.getString(mCursor.getColumnIndex("dgtrainwagonno")).toString(); // 铁路车皮号(国内信息)
+			String dgtraintype	=	mCursor.getString(mCursor.getColumnIndex("dgtraintype")).toString(); // 铁路车型(国内信息)
+			String dgtrainwaybillno=mCursor.getString(mCursor.getColumnIndex("dgtrainwaybillno")).toString(); // 铁路运单号(国内信息)
+			String dgtrainsinglenum=mCursor.getString(mCursor.getColumnIndex("dgtrainsinglenum")).toString(); // 铁路单车件数(国内信息)
+			String cargostatuscenter=mCursor.getString(mCursor.getColumnIndex("cargostatuscenter")).toString(); // 货物状态
+			
+			String dgtrainsingleton	=mCursor.getString(mCursor.getColumnIndex("dgtrainsingleton")).toString(); // 铁路单车吨数
+			String dgtrainwagonkg	=mCursor.getString(mCursor.getColumnIndex("dgtrainwagonkg")).toString(); // 铁路车皮标重
+			String dloadingtime		=mCursor.getString(mCursor.getColumnIndex("dloadingtime")).toString(); // 装车时间(调度)
+			String dgtrainstartdate =mCursor.getString(mCursor.getColumnIndex("dgtrainstartdate")).toString(); // 铁路发运日
+			String dgtrailerno		=mCursor.getString(mCursor.getColumnIndex("dgtrailerno")).toString(); // 拖车送拖车号(国内信息)
+			String dtrailermodelsdely=mCursor.getString(mCursor.getColumnIndex("dtrailermodelsdely")).toString(); // 拖车车型(送)(调度)
+			String dgsingletrailernum=mCursor.getString(mCursor.getColumnIndex("dgsingletrailernum")).toString(); // 拖车(送)单车件数(国内信息)
+			String dgsingletrailerton=mCursor.getString(mCursor.getColumnIndex("dgsingletrailerton")).toString(); // 拖车(送)单车吨数(国内信息)
+			String svehiclesdely	 =mCursor.getString(mCursor.getColumnIndex("svehiclesdely")).toString(); // 车数(送)(仓储)
 
-			String dgstartdate=mCursor.getString(mCursor.getColumnIndex("dgstartdate")).toString(); // 拖车(送)发车时间(国内信息)
+			String dgstartdate		 =mCursor.getString(mCursor.getColumnIndex("dgstartdate")).toString(); // 拖车(送)发车时间(国内信息)
 			// mCursor.getString(mCursor.getColumnIndex("img 	 			 varchar(1000) not null,"
 			// + // 图片
 			bid=mCursor.getString(mCursor.getColumnIndex("busiinvcode")).toString();		
 			
 			sResult="<html>" +
 						"<body>" +
-							"<table border=\"1\" style=\"width:2000px;font-family:'宋体';font-size:20px\">" +
+							"<table border=\"2\" style=\"width:"+tablewidth+"px;font-family:'宋体';font-weight:bold;font-size:"+wordsize+"px\">" +
 						"<tr bgcolor=\"#00FF00\" align=\"center\">" +
 							"<td >业务编号</td>" +
 							"<td >条码信息</td>" +
@@ -277,7 +280,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
 										"<td >"+dgstartdate+"</td>" +
 								 "</tr>" +
 							"</table>" +
-							"<table border=\"1\" style=\"font-family:'宋体';font-size:20px\">" +
+							"<table border=\"2\" style=\"font-family:'宋体';font-weight:bold;font-size:"+wordsize+"px\">" +
 							 "<tr>" +
 							 "<td align=\"center\" bgcolor=\"#00FF00\">图片</td><td align=\"center\">"+size+"张</td>" +
 							 "</tr>"+
@@ -299,11 +302,13 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
         private int 	mGalBackgroundItem;
         private int 	nSize;
         private List<BitmapDrawable> listBD;
+        private int 	nImgHeight;
         
-        public ImageAdaper(Context mContext,List<BitmapDrawable> list){  
+        public ImageAdaper(Context mContext,List<BitmapDrawable> list,int nImgHeight){  
             this.mContext = mContext;  
             this.listBD	  = list;
             this.nSize	  = list.size();
+            this.nImgHeight=nImgHeight;
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);  
             mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);  
             typedArray.recycle();
@@ -327,7 +332,7 @@ public class GetgoodsDetailActivity extends Activity implements OnClickListener{
             imageview.setImageDrawable(listBD.get(position));	            	
             
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);  
-            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,400));  
+            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,nImgHeight));  
             imageview.setBackgroundResource(mGalBackgroundItem);  
             notifyDataSetChanged();
             return imageview;   

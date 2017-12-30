@@ -8,6 +8,7 @@ import cn.com.jy.activity.R;
 import cn.com.jy.model.helper.MTConfigHelper;
 import cn.com.jy.model.helper.MTGetOrPostHelper;
 import cn.com.jy.model.helper.MTSQLiteHelper;
+import cn.com.jy.model.helper.MTScreenHelper;
 import cn.com.jy.model.helper.MTSharedpreferenceHelper;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,8 +21,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
@@ -113,6 +117,7 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	private MTGetOrPostHelper mGetOrPostHelper;
 	private UpLoadThread	  mThread;
 	private MTConfigHelper	  mtConfigHelper;
+	/*设置屏幕类型*/
 	
 	@SuppressLint("HandlerLeak")
 	Handler mHandler = new Handler() {
@@ -151,12 +156,6 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 		checkView();
 	}
 	
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-	}	
-	
 	private void initView(){
 		vBack	 =	(TextView) findViewById(R.id.btnBack);
 		vTopic	 =	(TextView) findViewById(R.id.tvTopic);
@@ -192,8 +191,9 @@ public class GetgoodsAddActivity extends Activity implements OnClickListener{
 	}
 	
 	private void initEvent(){
-		mContext	=	GetgoodsAddActivity.this;
-		mtConfigHelper=new MTConfigHelper();
+		mContext		=	GetgoodsAddActivity.this;
+		mtConfigHelper	=	new MTConfigHelper();
+		//
 		
 		
 		vFunction.setVisibility(View.GONE);
