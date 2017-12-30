@@ -224,6 +224,8 @@ public class SignInformationActivity extends Activity implements OnClickListener
 							String tmp=edit.getText().toString().trim();
 							if(!tmp.equals("")){								
 								state=tmp;	
+							}else if(tmp.equals("")){
+								state="异常";
 							}
 						}
 					});
@@ -393,7 +395,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 					mBuilder=	new Builder(mContext);
 					mBuilder.setTitle("信息确认");
 					sSize		=	String.valueOf(mtFileHelper.getListfiles().size());
-					String sContent="状态:"+state+"\r\n图片张数:"+sSize;
+					String sContent="二维码号:"+bid+"\r\n状态:"+state+"\r\n图片张数:"+sSize;
 					mBuilder.setMessage(sContent);
 					mBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 						
@@ -418,6 +420,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 			}else if(operkind.equals(TAG_MANUAL)){
 				String tmp=etSearch.getText().toString().trim();
 				if(!tmp.equals("")){
+					bid=gid=tmp;
 //					图片;
 					simg = mtFileHelper.getFileNamesByStrs(mtFileHelper.getListfiles(),"_");
 					if (simg.equals("")) simg = "未拍照";
@@ -425,7 +428,7 @@ public class SignInformationActivity extends Activity implements OnClickListener
 					mBuilder=	new Builder(mContext);
 					mBuilder.setTitle("信息确认");
 					sSize		=	String.valueOf(mtFileHelper.getListfiles().size());
-					String sContent="状态:"+state+"\r\n图片张数:"+sSize;
+					String sContent="二维码号:"+bid+"\r\n状态:"+state+"\r\n图片张数:"+sSize;
 					mBuilder.setMessage(sContent);
 					mBuilder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 						

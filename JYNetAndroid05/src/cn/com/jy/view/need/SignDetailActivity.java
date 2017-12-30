@@ -206,6 +206,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 	private void doLoadData(int size,int tablewidth,int wordsize){
 		sql		=	"select * from signinfo where _id="+_id;
 		tablewidth=wordsize*3*7;
+		wordsize=(int) (wordsize/1.5);
 		mCursor	= 	mDB.rawQuery(sql, null);
 		while (mCursor.moveToNext()) {	
 			//	信息加载;
