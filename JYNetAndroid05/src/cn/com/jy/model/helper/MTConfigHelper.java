@@ -48,8 +48,10 @@ public class MTConfigHelper {
 	//	数据库管理;
 	public static final int 	NID_DB_VERSION	 =	3;
 	public static final String 	SNAME_DB	  	 =	"myDB.db";
-	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
+	public static final String  TAG_IP_ADDRESS	 =	"210.12.45.200";
+//	public static final String  TAG_IP_ADDRESS	 =	"39.106.70.111";
 //	public static final String  TAG_IP_ADDRESS	 =	"192.168.99.239";
+//	http://210.12.45.200:8080/JYTest01/
 	public static final int	    TAG_PORT		 =	8080;
 	public static final String  TAG_PROGRAM		 =	"JYTest01";
 	public static final int	    TAG_COUNT_TIMEOUT=	6000;

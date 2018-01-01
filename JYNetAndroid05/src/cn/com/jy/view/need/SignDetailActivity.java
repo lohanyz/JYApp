@@ -25,7 +25,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,8 +139,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		int screenHeight=   mtScreenHelper.getScreenHeight();
 		int tablewidth	=(int) (screenWidth*15f);
 		int wordsize	=(int) (screenHeight*0.07f);
-		int nImgHeight	=	screenHeight-5*wordsize;
-		
+		int nImgHeight	=	(int) ((screenHeight-4*wordsize)*0.6);
 		
 		//	控件的初始化;
 		btnFunction.setVisibility(View.GONE);
@@ -152,7 +150,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 		Bundle	mBundle =	mIntent.getExtras();
 		_id				=	mBundle.getString("_id");
 		imgs				=	mBundle.getString("imgs");
-		Log.i("MyLog", "info="+imgs);
+//		Log.i("MyLog", "info="+imgs);
 		//	数据库加载;
 		mSqLiteHelper	=	new MTSQLiteHelper(mContext);
 		mDB 			= 	mSqLiteHelper.getmDB();
@@ -217,7 +215,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 			sResult="<html>" +
 						"<body>" +
 							"<table border=\"1\" style=\"width:"+tablewidth+"px;font-family:'宋体';font-size:"+wordsize+"px\">" +
-								"<tr bgcolor=\"#00FF00\" align=\"center\">" +
+								"<tr bgcolor=\"#00FF00\" align=\"center\" style=\"font-weight:bold;\">" +
 									"<td>业务编号</td>"+
 									"<td>二维码</td>"+
 									"<td>签收时间</td>"+
@@ -227,14 +225,14 @@ public class SignDetailActivity extends Activity implements OnClickListener{
 									"<td>"+gid+"</td>" +
 									"<td>"+receiptdate+"</td>" +
 								"</tr>"+
-								"<tr align=\"center\">" +
-									"<td colspan=\"3\">状态</td>" +
+								"<tr align=\"center\" bgcolor=\"#00FF00\">" +
+									"<td colspan=\"3\" style=\"font-weight:bold;\">状态</td>" +
 								"</tr>"+
 								"<tr align=\"center\">" +
 									"<td colspan=\"3\">"+cargostatussign+"</td>" +
 								"</tr>"+
 								"<tr align=\"center\">" +
-									"<td >图片</td>" +
+									"<td bgcolor=\"#00FF00\" style=\"font-weight:bold;\">图片</td>" +
 									"<td colspan=\"2\">"+size+"张</td>" +
 								"</tr>"+
 							"</table>"+
@@ -254,6 +252,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
         private int 	mGalBackgroundItem;
         private int 	nSize;
         private List<BitmapDrawable> listBD;
+        private int 	nImgWidth;
         private int 	nImgHeight;
         
         public ImageAdaper(Context mContext,List<BitmapDrawable> list,int nImgHeight){  
@@ -261,6 +260,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
             this.listBD	  = list;
             this.nSize	  = list.size();
             this.nImgHeight=nImgHeight;
+            this.nImgWidth=this.nImgHeight;
             TypedArray typedArray = obtainStyledAttributes(R.styleable.Gallery);  
             mGalBackgroundItem 	  = typedArray.getResourceId( R.styleable.Gallery_android_galleryItemBackground, 0);  
             typedArray.recycle();
@@ -284,7 +284,7 @@ public class SignDetailActivity extends Activity implements OnClickListener{
             imageview.setImageDrawable(this.listBD.get(position));	            	
             
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);  
-            imageview.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,nImgHeight));  
+            imageview.setLayoutParams(new Gallery.LayoutParams(nImgWidth,nImgHeight));  
             imageview.setBackgroundResource(mGalBackgroundItem);  
             notifyDataSetChanged();
             return imageview;   
